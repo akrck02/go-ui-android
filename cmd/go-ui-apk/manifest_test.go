@@ -10,7 +10,7 @@ import (
 
 func TestTheManifestNamesTheProgramAndItsLibrary(t *testing.T) {
 	app := application{Name: `Tides & "Winds"`, ID: "io.example.tides", VersionCode: 3, VersionName: "1.2",
-		MinimumSDK: 26, TargetSDK: 34, Icon: "icon.png", Debuggable: true}
+		MinimumSDK: 26, TargetSDK: 34, Icon: "icon.png", Debuggable: true, Notifications: true}
 	manifest, err := app.manifest()
 	if err != nil {
 		t.Fatal(err)
@@ -20,7 +20,8 @@ func TestTheManifestNamesTheProgramAndItsLibrary(t *testing.T) {
 	}
 	for _, wanted := range []string{`package="io.example.tides"`, `android:versionCode="3"`,
 		`android:label="Tides &amp; &quot;Winds&quot;"`, `android:value="main"`, `android:icon="@mipmap/icon"`,
-		`android:debuggable="true"`, `android:hasCode="false"`} {
+		`android:debuggable="true"`, `android:hasCode="false"`, `android.permission.POST_NOTIFICATIONS`,
+		`adjustResize`} {
 		if !strings.Contains(string(manifest), wanted) {
 			t.Fatalf("the manifest has no %s:\n%s", wanted, manifest)
 		}
@@ -30,7 +31,8 @@ func TestTheManifestNamesTheProgramAndItsLibrary(t *testing.T) {
 func TestAPlainBuildLeavesOutTheIconAndDebugging(t *testing.T) {
 	app := application{Name: "Tides", ID: "io.example.tides", VersionCode: 1, VersionName: "1.0", MinimumSDK: 26, TargetSDK: 34}
 	manifest, _ := app.manifest()
-	if strings.Contains(string(manifest), "android:icon") || strings.Contains(string(manifest), "debuggable") {
+	if strings.Contains(string(manifest), "android:icon") || strings.Contains(string(manifest), "debuggable") ||
+		strings.Contains(string(manifest), "POST_NOTIFICATIONS") {
 		t.Fatalf("an icon or debugging that was not asked for:\n%s", manifest)
 	}
 }

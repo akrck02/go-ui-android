@@ -22,6 +22,7 @@ import (
 // The screens of the navigation bar.
 const (
 	piecesScreen = iota
+	formsScreen
 	listScreen
 	stickScreen
 )
@@ -41,6 +42,15 @@ type gallery struct {
 	view        int
 	lighthouses []lighthouse
 	added       int
+
+	// the forms screen
+	search, name, reach string
+	formTab, kind       int
+	nightly             bool
+	progress            float32
+	dialogShown         bool
+	sheetShown          bool
+	snackbar            material.Snackbar
 
 	stick    material.Stick
 	boatX    float32 // the boat's place in the bay, from 0 to 1 across and down
@@ -74,8 +84,9 @@ func (program *gallery) build(context *ui.Context) {
 	scheme := material.System(dark) // the wallpaper's colours on Android 12 and later
 	context.Theme = scheme.Theme(dark)
 	look := material.New(context, scheme)
-	places := []material.Destination{{Icon: "layout-grid", Label: "Pieces"}, {Icon: "list", Label: "List"},
-		{Icon: "gamepad-2", Label: "Stick"}}
+	places := []material.Destination{{Icon: "layout-grid", Label: "Pieces"}, {Icon: "text-cursor-input", Label: "Forms"},
+		{Icon: "list", Label: "List", Badge: program.darkCount()}, {Icon: "gamepad-2", Label: "Stick"}}
+	defer program.layers(look, look.Wide())
 	// on its side, a phone has more width than height to spare: the destinations go down a rail
 	if look.Wide() {
 		context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func() {
@@ -95,6 +106,8 @@ func (program *gallery) show(look material.Look) {
 	switch program.screen {
 	case piecesScreen:
 		program.pieces(look)
+	case formsScreen:
+		program.forms(look)
 	case listScreen:
 		program.list(look)
 	default:
@@ -169,7 +182,7 @@ func (program *gallery) list(look material.Look) {
 		})
 	})
 	context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.Pad(16), AlignX: ui.End}, func() {
-		if look.FloatingButton("plus") {
+		if look.ExtendedFloatingButton("plus", "New light") {
 			program.added++
 			program.lighthouses = append(program.lighthouses, lighthouse{name: fmt.Sprintf("New light %d", program.added), place: "Not placed yet"})
 		}
@@ -225,4 +238,125 @@ func row(context *ui.Context, content func()) {
 
 func clamp(value, minimum, maximum float32) float32 {
 	return min(max(value, minimum), maximum)
+}
+
+// darkCount is the list's badge: how many lighthouses are dark, none when all are lit.
+func (program *gallery) darkCount() string {
+	dark := 0
+	for _, light := range program.lighthouses {
+		if !light.lit {
+			dark++
+		}
+	}
+	if dark == 0 {
+		return ""
+	}
+	return fmt.Sprint(dark)
+}
+
+// forms shows the fields and choices, and opens a dialog, a sheet, a note and a notification.
+func (program *gallery) forms(look material.Look) {
+	context := look.Context
+	look.TopAppBar(material.TopBar{Title: "Forms", Subtitle: "Fields, choices and what goes over the screen", Large: true})
+	context.ScrollArea("forms", ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow()}, func() {
+		context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.PadXY(16, 8), Gap: 16}, func() {
+			look.SearchBar("search", &program.search, "Search the lighthouses")
+			look.Tabs("form tabs", []string{"Details", "Watch"}, &program.formTab)
+			if program.formTab == 0 {
+				program.details(look)
+			} else {
+				program.watch(look)
+			}
+			look.SectionTitle("Over the screen")
+			context.Box(ui.Layout{Width: ui.Grow(), Gap: 8, Wrap: true}, func() {
+				if look.TonalButton("message-square", "Dialog") {
+					program.dialogShown = true
+				}
+				if look.TonalButton("panel-bottom", "Sheet") {
+					program.sheetShown = true
+				}
+				if look.TonalButton("info", "Snackbar") {
+					program.snackbar.Show("Harbour Light switched off", "Undo", 6*time.Second)
+				}
+				if look.TonalButton("bell", "Notification") {
+					program.notify()
+				}
+			})
+			context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(24)}, nil)
+		})
+	})
+}
+
+func (program *gallery) details(look material.Look) {
+	reachError := ""
+	for _, character := range program.reach {
+		if character < '0' || character > '9' {
+			reachError = "Nautical miles, in digits"
+			break
+		}
+	}
+	look.TextField("name", &program.name, material.Field{Label: "Name", Placeholder: "Harbour Light", Supporting: "As the chart writes it"})
+	look.TextField("reach", &program.reach, material.Field{Label: "Reach", Placeholder: "18", Supporting: "In nautical miles", Error: reachError, MaxLength: 3})
+	look.Checkbox("Lit every night", &program.nightly)
+	for index, kind := range []string{"Fixed light", "Flashing", "Occulting"} {
+		if look.RadioButton(kind, index == program.kind) {
+			program.kind = index
+		}
+	}
+}
+
+func (program *gallery) watch(look material.Look) {
+	scheme := look.Scheme
+	look.Text("Keeper's round", 16, draw2d.Medium, scheme.OnSurface)
+	look.LinearProgress(program.progress)
+	look.Context.SliderStep("round", &program.progress, 0, 1, 0.05)
+	look.Text("Waiting for the weather", 16, draw2d.Medium, scheme.OnSurface)
+	look.LinearProgress(-1)
+}
+
+// notify sends a notification, asking first where the phone wants it allowed.
+func (program *gallery) notify() {
+	if !window.NotificationsAllowed() {
+		window.AskForNotifications()
+		program.snackbar.Show("Allow notifications, then touch again", "", 4*time.Second)
+		return
+	}
+	if window.Notify(1, "Harbour Light", "Lit for the night, reaching 18 miles") {
+		program.snackbar.Show("Notification sent: look at the shade", "", 4*time.Second)
+		return
+	}
+	program.snackbar.Show("Notifications are not shown here", "", 4*time.Second)
+}
+
+// layers draws what goes over the screen: the dialog, the sheet and the note.
+func (program *gallery) layers(look material.Look, wide bool) {
+	if program.dialogShown {
+		answer := look.Dialog("switch off", material.Dialog{Icon: "lightbulb-off", Title: "Switch every light off?",
+			Text: "Ships will not see the coast until they are lit again.", Confirm: "Switch off", Dismiss: "Cancel"})
+		if answer == material.Confirmed {
+			for index := range program.lighthouses {
+				program.lighthouses[index].lit = false
+			}
+			program.snackbar.Show("Every light is off", "Undo", 6*time.Second)
+		}
+		program.dialogShown = answer == material.Open
+	}
+	if program.sheetShown && look.BottomSheet("actions", func() {
+		look.ListItem("share", material.Item{Icon: "share-2", Headline: "Share the chart"})
+		look.ListItem("copy", material.Item{Icon: "copy", Headline: "Copy the position"})
+		if look.ListItem("close", material.Item{Icon: "x", Headline: "Close"}) {
+			program.sheetShown = false
+		}
+	}) {
+		program.sheetShown = false
+	}
+	program.snackbar.Above = material.NavigationBarHeight
+	if wide {
+		program.snackbar.Above = 0
+	}
+	if look.Snackbar(&program.snackbar) {
+		for index := range program.lighthouses {
+			program.lighthouses[index].lit = true
+		}
+	}
 }

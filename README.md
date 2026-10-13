@@ -26,6 +26,7 @@ adb install lighthouses.apk
 <img src="docs/images/pieces-wallpaper.png" width="240" alt="The gallery's pieces in the colours of the phone's wallpaper">
 <img src="docs/images/list.png" width="240" alt="A list with switches and a floating button, in Material's own colours">
 <img src="docs/images/stick.png" width="240" alt="An on-screen stick sailing a boat across a bay">
+<img src="docs/images/forms-keyboard.png" width="240" alt="A text field typed in with the phone's on-screen keyboard">
 </p>
 
 Start with [the docs](docs/README.md). `go run ./cmd/gallery` shows every piece.

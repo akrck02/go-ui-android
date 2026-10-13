@@ -18,7 +18,10 @@ type application struct {
 	TargetSDK   int
 	Icon        string // a PNG file, or empty for Android's default icon
 	Debuggable  bool
-	Package     string // the Go package to build
+	// Notifications names the permission Android 13 and later ask the person for before the
+	// program's notifications show.
+	Notifications bool
+	Package       string // the Go package to build
 }
 
 // libraryName is the shared library's name in the package (libmain.so), which the manifest names.
@@ -44,17 +47,21 @@ func (app application) check() error {
 }
 
 // The manifest: Android's NativeActivity runs the program's library, with no Java (hasCode false).
-// The activity keeps running through rotations and theme changes, which the program follows itself.
+// The activity keeps running through rotations and theme changes, which the program follows itself,
+// and the on-screen keyboard shrinks the window rather than covering what is typed in.
 var manifestTemplate = template.Must(template.New("manifest").Funcs(template.FuncMap{"xml": escapeXML}).Parse(
 	`<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="{{.ID}}" android:versionCode="{{.VersionCode}}" android:versionName="{{xml .VersionName}}">
   <uses-sdk android:minSdkVersion="{{.MinimumSDK}}" android:targetSdkVersion="{{.TargetSDK}}" />
+  {{- if .Notifications}}
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  {{- end}}
   <application android:label="{{xml .Name}}" android:hasCode="false" android:theme="@style/WindowTheme"
       {{- if .Icon}} android:icon="@mipmap/icon"{{end}}{{if .Debuggable}} android:debuggable="true"{{end}}>
     <activity android:name="android.app.NativeActivity" android:label="{{xml .Name}}"
         android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|density"
-        android:exported="true">
+        android:windowSoftInputMode="adjustResize" android:exported="true">
       <meta-data android:name="android.app.lib_name" android:value="` + libraryName + `" />
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />

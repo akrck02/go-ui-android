@@ -71,7 +71,7 @@ func TestASwitchFlipsWhenTouched(t *testing.T) {
 
 func TestTheNavigationBarGoesWhereItIsTouched(t *testing.T) {
 	selected, changes := 0, 0
-	places := []Destination{{"home", "Home"}, {"map", "Map"}, {"settings", "Settings"}}
+	places := []Destination{{Icon: "home", Label: "Home"}, {Icon: "map", Label: "Map"}, {Icon: "settings", Label: "Settings"}}
 	screen := newScreen(t, func(look Look) {
 		if look.NavigationBar(places, &selected) {
 			changes++
@@ -92,7 +92,7 @@ func TestBarsReachUnderTheSystemsBars(t *testing.T) {
 			look.TopAppBar(TopBar{Title: "Inbox"})
 			look.Context.Spacer()
 			selected := 0
-			look.NavigationBar([]Destination{{"home", "Home"}}, &selected)
+			look.NavigationBar([]Destination{{Icon: "home", Label: "Home"}}, &selected)
 		})
 	})
 	screen.context.SetInsets(ui.Insets{Top: 24, Bottom: 48})
@@ -256,7 +256,7 @@ func TestOnItsSideTheScreenUsesARailAndKeepsClearOfTheEdges(t *testing.T) {
 			t.Fatal("a screen wider than tall is not wide")
 		}
 		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func() {
-			look.NavigationRail([]Destination{{"home", "Home"}, {"map", "Map"}}, &selected)
+			look.NavigationRail([]Destination{{Icon: "home", Label: "Home"}, {Icon: "map", Label: "Map"}}, &selected)
 			look.Body(true, func() { look.FilledButton("", "Inside") })
 		})
 	})

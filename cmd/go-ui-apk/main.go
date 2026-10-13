@@ -49,6 +49,7 @@ func readArguments(arguments []string) (application, string, error) {
 	flags.IntVar(&app.TargetSDK, "target-sdk", 34, "the Android API level it is made for")
 	flags.StringVar(&app.Icon, "icon", "", "a square PNG for the launcher (default: Android's own)")
 	flags.BoolVar(&app.Debuggable, "debuggable", true, "let adb read its folder (run-as) and debug it")
+	flags.BoolVar(&app.Notifications, "notifications", false, "ask for the permission to show notifications (Android 13+)")
 	if err := flags.Parse(arguments); err != nil {
 		return application{}, "", err
 	}

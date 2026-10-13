@@ -27,6 +27,8 @@ type Scheme struct {
 	Surface, OnSurface, OnSurfaceVariant                                                 draw2d.Color
 	SurfaceContainerLow, SurfaceContainer, SurfaceContainerHigh, SurfaceContainerHighest draw2d.Color
 	Outline, OutlineVariant                                                              draw2d.Color
+	// The inverse roles paint what stands out against the screen: a snackbar.
+	InverseSurface, InverseOnSurface, InversePrimary draw2d.Color
 	// Scrim is the surface's colour, see-through: under a bar painted over a scene.
 	Scrim draw2d.Color
 }
@@ -44,6 +46,7 @@ func Baseline(dark bool) Scheme {
 			SurfaceContainerLow: draw2d.Hex("#1d1b20"), SurfaceContainer: draw2d.Hex("#211f26"),
 			SurfaceContainerHigh: draw2d.Hex("#2b2930"), SurfaceContainerHighest: draw2d.Hex("#36343b"),
 			Outline: draw2d.Hex("#938f99"), OutlineVariant: draw2d.Hex("#49454f"), Scrim: draw2d.Hex("#141218cc"),
+			InverseSurface: draw2d.Hex("#e6e0e9"), InverseOnSurface: draw2d.Hex("#322f35"), InversePrimary: draw2d.Hex("#6750a4"),
 		}
 	}
 	return Scheme{
@@ -56,6 +59,7 @@ func Baseline(dark bool) Scheme {
 		SurfaceContainerLow: draw2d.Hex("#f7f2fa"), SurfaceContainer: draw2d.Hex("#f3edf7"),
 		SurfaceContainerHigh: draw2d.Hex("#ece6f0"), SurfaceContainerHighest: draw2d.Hex("#e6e0e9"),
 		Outline: draw2d.Hex("#79747e"), OutlineVariant: draw2d.Hex("#cac4d0"), Scrim: draw2d.Hex("#fef7ffcc"),
+		InverseSurface: draw2d.Hex("#322f35"), InverseOnSurface: draw2d.Hex("#f5eff7"), InversePrimary: draw2d.Hex("#d0bcff"),
 	}
 }
 

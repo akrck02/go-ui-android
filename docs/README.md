@@ -34,6 +34,30 @@ own controls do.
 | `SectionTitle`, `Divider` | A small heading over a group of rows; a line between groups |
 | `Text`, `Paragraph` | One line; text that breaks into lines at the width it has |
 | `Stick(name, &stick, size)` | An on-screen stick for walking or driving with a thumb |
+| `TextField(name, &text, Field{…})` | Material's outlined field: a label, the box, a hint or an error under it. The on-screen keyboard comes up while it is typed in |
+| `SearchBar(name, &text, placeholder)` | A pill to search in, with a button to empty it |
+| `Checkbox(label, &on)`, `RadioButton(label, chosen)` | A tick box; one of a few choices |
+| `Tabs(name, labels, &selected)` | Primary tabs under a top bar, the chosen one underlined |
+| `Menu(icon, choices)` | A button that opens a list of choices; returns the one chosen |
+| `LinearProgress(fraction)` | A bar that fills; a negative fraction for work of unknown length |
+| `ExtendedFloatingButton(icon, label)` | The floating action button with its action written |
+| `Dialog(name, Dialog{…})` | A question over the dimmed screen: an icon, a title, a text, more content, one or two actions. Returns `Open`, `Confirmed` or `Dismissed` |
+| `BottomSheet(name, content)` | Choices or a short form in a sheet rising from the bottom |
+| `Snackbar(&snackbar)` | A short note at the bottom for a few seconds, with an action (`snackbar.Show(text, action, duration)`) |
+
+`TopBar{Large: true}` writes the title big under the bar, and `Destination.Badge` marks a
+destination's icon with a count or a dot.
+
+<img src="images/forms-keyboard.png" width="260" alt="The forms screen typing into a field with the phone's on-screen keyboard">
+
+### Notifications
+
+A program's notifications go through go-ui's window: `window.Notify(id, title, text)` shows one in
+the phone's shade, even while the program is in the background, and touching it opens the program.
+Android 13 and later show them only once the person allows it: check `window.NotificationsAllowed()`
+and ask with `window.AskForNotifications()` when they do something that needs them. Build the
+package with `go-ui-apk -notifications`, which names the permission. In a browser they are the
+page's notifications; on the desktop they are not shown yet. The gallery's Forms screen sends one.
 
 Sizes are Material's: targets of at least 48 pixels, bars 64 and 80 pixels tall, 16-pixel text.
 A finger has no hover, so pieces change only while pressed. Each piece takes the name go-ui tells it
@@ -120,6 +144,7 @@ the package with the SDK's own `aapt2`, `zipalign` and `apksigner`. It signs wit
 | `-min-sdk`, `-target-sdk` | The oldest Android it runs on (26, Android 8, at least) and the one it is made for |
 | `-icon` | A square PNG for the launcher |
 | `-debuggable` | Lets `adb` read its folder and debug it; on by default |
+| `-notifications` | Names the permission Android 13 and later ask before showing notifications |
 
 What the program writes to its standard error (a panic, `log.Fatal`) is in Android's log:
 `adb logcat -s Go`.
@@ -134,8 +159,8 @@ the tool's manifest, with no display.
 
 ## Not yet
 
-- Text fields with the on-screen keyboard (go-ui reads only a hardware keyboard on Android).
-- Dialogs, bottom sheets and menus in Material's look (go-ui's own work, in its theme).
+- Date and time pickers, sliders in Material's own look (go-ui's slider takes the theme), chips with
+  a close button, carousels.
 - The back gesture inside the program, and long presses.
 - Packages for x86_64 emulators and for stores (a release key, an app bundle).
 - A tool that turns a brand's single colour into a whole scheme, as Material's does.

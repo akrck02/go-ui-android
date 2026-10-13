@@ -77,3 +77,15 @@ func (look Look) RoundButton(icon string, size float32, primary bool) bool {
 		look.Context.IconSized(icon, size*0.45, ink)
 	})
 }
+
+// ExtendedFloatingButton is the floating action button with its action written beside the icon:
+// clearer where the icon alone would not say it.
+func (look Look) ExtendedFloatingButton(icon, label string) bool {
+	scheme := look.Scheme
+	normal := ui.Look{Fill: scheme.PrimaryContainer, Radius: 16, Shadow: true}
+	layout := ui.Layout{Height: ui.Fixed(56), Padding: ui.Padding{Left: 16, Right: 20}, Gap: 12, AlignY: ui.Center}
+	return look.Context.Clickable("floating "+label, layout, pressedOnly(normal, scheme.SecondaryContainer), func() {
+		look.Context.IconSized(icon, 24, scheme.OnPrimaryContainer)
+		look.Text(label, 14, draw2d.Medium, scheme.OnPrimaryContainer)
+	})
+}

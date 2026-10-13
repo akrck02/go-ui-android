@@ -14,6 +14,8 @@ type TopBar struct {
 	Actions func()
 	// OverScene paints the bar see-through (the scheme's scrim), over a scene behind the interface.
 	OverScene bool
+	// Large writes the title big under the arrow and the actions, for a screen's first level.
+	Large bool
 }
 
 // TopAppBar is the bar at the top, painted up under the status bar, so the screen reaches the top
@@ -24,6 +26,9 @@ func (look Look) TopAppBar(bar TopBar) (back bool) {
 	fill := scheme.Surface
 	if bar.OverScene {
 		fill = scheme.Scrim
+	}
+	if bar.Large {
+		return look.largeTopAppBar(bar, fill)
 	}
 	layout := ui.Layout{Width: ui.Grow(), Height: ui.Fixed(64 + insets.Top),
 		Padding: ui.Padding{Left: 4, Top: insets.Top, Right: 4}, Gap: 4, AlignY: ui.Center}
@@ -49,6 +54,58 @@ func (look Look) TopAppBar(bar TopBar) (back bool) {
 // Destination is a place the navigation bar leads to: an icon and a short label.
 type Destination struct {
 	Icon, Label string
+	// Badge marks the icon: a count ("3"), or a dot with "•"; none when empty.
+	Badge string
+}
+
+// largeTopAppBar is the large top bar: the arrow and the actions on a row, the title big under them.
+func (look Look) largeTopAppBar(bar TopBar, fill draw2d.Color) (back bool) {
+	insets := look.Context.Insets()
+	scheme := look.Scheme
+	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Fixed(152 + insets.Top),
+		Padding: ui.Padding{Left: 4, Top: insets.Top, Right: 4, Bottom: 24}}
+	look.Context.Frame(layout, ui.Look{Fill: fill}, func() {
+		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(64), AlignY: ui.Center}, func() {
+			if bar.Back {
+				back = look.IconButton("arrow-left")
+			}
+			look.Context.Spacer()
+			if bar.Actions != nil {
+				bar.Actions()
+			}
+		})
+		look.Context.Spacer()
+		look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.PadXY(12, 0), Gap: 4}, func() {
+			look.Text(bar.Title, 32, draw2d.Regular, scheme.OnSurface)
+			if bar.Subtitle != "" {
+				look.Text(bar.Subtitle, 14, draw2d.Regular, scheme.OnSurfaceVariant)
+			}
+		})
+	})
+	return back
+}
+
+// destinationIcon is a destination's icon with its badge over the icon's top end, as Material
+// places it.
+func (look Look) destinationIcon(place Destination, ink draw2d.Color) {
+	look.Context.IconSized(place.Icon, 24, ink)
+	if place.Badge == "" {
+		return
+	}
+	scheme := look.Scheme
+	// a negative gap lays the badge over the icon's corner
+	look.Context.Box(ui.Layout{Width: ui.Fixed(0), Height: ui.Fixed(24)}, nil)
+	if place.Badge == "•" {
+		look.Context.Box(ui.Layout{Height: ui.Fixed(24), Padding: ui.Padding{Left: -8, Top: 2}}, func() {
+			look.Context.Frame(ui.Layout{Width: ui.Fixed(6), Height: ui.Fixed(6)}, ui.Look{Fill: scheme.Error, Radius: 3}, nil)
+		})
+		return
+	}
+	look.Context.Box(ui.Layout{Height: ui.Fixed(24), Padding: ui.Padding{Left: -12}}, func() {
+		look.Context.Frame(ui.Layout{Height: ui.Fixed(16), Padding: ui.PadXY(4, 0), AlignY: ui.Center}, ui.Look{Fill: scheme.Error, Radius: 8}, func() {
+			look.Text(place.Badge, 11, draw2d.Medium, scheme.OnError)
+		})
+	})
 }
 
 // NavigationBar is the bar at the bottom, painted down under the gesture bar: three to five
@@ -78,7 +135,7 @@ func (look Look) navigationItem(place Destination, selected bool) bool {
 	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Share(1), Height: ui.Grow(), Gap: 4, AlignX: ui.Center}
 	return look.Context.Clickable("navigate "+place.Label, layout, ui.Looks{}, func() {
 		indicator := ui.Layout{Width: ui.Fixed(64), Height: ui.Fixed(32), AlignX: ui.Center, AlignY: ui.Center}
-		look.Context.Frame(indicator, pill, func() { look.Context.IconSized(place.Icon, 24, ink) })
+		look.Context.Frame(indicator, pill, func() { look.destinationIcon(place, ink) })
 		look.Text(place.Label, 12, weight, label)
 	})
 }
@@ -120,7 +177,7 @@ func (look Look) railItem(place Destination, selected bool) bool {
 	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Fixed(56), Gap: 4, AlignX: ui.Center}
 	return look.Context.Clickable("navigate "+place.Label, layout, ui.Looks{}, func() {
 		indicator := ui.Layout{Width: ui.Fixed(56), Height: ui.Fixed(32), AlignX: ui.Center, AlignY: ui.Center}
-		look.Context.Frame(indicator, pill, func() { look.Context.IconSized(place.Icon, 24, ink) })
+		look.Context.Frame(indicator, pill, func() { look.destinationIcon(place, ink) })
 		look.Text(place.Label, 12, weight, label)
 	})
 }

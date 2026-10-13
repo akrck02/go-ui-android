@@ -51,6 +51,7 @@ func FromPalettes(palettes window.Palettes, dark bool) Scheme {
 		scheme.SurfaceContainerHigh = mix(neutral[shade900], neutral[shade800], 0.7) // tone 17
 		scheme.SurfaceContainerHighest = mix(neutral[shade800], neutral[shade700], 0.2)
 		scheme.Outline, scheme.OutlineVariant = variant[shade400], variant[shade700]
+		scheme.InverseSurface, scheme.InverseOnSurface, scheme.InversePrimary = neutral[shade100], neutral[shade800], accent[shade600]
 	} else {
 		scheme.Primary, scheme.OnPrimary = accent[shade600], accent[shade0]
 		scheme.PrimaryContainer, scheme.OnPrimaryContainer = accent[shade100], accent[shade900]
@@ -62,6 +63,7 @@ func FromPalettes(palettes window.Palettes, dark bool) Scheme {
 		scheme.SurfaceContainerHigh = mix(neutral[shade50], neutral[shade100], 0.6) // tone 92
 		scheme.SurfaceContainerHighest = neutral[shade100]                          // tone 90
 		scheme.Outline, scheme.OutlineVariant = variant[shade500], variant[shade200]
+		scheme.InverseSurface, scheme.InverseOnSurface, scheme.InversePrimary = neutral[shade800], neutral[shade50], accent[shade200]
 	}
 	scheme.Scrim = draw2d.Color{scheme.Surface[0], scheme.Surface[1], scheme.Surface[2], 0.8}
 	return scheme
