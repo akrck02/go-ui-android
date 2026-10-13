@@ -24,6 +24,7 @@ const (
 	piecesScreen = iota
 	formsScreen
 	listScreen
+	loadingScreen
 	stickScreen
 )
 
@@ -57,6 +58,9 @@ type gallery struct {
 	drawerOpen          bool
 	tags                []string
 	volume              float32
+	loaded              bool
+	size                int
+	create              material.FloatingMenu
 
 	stick    material.Stick
 	boatX    float32 // the boat's place in the bay, from 0 to 1 across and down
@@ -92,7 +96,8 @@ func (program *gallery) build(context *ui.Context) {
 	context.Theme = scheme.Theme(dark)
 	look := material.New(context, scheme)
 	places := []material.Destination{{Icon: "layout-grid", Label: "Pieces"}, {Icon: "text-cursor-input", Label: "Forms"},
-		{Icon: "list", Label: "List", Badge: program.darkCount()}, {Icon: "gamepad-2", Label: "Stick"}}
+		{Icon: "list", Label: "List", Badge: program.darkCount()}, {Icon: "loader", Label: "Loading"},
+		{Icon: "gamepad-2", Label: "Stick"}}
 	// last in the frame: what is over the screen answers the system's back before the screen does
 	defer program.goBack(look)
 	defer program.layers(look, look.Wide())
@@ -124,6 +129,8 @@ func (program *gallery) showScreen(look material.Look) {
 		program.forms(look)
 	case listScreen:
 		program.list(look)
+	case loadingScreen:
+		program.loading(look)
 	default:
 		program.bay(look)
 	}
@@ -420,5 +427,67 @@ func (program *gallery) drawer(look material.Look, places []material.Destination
 func (program *gallery) goBack(look material.Look) {
 	if program.screen != piecesScreen && look.Back() {
 		program.screen = piecesScreen
+	}
+}
+
+// loading shows Material 3 Expressive's indicators, skeletons standing in for a list, and the
+// pieces for actions: a button group, a split button, a floating toolbar and a floating menu.
+func (program *gallery) loading(look material.Look) {
+	context, scheme := look.Context, look.Scheme
+	look.TopAppBar(material.TopBar{Title: "Loading", Subtitle: "Indicators, skeletons and actions"})
+	context.ScrollArea("loading", ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow()}, func() {
+		context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.Padding{Left: 16, Top: 8, Right: 16, Bottom: 160}, Gap: 16}, func() {
+			look.SectionTitle("Indicators")
+			context.Box(ui.Layout{Width: ui.Grow(), Gap: 16, AlignY: ui.Center, Wrap: true}, func() {
+				look.LoadingIndicator(48)
+				look.ContainedLoadingIndicator(48)
+				look.CircularProgress(material.Indeterminate, 48, false)
+				look.CircularProgress(material.Indeterminate, 48, true)
+				look.CircularProgress(program.progress, 48, true)
+			})
+			look.WavyProgress(material.Indeterminate)
+			look.WavyProgress(program.progress)
+			look.Slider("progress", &program.progress, 0, 1, 0)
+			look.SectionTitle("Skeletons")
+			look.ListItem("loaded", material.Item{Headline: "Loaded", Trailing: func() { look.Switch("loaded switch", &program.loaded) }})
+			for index, light := range program.lighthouses {
+				if program.loaded {
+					look.ListItem(fmt.Sprint("light ", index), material.Item{Icon: "lightbulb", Headline: light.name, Supporting: light.place})
+					continue
+				}
+				context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(72), Padding: ui.PadXY(16, 0), Gap: 16, AlignY: ui.Center}, func() {
+					look.Skeleton(ui.Fixed(40), ui.Fixed(40), 20)
+					context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Gap: 8}, func() {
+						look.Skeleton(ui.Percent(0.6), ui.Fixed(14), 7)
+						look.Skeleton(ui.Percent(0.4), ui.Fixed(12), 6)
+					})
+				})
+			}
+			look.SectionTitle("Actions")
+			look.ButtonGroup("size", []string{"Small", "Medium", "Large"}, &program.size)
+			if action, more := look.SplitButton("send", "Send the report"); action {
+				program.snackbar.Show("Report sent", "", 3*time.Second)
+			} else if more {
+				program.snackbar.Show("Later: schedule it, or send it to someone else", "", 3*time.Second)
+			}
+			look.Text("A toolbar and a menu float over the screen.", 14, draw2d.Regular, scheme.OnSurfaceVariant)
+		})
+	})
+	above := float32(material.NavigationBarHeight)
+	if look.Wide() {
+		above = 0
+	}
+	switch look.FloatingToolbar("tools", []string{"pencil", "share-2", "trash-2"}, above) {
+	case 0:
+		program.snackbar.Show("Edit", "", 2*time.Second)
+	case 1:
+		program.snackbar.Show("Share", "", 2*time.Second)
+	case 2:
+		program.snackbar.Show("Deleted", "Undo", 4*time.Second)
+	}
+	program.create.Icon, program.create.Above = "plus", above
+	program.create.Actions = []material.Destination{{Icon: "file", Label: "Note"}, {Icon: "image", Label: "Picture"}, {Icon: "clock", Label: "Reminder"}}
+	if chosen := look.FloatingMenu("create", &program.create); chosen >= 0 {
+		program.snackbar.Show("New "+program.create.Actions[chosen].Label, "", 2*time.Second)
 	}
 }

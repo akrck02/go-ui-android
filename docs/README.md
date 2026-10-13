@@ -47,12 +47,29 @@ own controls do.
 | `DatePicker(name, &picker, &date)` | A day chosen a month at a time, in a dialog; `DateNames` for another language |
 | `AssistChip(icon, label)`, `InputChip(label)` | An action suggested beside the content; something entered, with a cross to take it out |
 | `Slider(name, &value, minimum, maximum, step)` | A value between two ends, dragged |
+| `LoadingIndicator(size)`, `ContainedLoadingIndicator(size)` | Material 3 Expressive's indicator for a short wait: a filled shape turning and morphing from one form to the next (a burst, a cookie, a pentagon, a pill, a sun, an oval), alone or on a round container |
+| `CircularProgress(fraction, size, wavy)` | A ring filling as work gets done, or an arc chasing round (`Indeterminate`); wavy as Expressive draws it |
+| `WavyProgress(fraction)` | A line filling with a travelling wave, a track and a stop dot; a running wave when `Indeterminate` |
+| `Skeleton(width, height, radius)` | A quiet block with a light crossing it, standing in for content still coming |
+| `ButtonGroup(name, labels, &selected)` | Expressive's connected buttons: the chosen one fills and rounds out |
+| `SplitButton(icon, label)` | A main action joined to a button opening its other choices; tells which half was touched |
+| `FloatingToolbar(name, icons, above)` | A pill of actions floating over the content at the bottom |
+| `FloatingMenu(name, &menu)` | The floating action button opening into a few actions stacked above it |
 | `Snackbar(&snackbar)` | A short note at the bottom for a few seconds, with an action (`snackbar.Show(text, action, duration)`) |
 
 `TopBar{Large: true}` writes the title big under the bar, and `Destination.Badge` marks a
 destination's icon with a count or a dot.
 
 <img src="images/forms-keyboard.png" width="260" alt="The forms screen typing into a field with the phone's on-screen keyboard">
+
+### How indicators are drawn
+
+go-renderer draws rounded rectangles, shadows, text and icons; the indicators' shapes are made of
+rectangles in a box the program paints itself (go-ui's `Context.Paint`): a shape is filled row by
+row and edged with small dots, a wave or an arc is a line of dots. An indicator asks for frames
+while it is on screen (about sixty a second), and a screen without one sleeps: the gallery's
+Loading screen, with five of them at once, takes about a third of a core on a OnePlus 7 Pro, and
+nothing once left.
 
 ### Back and motion
 
@@ -184,8 +201,8 @@ the tool's manifest, with no display.
 
 ## Not yet
 
-- Date and time pickers, sliders in Material's own look (go-ui's slider takes the theme), chips with
-  a close button, carousels.
+- A time picker, carousels, pull to refresh and rows swiped away (the last two need go-ui to tell a
+  pull past a list's top and a sideways drag).
 - Long presses, and pieces leaving with motion (they go at once: a program stops drawing them).
 - Packages for x86_64 emulators and for stores (a release key, an app bundle).
 - A tool that turns a brand's single colour into a whole scheme, as Material's does.
