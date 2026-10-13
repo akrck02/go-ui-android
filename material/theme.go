@@ -3,6 +3,7 @@ package material
 import (
 	"embed"
 
+	"github.com/akrck02/go-renderer/draw2d"
 	"github.com/akrck02/go-renderer/opengl/overlay"
 	ui "github.com/akrck02/go-ui"
 )
@@ -23,6 +24,7 @@ func (scheme Scheme) Theme(dark bool) ui.Theme {
 	theme.TextSize, theme.SmallTextSize, theme.HeadingSize, theme.IconSize = 16, 14, 22, 24
 	theme.ControlHeight, theme.Gap, theme.Padding = 48, 12, 16
 	theme.ControlRadius, theme.PanelRadius = 20, 16
+	theme.Scrim = draw2d.Color{0, 0, 0, 0.32} // Material's: behind a dialog or a sheet, in both themes
 	return theme
 }
 
