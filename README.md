@@ -41,3 +41,7 @@ I write most of my code by hand, so I want to be clear about where AI was used h
 Commits made with AI carry a `Co-Authored-By: Claude` line.
 
 The material package embeds the Roboto typeface (SIL Open Font License, licence in `material/fonts`).
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). Roboto is under the SIL Open Font License (`material/fonts/OFL.txt`).
