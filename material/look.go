@@ -2,10 +2,17 @@ package material
 
 import (
 	"strings"
+	"time"
 
 	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
 )
+
+// safePadding is a margin from the window's edges plus what the system draws over them.
+func (look Look) safePadding(margin float32) ui.Padding {
+	insets := look.Context.Insets()
+	return ui.Padding{Left: margin + insets.Left, Top: margin + insets.Top, Right: margin + insets.Right, Bottom: margin + insets.Bottom}
+}
 
 // Look draws the pieces in one frame, with one scheme. It is small: make one in every frame.
 //
@@ -49,4 +56,17 @@ func (look Look) Paragraph(text string, size float32, weight draw2d.Weight, colo
 			look.Context.Text(word, style)
 		}
 	})
+}
+
+// Material's short motions: a control's own change, and something arriving on the screen.
+const (
+	switchMotion   = 150 * time.Millisecond
+	arrivingMotion = 250 * time.Millisecond
+)
+
+func boolFloat(value bool) float32 {
+	if value {
+		return 1
+	}
+	return 0
 }

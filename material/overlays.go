@@ -110,10 +110,6 @@ type Snackbar struct {
 	until time.Time
 }
 
-// NavigationBarHeight is a navigation bar's height without the gesture bar under it, for a snackbar
-// or a floating button to keep above.
-const NavigationBarHeight = 80
-
 // Show puts a note up for a while (Material's are 4 to 10 seconds).
 func (snackbar *Snackbar) Show(text, action string, duration time.Duration) {
 	snackbar.Text, snackbar.Action, snackbar.until = text, action, time.Now().Add(duration)
@@ -163,8 +159,16 @@ func (look Look) Snackbar(snackbar *Snackbar) (actionTouched bool) {
 	return actionTouched
 }
 
-// safePadding is a margin from the window's edges plus what the system draws over them.
-func (look Look) safePadding(margin float32) ui.Padding {
-	insets := look.Context.Insets()
-	return ui.Padding{Left: margin + insets.Left, Top: margin + insets.Top, Right: margin + insets.Right, Bottom: margin + insets.Bottom}
+// Menu is a button with an icon (three dots, usually) that opens a list of choices under it. It
+// returns the index of the one chosen in this frame, or -1.
+func (look Look) Menu(icon string, choices []string) int {
+	chosen := -1
+	look.Context.MenuButton(icon, "", func() {
+		for index, choice := range choices {
+			if look.Context.MenuItem("", choice, "") {
+				chosen = index
+			}
+		}
+	})
+	return chosen
 }

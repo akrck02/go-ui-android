@@ -1,19 +1,8 @@
-// Package material draws go-ui interfaces the way Android's own applications look (Material
-// Design 3): a top app bar and a navigation bar painted under the system's bars, list items,
-// buttons, chips, a switch, segmented buttons, cards, floating buttons and an on-screen stick.
-//
-// The pieces are made of go-ui boxes, texts and clickables, as any program can make controls of its
-// own, so they draw the same on a phone, on a desktop and in a browser. A program makes a Look for
-// each frame and calls its pieces:
-//
-//	scheme := material.Baseline(dark)
-//	context.Theme = scheme.Theme(dark)
-//	look := material.New(context, scheme)
-//	look.TopAppBar(material.TopBar{Title: "Inbox"})
-//	if look.FilledButton("add", "New message") { … }
 package material
 
-import "github.com/akrck02/go-renderer/draw2d"
+import (
+	"github.com/akrck02/go-renderer/draw2d"
+)
 
 // Scheme holds the colour roles of Material Design 3: what each piece is painted with. Baseline
 // gives Material's own; a program with colours of its own changes the roles it needs (WithPrimary

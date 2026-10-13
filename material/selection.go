@@ -1,11 +1,22 @@
 package material
 
 import (
-	"time"
-
 	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
 )
+
+// Slider chooses a value between two ends by dragging, in steps (0 for any value): go-ui's slider
+// in the scheme's colours and a finger's size. It returns true when the value changed.
+func (look Look) Slider(name string, value *float32, minimum, maximum, step float32) bool {
+	context := look.Context
+	saved := context.Theme
+	defer func() { context.Theme = saved }()
+	context.Theme.ControlLine, context.Theme.Sunken = look.Scheme.SecondaryContainer, look.Scheme.SecondaryContainer
+	if step <= 0 {
+		return context.Slider(name, value, minimum, maximum)
+	}
+	return context.SliderStep(name, value, minimum, maximum, step)
+}
 
 // Switch is Material's switch: a 52 × 32 track whose handle grows and moves to the end when on. It
 // flips the value and returns true when touched.
@@ -27,30 +38,6 @@ func (look Look) Switch(name string, on *bool) bool {
 		*on = !*on
 	}
 	return touched
-}
-
-// FilterChip is a choice that is on or off, among others in a row: outlined, or filled with a tick
-// when selected. It returns true when touched; the program flips its own value.
-func (look Look) FilterChip(label string, selected bool) bool {
-	scheme := look.Scheme
-	normal, ink := ui.Look{Border: scheme.OutlineVariant, BorderWidth: 1, Radius: 8}, scheme.OnSurfaceVariant
-	if selected {
-		normal, ink = ui.Look{Fill: scheme.SecondaryContainer, Radius: 8}, scheme.OnSecondaryContainer
-	}
-	layout := ui.Layout{Height: ui.Fixed(32), Padding: ui.PadXY(12, 0), Gap: 8, AlignY: ui.Center}
-	return look.Context.Clickable("chip "+label, layout, pressedOnly(normal, stateLayer(ink, 0.12)), func() {
-		if selected {
-			look.Context.IconSized("check", 18, ink)
-		}
-		look.Text(label, 14, draw2d.Medium, ink)
-	})
-}
-
-// Tag is a label that cannot be touched, in a pill of its own colours: a state ("3 running"), a
-// count, a kind. ink is the text's colour and tint the pill's.
-func (look Look) Tag(text string, ink, tint draw2d.Color) {
-	look.Context.Frame(ui.Layout{Height: ui.Fixed(26), Padding: ui.PadXY(10, 0), AlignY: ui.Center},
-		ui.Look{Fill: tint, Radius: 13}, func() { look.Text(text, 12, draw2d.Bold, ink) })
 }
 
 // SegmentedButtons are two to five choices side by side sharing the row's width, one of them
@@ -127,67 +114,4 @@ func (look Look) RadioButton(label string, chosen bool) bool {
 		})
 		look.Text(label, 16, draw2d.Regular, scheme.OnSurface)
 	})
-}
-
-// Tabs are the primary tabs under a top bar: labels sharing the width, the chosen one underlined.
-// It changes selected and returns true when another is touched.
-func (look Look) Tabs(name string, labels []string, selected *int) bool {
-	scheme := look.Scheme
-	changed := false
-	look.Context.Push(name)
-	defer look.Context.Pop()
-	look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow()}, func() {
-		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(48)}, func() {
-			for index, label := range labels {
-				chosen := index == *selected
-				ink := scheme.OnSurfaceVariant
-				if chosen {
-					ink = scheme.Primary
-				}
-				layout := ui.Layout{Direction: ui.Vertical, Width: ui.Share(1), Height: ui.Grow(), AlignX: ui.Center, AlignY: ui.End}
-				touched := look.Context.Clickable(label, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(ink, 0.1)}}, func() {
-					look.Context.Box(ui.Layout{Height: ui.Grow(), AlignY: ui.Center}, func() {
-						look.Text(label, 14, draw2d.Medium, ink)
-					})
-					underline := ui.Look{}
-					if chosen {
-						underline = ui.Look{Fill: scheme.Primary, Radius: 1.5}
-					}
-					look.Context.Frame(ui.Layout{Width: ui.Fixed(min(look.Context.Theme.TextSize*float32(len(label))*0.55, 120)), Height: ui.Fixed(3)}, underline, nil)
-				})
-				if touched && !chosen {
-					*selected, changed = index, true
-				}
-			}
-		})
-		look.Divider()
-	})
-	return changed
-}
-
-// Menu is a button with an icon (three dots, usually) that opens a list of choices under it. It
-// returns the index of the one chosen in this frame, or -1.
-func (look Look) Menu(icon string, choices []string) int {
-	chosen := -1
-	look.Context.MenuButton(icon, "", func() {
-		for index, choice := range choices {
-			if look.Context.MenuItem("", choice, "") {
-				chosen = index
-			}
-		}
-	})
-	return chosen
-}
-
-// Material's short motions: a control's own change, and something arriving on the screen.
-const (
-	switchMotion   = 150 * time.Millisecond
-	arrivingMotion = 250 * time.Millisecond
-)
-
-func boolFloat(value bool) float32 {
-	if value {
-		return 1
-	}
-	return 0
 }

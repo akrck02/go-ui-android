@@ -39,15 +39,26 @@ func (look Look) InputChip(label string) (touched, removed bool) {
 	return touched, removed
 }
 
-// Slider chooses a value between two ends by dragging, in steps (0 for any value): go-ui's slider
-// in the scheme's colours and a finger's size. It returns true when the value changed.
-func (look Look) Slider(name string, value *float32, minimum, maximum, step float32) bool {
-	context := look.Context
-	saved := context.Theme
-	defer func() { context.Theme = saved }()
-	context.Theme.ControlLine, context.Theme.Sunken = look.Scheme.SecondaryContainer, look.Scheme.SecondaryContainer
-	if step <= 0 {
-		return context.Slider(name, value, minimum, maximum)
+// FilterChip is a choice that is on or off, among others in a row: outlined, or filled with a tick
+// when selected. It returns true when touched; the program flips its own value.
+func (look Look) FilterChip(label string, selected bool) bool {
+	scheme := look.Scheme
+	normal, ink := ui.Look{Border: scheme.OutlineVariant, BorderWidth: 1, Radius: 8}, scheme.OnSurfaceVariant
+	if selected {
+		normal, ink = ui.Look{Fill: scheme.SecondaryContainer, Radius: 8}, scheme.OnSecondaryContainer
 	}
-	return context.SliderStep(name, value, minimum, maximum, step)
+	layout := ui.Layout{Height: ui.Fixed(32), Padding: ui.PadXY(12, 0), Gap: 8, AlignY: ui.Center}
+	return look.Context.Clickable("chip "+label, layout, pressedOnly(normal, stateLayer(ink, 0.12)), func() {
+		if selected {
+			look.Context.IconSized("check", 18, ink)
+		}
+		look.Text(label, 14, draw2d.Medium, ink)
+	})
+}
+
+// Tag is a label that cannot be touched, in a pill of its own colours: a state ("3 running"), a
+// count, a kind. ink is the text's colour and tint the pill's.
+func (look Look) Tag(text string, ink, tint draw2d.Color) {
+	look.Context.Frame(ui.Layout{Height: ui.Fixed(26), Padding: ui.PadXY(10, 0), AlignY: ui.Center},
+		ui.Look{Fill: tint, Radius: 13}, func() { look.Text(text, 12, draw2d.Bold, ink) })
 }
