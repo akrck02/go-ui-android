@@ -19,6 +19,8 @@ own controls do.
 |---|---|
 | `TopAppBar(TopBar{…})` | The bar at the top, painted up under the status bar: a back arrow, a title and a subtitle, actions at its end. Returns true when the arrow is touched |
 | `NavigationBar(destinations, &selected)` | The bar at the bottom, painted down under the gesture bar, three to five destinations; the selected one has its icon on a pill |
+| `NavigationRail(destinations, &selected)` | The navigation bar's form on a wide screen: the destinations down the left edge. `Wide()` tells when |
+| `Body(besideRail, content)` | A screen's content between the bars, kept clear of a cutout at the sides and, beside a rail, of the gesture bar |
 | `StatusBarScrim()` | The strip under the status bar alone, for a screen whose top is a map or a scene |
 | `FilledButton`, `TonalButton`, `OutlinedButton`, `TextButton` | Actions, from the most to the least important; an icon before the label when given |
 | `IconButton(icon)` | A round 48-pixel target with an icon, in the bars and at the end of rows |
@@ -37,6 +39,29 @@ Sizes are Material's: targets of at least 48 pixels, bars 64 and 80 pixels tall,
 A finger has no hover, so pieces change only while pressed. Each piece takes the name go-ui tells it
 apart by (its label, its icon or a name given); rows that repeat get a scope each with
 `context.Push`, as in go-ui.
+
+### Turning the phone
+
+A phone on its side has more width than height to spare, and its camera's cutout at a side. Material
+moves the destinations from a bar at the bottom to a rail down the left:
+
+```go
+if look.Wide() {
+	context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func() {
+		look.NavigationRail(places, &screen)
+		look.Body(true, func() { drawScreen(look) })
+	})
+	return
+}
+context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow()}, func() {
+	look.Body(false, func() { drawScreen(look) })
+	look.NavigationBar(places, &screen)
+})
+```
+
+`Body` keeps the content clear of the cutout; go-ui-apk's window theme paints beside it
+(`shortEdges`), so no black strip is left there. The gallery does this, and was turned all the way
+round on the Android 16 emulator.
 
 ### Colours
 
@@ -102,7 +127,7 @@ What the program writes to its standard error (a panic, `log.Fatal`) is in Andro
 ## Tried on
 
 The gallery on a Pixel 6 Pro (Android 16, the wallpaper's colours, dark), the Android 16 emulator
-(the wallpaper's colours, light) and a OnePlus 7 Pro (Android 10, Material's baseline): every piece,
+(the wallpaper's colours, light, turned all the way round) and a OnePlus 7 Pro (Android 10, Material's baseline): every piece,
 the theme following the phone, the stick, going to the background and back. The tests
 (`go test ./...`) drive the pieces with a fake pointer and fake fingers, and check the schemes and
 the tool's manifest, with no display.

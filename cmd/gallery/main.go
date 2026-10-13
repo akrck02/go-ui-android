@@ -74,18 +74,32 @@ func (program *gallery) build(context *ui.Context) {
 	scheme := material.System(dark) // the wallpaper's colours on Android 12 and later
 	context.Theme = scheme.Theme(dark)
 	look := material.New(context, scheme)
+	places := []material.Destination{{Icon: "layout-grid", Label: "Pieces"}, {Icon: "list", Label: "List"},
+		{Icon: "gamepad-2", Label: "Stick"}}
+	// on its side, a phone has more width than height to spare: the destinations go down a rail
+	if look.Wide() {
+		context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func() {
+			look.NavigationRail(places, &program.screen)
+			look.Body(true, func() { program.show(look) })
+		})
+		return
+	}
 	context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow()}, func() {
-		switch program.screen {
-		case piecesScreen:
-			program.pieces(look)
-		case listScreen:
-			program.list(look)
-		default:
-			program.bay(look)
-		}
-		look.NavigationBar([]material.Destination{{Icon: "layout-grid", Label: "Pieces"}, {Icon: "list", Label: "List"},
-			{Icon: "gamepad-2", Label: "Stick"}}, &program.screen)
+		look.Body(false, func() { program.show(look) })
+		look.NavigationBar(places, &program.screen)
 	})
+}
+
+// show draws the screen chosen in the navigation.
+func (program *gallery) show(look material.Look) {
+	switch program.screen {
+	case piecesScreen:
+		program.pieces(look)
+	case listScreen:
+		program.list(look)
+	default:
+		program.bay(look)
+	}
 }
 
 // pieces shows the buttons, the choices and a card.
@@ -172,21 +186,36 @@ func (program *gallery) bay(look material.Look) {
 	program.boatY = clamp(program.boatY-program.stick.Forward*step*0.4, 0, 1)
 
 	look.TopAppBar(material.TopBar{Title: "Stick", Subtitle: "Hold the circle and push"})
-	context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow(), Padding: ui.Pad(16), Gap: 16}, func() {
-		width, _ := context.Size()
-		bay := width - 32
+	wide := look.Wide()
+	// tall, the stick goes under the bay; on its side, beside it
+	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow(), Padding: ui.Pad(16), Gap: 16}
+	if wide {
+		layout.Direction, layout.AlignY = ui.Horizontal, ui.End
+	}
+	context.Box(layout, func() {
+		size := program.baySize(look, wide)
 		boat := float32(28)
-		padding := ui.Padding{Left: program.boatX * (bay - boat), Top: program.boatY * (bay - boat)}
-		context.Frame(ui.Layout{Width: ui.Fixed(bay), Height: ui.Fixed(bay), Padding: padding},
+		padding := ui.Padding{Left: program.boatX * (size - boat), Top: program.boatY * (size - boat)}
+		context.Frame(ui.Layout{Width: ui.Fixed(size), Height: ui.Fixed(size), Padding: padding},
 			ui.Look{Fill: scheme.PrimaryContainer, Radius: 16}, func() {
 				context.Frame(ui.Layout{Width: ui.Fixed(boat), Height: ui.Fixed(boat), AlignX: ui.Center, AlignY: ui.Center},
 					ui.Look{Fill: scheme.Primary, Radius: boat / 2}, func() { context.IconSized("sailboat", 18, scheme.OnPrimary) })
 			})
 		context.Spacer()
+		// a stick is found by its name on the screen: keep it out of scopes and scroll areas
+		look.Stick("stick", &program.stick, 128)
 	})
-	// a stick is found by its name on the screen: keep it out of scopes and scroll areas
-	look.Stick("stick", &program.stick, 128)
-	context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(16)}, nil)
+}
+
+// baySize is the square bay's side: the screen's width when tall, the height left under the top
+// bar when on its side.
+func (program *gallery) baySize(look material.Look, wide bool) float32 {
+	width, height := look.Context.Size()
+	insets := look.Context.Insets()
+	if wide {
+		return max(height-insets.Top-insets.Bottom-64-32, 64)
+	}
+	return max(width-insets.Left-insets.Right-32, 64)
 }
 
 // row lays pieces side by side with Material's 8-pixel gap, inside the screen's margins.

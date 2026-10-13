@@ -248,3 +248,28 @@ func TestAParagraphBreaksIntoLines(t *testing.T) {
 		t.Fatalf("%d lines; want the words broken into several in 200 pixels", len(lines))
 	}
 }
+
+func TestOnItsSideTheScreenUsesARailAndKeepsClearOfTheEdges(t *testing.T) {
+	selected := 0
+	screen := newScreen(t, func(look Look) {
+		if !look.Wide() {
+			t.Fatal("a screen wider than tall is not wide")
+		}
+		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func() {
+			look.NavigationRail([]Destination{{"home", "Home"}, {"map", "Map"}}, &selected)
+			look.Body(true, func() { look.FilledButton("", "Inside") })
+		})
+	})
+	screen.state.WindowWidth, screen.state.WindowHeight = 800, 400
+	screen.context.SetInsets(ui.Insets{Top: 24, Bottom: 20, Left: 30, Right: 40})
+	screen.frame()
+	screen.tap("navigate Map")
+	if selected != 1 {
+		t.Fatal("the rail did not go to Map")
+	}
+	rail, _ := screen.context.Area("navigate Home")
+	button, _ := screen.context.Area("button Inside")
+	if rail.X < 30 || button.X < 30+80 {
+		t.Fatalf("rail item at %v, content at %v: want them clear of the 30-pixel cutout and the rail", rail.X, button.X)
+	}
+}

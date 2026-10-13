@@ -95,7 +95,8 @@ func escapeXML(text string) string {
 }
 
 // windowTheme is the window's theme, light or dark (for the system's night mode): it covers the
-// whole screen under see-through bars, whose backgrounds the program paints itself
+// whole screen under see-through bars and beside a camera's cutout (on its side when the phone lies
+// on its side), whose backgrounds the program paints itself
 // (ui.Context.Insets), with the bars' icons dark on a light interface and light on a dark one.
 func windowTheme(dark bool) []byte {
 	parent, lightIcons, background := "Theme.DeviceDefault.Light.NoActionBar", "true", "white"
@@ -110,6 +111,7 @@ func windowTheme(dark bool) []byte {
     <item name="android:windowLightStatusBar">%s</item>
     <item name="android:windowLightNavigationBar">%s</item>
     <item name="android:windowBackground">@android:color/%s</item>
+    <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
   </style>
 </resources>
 `, parent, lightIcons, lightIcons, background))
