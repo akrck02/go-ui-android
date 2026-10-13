@@ -51,6 +51,12 @@ type gallery struct {
 	dialogShown         bool
 	sheetShown          bool
 	snackbar            material.Snackbar
+	date                time.Time
+	datePicker          material.DatePicker
+	choosingDate        bool
+	drawerOpen          bool
+	tags                []string
+	volume              float32
 
 	stick    material.Stick
 	boatX    float32 // the boat's place in the bay, from 0 to 1 across and down
@@ -63,6 +69,7 @@ func main() {
 	options.RegisterFlags(flag.CommandLine)
 	flag.Parse()
 	program := &gallery{dark: options.Dark, themeSet: options.Dark, boatX: 0.5, boatY: 0.5, lastStep: time.Now(),
+		date: time.Now(), tags: []string{"North shore", "Cliffs", "Harbour"}, volume: 0.4,
 		lighthouses: []lighthouse{{"North Cape", "Cliffs, north shore", true}, {"Harbour Light", "End of the pier", true},
 			{"Seal Rock", "Two miles out", false}, {"Old Tower", "The hill above the town", false}}}
 	material.UseRoboto() // before the window makes its interface, which reads the fonts
@@ -86,7 +93,10 @@ func (program *gallery) build(context *ui.Context) {
 	look := material.New(context, scheme)
 	places := []material.Destination{{Icon: "layout-grid", Label: "Pieces"}, {Icon: "text-cursor-input", Label: "Forms"},
 		{Icon: "list", Label: "List", Badge: program.darkCount()}, {Icon: "gamepad-2", Label: "Stick"}}
+	// last in the frame: what is over the screen answers the system's back before the screen does
+	defer program.goBack(look)
 	defer program.layers(look, look.Wide())
+	defer program.drawer(look, places)
 	// on its side, a phone has more width than height to spare: the destinations go down a rail
 	if look.Wide() {
 		context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func() {
@@ -101,8 +111,12 @@ func (program *gallery) build(context *ui.Context) {
 	})
 }
 
-// show draws the screen chosen in the navigation.
+// show draws the screen chosen in the navigation, rising into place as it arrives.
 func (program *gallery) show(look material.Look) {
+	look.Enter(fmt.Sprint("screen ", program.screen), func() { program.showScreen(look) })
+}
+
+func (program *gallery) showScreen(look material.Look) {
 	switch program.screen {
 	case piecesScreen:
 		program.pieces(look)
@@ -119,7 +133,17 @@ func (program *gallery) show(look material.Look) {
 func (program *gallery) pieces(look material.Look) {
 	context, scheme := look.Context, look.Scheme
 	look.TopAppBar(material.TopBar{Title: "Pieces", Subtitle: "Material Design 3, drawn by go-ui",
-		Actions: func() { look.IconButton("search") }})
+		Actions: func() {
+			if look.IconButton("menu") {
+				program.drawerOpen = true
+			}
+			switch look.Menu("ellipsis-vertical", []string{"Light theme", "Dark theme"}) {
+			case 0:
+				program.dark, program.themeSet = false, true
+			case 1:
+				program.dark, program.themeSet = true, true
+			}
+		}})
 	context.ScrollArea("pieces", ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow()}, func() {
 		look.SectionTitle("Buttons")
 		row(context, func() {
@@ -148,6 +172,23 @@ func (program *gallery) pieces(look material.Look) {
 					program.dark, program.themeSet = dark, true
 				}
 			}})
+		look.SectionTitle("Chips and sliders")
+		row(context, func() {
+			look.AssistChip("calendar-plus", "Add to calendar")
+			look.AssistChip("share-2", "Share")
+		})
+		row(context, func() {
+			for index := 0; index < len(program.tags); index++ {
+				if _, removed := look.InputChip(program.tags[index]); removed {
+					program.tags = append(program.tags[:index], program.tags[index+1:]...)
+					index--
+				}
+			}
+		})
+		context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.PadXY(16, 0), Gap: 12, AlignY: ui.Center}, func() {
+			context.IconSized("volume-2", 24, scheme.OnSurfaceVariant)
+			look.Slider("volume", &program.volume, 0, 1, 0)
+		})
 		look.SectionTitle("Cards and tags")
 		context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.PadXY(16, 0), Gap: 12}, func() {
 			look.Card(func() {
@@ -298,6 +339,9 @@ func (program *gallery) details(look material.Look) {
 	look.TextField("name", &program.name, material.Field{Label: "Name", Placeholder: "Harbour Light", Supporting: "As the chart writes it"})
 	look.TextField("reach", &program.reach, material.Field{Label: "Reach", Placeholder: "18", Supporting: "In nautical miles", Error: reachError, MaxLength: 3})
 	look.Checkbox("Lit every night", &program.nightly)
+	if look.OutlinedButton("calendar", "Last inspection: "+program.date.Format("2 Jan 2006")) {
+		program.choosingDate = true
+	}
 	for index, kind := range []string{"Fixed light", "Flashing", "Occulting"} {
 		if look.RadioButton(kind, index == program.kind) {
 			program.kind = index
@@ -341,6 +385,9 @@ func (program *gallery) layers(look material.Look, wide bool) {
 		}
 		program.dialogShown = answer == material.Open
 	}
+	if program.choosingDate {
+		program.choosingDate = look.DatePicker("inspection", &program.datePicker, &program.date) == material.Open
+	}
 	if program.sheetShown && look.BottomSheet("actions", func() {
 		look.ListItem("share", material.Item{Icon: "share-2", Headline: "Share the chart"})
 		look.ListItem("copy", material.Item{Icon: "copy", Headline: "Copy the position"})
@@ -358,5 +405,20 @@ func (program *gallery) layers(look material.Look, wide bool) {
 		for index := range program.lighthouses {
 			program.lighthouses[index].lit = true
 		}
+	}
+}
+
+// drawer shows every destination in a drawer from the left, opened from the Pieces screen's menu.
+func (program *gallery) drawer(look material.Look, places []material.Destination) {
+	if program.drawerOpen && look.NavigationDrawer("drawer", "Gallery", places, &program.screen) {
+		program.drawerOpen = false
+	}
+}
+
+// goBack answers the system's back the dialogs, sheets and drawer left: from any destination back
+// to the first; from the first, nobody answers, and the program goes to the background.
+func (program *gallery) goBack(look material.Look) {
+	if program.screen != piecesScreen && look.Back() {
+		program.screen = piecesScreen
 	}
 }

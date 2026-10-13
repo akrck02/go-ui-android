@@ -128,13 +128,16 @@ func (look Look) NavigationBar(destinations []Destination, selected *int) bool {
 
 func (look Look) navigationItem(place Destination, selected bool) bool {
 	scheme := look.Scheme
-	pill, ink, label, weight := ui.Look{Radius: 16}, scheme.OnSurfaceVariant, scheme.OnSurfaceVariant, draw2d.Medium
+	ink, label, weight := scheme.OnSurfaceVariant, scheme.OnSurfaceVariant, draw2d.Medium
 	if selected {
-		pill.Fill, ink, label, weight = scheme.SecondaryContainer, scheme.OnSecondaryContainer, scheme.OnSurface, draw2d.Bold
+		ink, label, weight = scheme.OnSecondaryContainer, scheme.OnSurface, draw2d.Bold
 	}
+	// the pill grows out from the icon as its destination is chosen
+	shown := look.Context.Animate("pill "+place.Label, boolFloat(selected), arrivingMotion)
+	pill := ui.Look{Fill: stateLayer(scheme.SecondaryContainer, shown*scheme.SecondaryContainer[3]), Radius: 16}
 	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Share(1), Height: ui.Grow(), Gap: 4, AlignX: ui.Center}
 	return look.Context.Clickable("navigate "+place.Label, layout, ui.Looks{}, func() {
-		indicator := ui.Layout{Width: ui.Fixed(64), Height: ui.Fixed(32), AlignX: ui.Center, AlignY: ui.Center}
+		indicator := ui.Layout{Width: ui.Fixed(32 + 32*shown), Height: ui.Fixed(32), AlignX: ui.Center, AlignY: ui.Center}
 		look.Context.Frame(indicator, pill, func() { look.destinationIcon(place, ink) })
 		look.Text(place.Label, 12, weight, label)
 	})
@@ -200,4 +203,17 @@ func (look Look) Body(besideRail bool, content func()) {
 		padding.Left, padding.Bottom = 0, insets.Bottom
 	}
 	look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow(), Padding: padding}, content)
+}
+
+// Back answers the system's back (a phone's back gesture) for the screen: true when there was one,
+// and the program then goes back (to the first destination, to the list a detail came from).
+// Dialogs and sheets answer it first; a back nobody answers takes the program to the background.
+func (look Look) Back() bool { return look.Context.Back() }
+
+// Enter shows a screen rising gently into place when it is first shown, as Material's screens
+// arrive: give each screen its own key.
+func (look Look) Enter(key string, content func()) {
+	arrived := look.Context.Appear("enter "+key, arrivingMotion)
+	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow(), Padding: ui.Padding{Top: (1 - arrived) * 24}}
+	look.Context.Box(layout, content)
 }

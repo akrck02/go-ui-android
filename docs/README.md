@@ -43,12 +43,37 @@ own controls do.
 | `ExtendedFloatingButton(icon, label)` | The floating action button with its action written |
 | `Dialog(name, Dialog{…})` | A question over the dimmed screen: an icon, a title, a text, more content, one or two actions. Returns `Open`, `Confirmed` or `Dismissed` |
 | `BottomSheet(name, content)` | Choices or a short form in a sheet rising from the bottom |
+| `NavigationDrawer(name, title, destinations, &selected)` | Every destination in a drawer sliding in from the left, for more than a bar holds |
+| `DatePicker(name, &picker, &date)` | A day chosen a month at a time, in a dialog; `DateNames` for another language |
+| `AssistChip(icon, label)`, `InputChip(label)` | An action suggested beside the content; something entered, with a cross to take it out |
+| `Slider(name, &value, minimum, maximum, step)` | A value between two ends, dragged |
 | `Snackbar(&snackbar)` | A short note at the bottom for a few seconds, with an action (`snackbar.Show(text, action, duration)`) |
 
 `TopBar{Large: true}` writes the title big under the bar, and `Destination.Badge` marks a
 destination's icon with a count or a dot.
 
 <img src="images/forms-keyboard.png" width="260" alt="The forms screen typing into a field with the phone's on-screen keyboard">
+
+### Back and motion
+
+A phone's back gesture reaches the program. Dialogs, sheets and the drawer answer it first and
+close; then `look.Back()` tells the screen, which goes back (to the first destination, to the list a
+detail came from). A back nobody answers sends the program to the background, as Android's own
+applications do at their first screen. Ask for it after drawing what goes over the screen, so that
+gets it first:
+
+```go
+defer func() {
+	if screen != firstScreen && look.Back() {
+		screen = firstScreen
+	}
+}()
+```
+
+Pieces move as Material's do, and only while they move does the window draw: the switch's handle
+slides and grows, the navigation bar's pill widens under the chosen icon, dialogs rise in as the
+screen darkens, sheets and the drawer slide in, the snackbar slides up, and `look.Enter(key, …)`
+lets a screen rise into place when it is first shown. Lists scroll with a finger and glide on.
 
 ### Notifications
 
@@ -161,7 +186,7 @@ the tool's manifest, with no display.
 
 - Date and time pickers, sliders in Material's own look (go-ui's slider takes the theme), chips with
   a close button, carousels.
-- The back gesture inside the program, and long presses.
+- Long presses, and pieces leaving with motion (they go at once: a program stops drawing them).
 - Packages for x86_64 emulators and for stores (a release key, an app bundle).
 - A tool that turns a brand's single colour into a whole scheme, as Material's does.
 

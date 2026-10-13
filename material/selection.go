@@ -1,6 +1,8 @@
 package material
 
 import (
+	"time"
+
 	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
 )
@@ -9,13 +11,14 @@ import (
 // flips the value and returns true when touched.
 func (look Look) Switch(name string, on *bool) bool {
 	scheme := look.Scheme
-	track := ui.Look{Fill: scheme.SurfaceContainerHighest, Border: scheme.Outline, BorderWidth: 2, Radius: 16}
-	handle, handleSize, align := scheme.Outline, float32(16), ui.Start
-	if *on {
-		track = ui.Look{Fill: scheme.Primary, Radius: 16}
-		handle, handleSize, align = scheme.OnPrimary, 24, ui.End
-	}
-	layout := ui.Layout{Width: ui.Fixed(52), Height: ui.Fixed(32), Padding: ui.PadXY(4, 0), AlignX: align, AlignY: ui.Center}
+	// the handle slides across and grows as the track fills with colour
+	progress := look.Context.Animate(name, boolFloat(*on), switchMotion)
+	track := ui.Look{Fill: mix(scheme.SurfaceContainerHighest, scheme.Primary, progress),
+		Border: stateLayer(scheme.Outline, 1-progress), BorderWidth: 2, Radius: 16}
+	handle, handleSize := mix(scheme.Outline, scheme.OnPrimary, progress), 16+8*progress
+	travel := 52 - 8 - handleSize
+	layout := ui.Layout{Width: ui.Fixed(52), Height: ui.Fixed(32), Padding: ui.Padding{Left: 4 + travel*progress, Right: 4},
+		AlignX: ui.Start, AlignY: ui.Center}
 	touched := look.Context.Clickable(name, layout, ui.Looks{Normal: track, Hovered: track, Pressed: track}, func() {
 		size := ui.Fixed(handleSize)
 		look.Context.Frame(ui.Layout{Width: size, Height: size}, ui.Look{Fill: handle, Radius: handleSize / 2}, nil)
@@ -174,4 +177,17 @@ func (look Look) Menu(icon string, choices []string) int {
 		}
 	})
 	return chosen
+}
+
+// Material's short motions: a control's own change, and something arriving on the screen.
+const (
+	switchMotion   = 150 * time.Millisecond
+	arrivingMotion = 250 * time.Millisecond
+)
+
+func boolFloat(value bool) float32 {
+	if value {
+		return 1
+	}
+	return 0
 }

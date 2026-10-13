@@ -33,8 +33,12 @@ func (look Look) Dialog(name string, dialog Dialog) Answer {
 	scheme := look.Scheme
 	width, _ := look.Context.Size()
 	answer := Open
-	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.Center, Padding: look.safePadding(24),
-		Width: ui.Fixed(min(560, max(width-48, 200)))}
+	// it rises into place as the screen behind darkens
+	arrived := look.Context.Appear("dialog "+name, arrivingMotion)
+	padding := look.safePadding(24)
+	padding.Top += (1 - arrived) * 48
+	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.Center, Padding: padding,
+		Width: ui.Fixed(min(560, max(width-48, 200))), Hidden: 1 - arrived}
 	card := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.Pad(24), Gap: 16}
 	dismissed := look.Context.Modal(name, options, func() {
 		look.Context.Frame(card, ui.Look{Fill: scheme.SurfaceContainerHigh, Radius: 28, Shadow: true}, func() {
@@ -77,8 +81,10 @@ func (look Look) BottomSheet(name string, content func()) (dismissed bool) {
 	scheme := look.Scheme
 	insets := look.Context.Insets()
 	width, _ := look.Context.Size()
-	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.End, Padding: ui.Padding{Top: insets.Top + 72},
-		Width: ui.Fixed(min(640, width))}
+	// it slides up from below the screen as the screen darkens
+	arrived := look.Context.Appear("sheet "+name, arrivingMotion)
+	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.End, Padding: ui.Padding{Top: insets.Top + 72, Bottom: -(1 - arrived) * 400},
+		Width: ui.Fixed(min(640, width)), Hidden: 1 - arrived}
 	sheet := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(),
 		Padding: ui.Padding{Left: 16 + insets.Left, Top: 16, Right: 16 + insets.Right, Bottom: 16 + insets.Bottom}, Gap: 8}
 	return look.Context.Modal(name, options, func() {
@@ -130,7 +136,9 @@ func (look Look) Snackbar(snackbar *Snackbar) (actionTouched bool) {
 	scheme := look.Scheme
 	insets := look.Context.Insets()
 	width, _ := look.Context.Size()
-	padding := ui.Padding{Left: 16 + insets.Left, Right: 16 + insets.Right, Bottom: 16 + insets.Bottom + snackbar.Above}
+	arrived := look.Context.Appear("snackbar", arrivingMotion) // it slides up from the bottom edge
+	padding := ui.Padding{Left: 16 + insets.Left, Right: 16 + insets.Right,
+		Bottom: 16 + insets.Bottom + snackbar.Above - (1-arrived)*(80+insets.Bottom+snackbar.Above)}
 	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.End, Padding: padding,
 		Width: ui.Fixed(min(600, width-padding.Left-padding.Right))}
 	look.Context.Overlay("snackbar", options, func() {
