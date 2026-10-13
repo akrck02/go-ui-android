@@ -56,7 +56,7 @@ surface and the raised containers over it, the outlines, the error colours.
 
 `material.UseRoboto()`, before the window opens, draws every text in Roboto, Android's typeface.
 
-| The wallpaper's colours (Android 16 emulator) | Material's baseline (Android 10) |
+| The wallpaper's colours (Android 16 emulator) | Material's baseline (a desktop window; the same on Android 10) |
 |---|---|
 | <img src="images/pieces-wallpaper.png" width="260" alt="Pieces in the blue of the emulator's wallpaper"> | <img src="images/pieces.png" width="260" alt="Pieces in Material's purple"> |
 
