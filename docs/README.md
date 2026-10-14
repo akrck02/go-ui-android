@@ -127,6 +127,7 @@ The package's files follow the same order (`doc.go` lists them).
 | `LoadingIndicator(size)`, `ContainedLoadingIndicator(size)` | Expressive's indicator for a short wait: a filled shape turning and morphing from one form to the next, alone or on a round container |
 | `CircularProgress(fraction, size, wavy)` | A ring filling as work gets done, or an arc chasing round (`Indeterminate`); wavy as Expressive draws it |
 | `WavyProgress(fraction)`, `LinearProgress(fraction)` | A line filling with a travelling wave, a track and a stop dot; the plain line |
+| `VideoPlayer(name, video, height)` | A film (go-ui's `window.Video`) in a rounded box, a round play button over it while paused, a line of how far it has played; touching it plays or pauses |
 | `Skeleton(width, height, radius)` | A quiet block with a light crossing it, standing in for content still coming |
 
 go-renderer draws rounded rectangles, shadows, text and icons; the indicators' shapes are made of
@@ -162,6 +163,24 @@ var northCapeFile []byte
 northCape, err := draw2d.DecodeImage(bytes.NewReader(northCapeFile))
 …
 look.ListItem("north", material.Item{Picture: northCape, Headline: "North Cape"})
+```
+
+### Films
+
+`window.OpenVideo(film)` opens a film (the bytes of an MP4 or WebM, often embedded) and
+`look.VideoPlayer` shows it: on Android the phone's own decoders read it, in a browser the browser
+does, without sound for now; on the desktop films do not play yet (`window.ErrVideoUnsupported`).
+The gallery's film, six seconds of a made-up coast at dusk, plays in a card on the tabs screen; on
+a OnePlus 7 Pro it takes about two fifths of a core while it plays.
+
+```go
+//go:embed harbour.mp4
+var harbour []byte
+
+video, err := window.OpenVideo(harbour)
+video.Loop = true
+…
+look.VideoPlayer("harbour", video, 180)
 ```
 
 ## Gestures

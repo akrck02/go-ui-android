@@ -13,6 +13,7 @@ type tabsState struct {
 	pager    material.Pager
 	carousel material.Carousel
 	coast    material.Carousel
+	film     film
 	stick    material.Stick
 	boatX    float32 // the boat's place in the bay, from 0 to 1 across and down
 	boatY    float32
@@ -65,6 +66,15 @@ func (tabs *tabsState) places(look material.Look) {
 func (tabs *tabsState) cards(look material.Look) {
 	context, scheme := look.Context, look.Scheme
 	page(context, "cards", func() {
+		look.OutlinedCard(func() {
+			if video := tabs.film.open(); video != nil {
+				look.VideoPlayer("film", video, 180)
+			} else {
+				look.Paragraph("Films play on phones and in browsers; not on the desktop yet.", 14, draw2d.Regular, scheme.OnSurfaceVariant)
+			}
+			look.Text("The harbour at dusk", 18, draw2d.Medium, scheme.OnSurface)
+			look.Paragraph("Touch the film to play or pause it. It plays without sound, round and round.", 14, draw2d.Regular, scheme.OnSurfaceVariant)
+		})
 		look.OutlinedCard(func() {
 			context.Image(coast()[3], ui.Layout{Width: ui.Grow(), Height: ui.Fixed(160)}, 12)
 			look.Text("The north light at night", 18, draw2d.Medium, scheme.OnSurface)
