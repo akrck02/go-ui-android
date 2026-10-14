@@ -1,6 +1,7 @@
 package material
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/akrck02/go-renderer/draw2d"
@@ -46,5 +47,93 @@ func TestATextFieldTakesWhatIsTyped(t *testing.T) {
 	screen.frame()
 	if name != "Ño" {
 		t.Fatalf("name %q; want what was typed", name)
+	}
+}
+
+func TestAFieldWritesItsPrefixSuffixAndCount(t *testing.T) {
+	reach := "18"
+	screen := newScreen(t, func(look Look) {
+		look.TextField("reach", &reach, Field{Label: "Reach", Prefix: "≈", Suffix: "miles", MaxLength: 3, Counter: true, Filled: true})
+	})
+	screen.frame()
+	for _, text := range []string{"≈", "miles", "2/3", "18"} {
+		if !screen.drawn(text) {
+			t.Errorf("the field does not write %q", text)
+		}
+	}
+}
+
+func TestAPasswordShowsWhenRevealed(t *testing.T) {
+	password, revealed := "lamp", false
+	screen := newScreen(t, func(look Look) {
+		look.TextField("password", &password, Field{Label: "Password", Secret: true, Reveal: &revealed})
+	})
+	screen.frame()
+	if screen.drawn("lamp") || !screen.drawn("••••") {
+		t.Fatal("a password shows its characters before it is revealed")
+	}
+	screen.tap("icon eye")
+	screen.frame()
+	if !revealed || !screen.drawn("lamp") {
+		t.Fatal("touching the eye does not show the password")
+	}
+}
+
+func TestADropdownOpensItsChoicesAndTakesOne(t *testing.T) {
+	kinds := []string{"Fixed", "Flashing", "Occulting"}
+	var dropdown Dropdown
+	changes := 0
+	screen := newScreen(t, func(look Look) {
+		if look.Dropdown("kind", "Kind of light", kinds, &dropdown) {
+			changes++
+		}
+	})
+	screen.frame()
+	if !screen.drawn("Fixed") || screen.drawn("Occulting") {
+		t.Fatal("a closed dropdown should show its choice only")
+	}
+	screen.tap("kind")
+	screen.frame()
+	if !screen.drawn("Occulting") {
+		t.Fatal("touching the dropdown does not show its choices")
+	}
+	screen.tap("kind choices", "choice Occulting")
+	screen.frame()
+	if dropdown.Selected != 2 || changes != 1 || screen.drawn("Flashing") {
+		t.Fatalf("selected %d after %d changes; want Occulting chosen once and the choices closed", dropdown.Selected, changes)
+	}
+}
+
+func TestASearchOpensReadyToTypeAndCloses(t *testing.T) {
+	var search Search
+	chosen := ""
+	screen := newScreen(t, func(look Look) {
+		look.SearchView("lights", "Search the lighthouses", &search, func() {
+			for _, name := range []string{"North Cape", "Seal Rock"} {
+				if strings.Contains(strings.ToLower(name), strings.ToLower(search.Query)) && look.ListItem(name, Item{Headline: name}) {
+					chosen, search.Active = name, false
+				}
+			}
+		})
+	})
+	screen.clocked()
+	screen.frame()
+	screen.tap("lights")
+	for range 3 {
+		screen.frame()
+	}
+	if !search.Active || !screen.context.Typing() {
+		t.Fatalf("active %v, typing %v after touching the pill; want the search open with the keyboard up", search.Active, screen.context.Typing())
+	}
+	screen.state.AddCharacter('s')
+	screen.state.AddCharacter('e')
+	screen.frame()
+	screen.frame()
+	if search.Query != "se" || screen.drawn("North Cape") || !screen.drawn("Seal Rock") {
+		t.Fatalf("query %q; want what was typed, and only what it finds", search.Query)
+	}
+	screen.tap("lights open", "Seal Rock")
+	if chosen != "Seal Rock" || search.Active {
+		t.Fatalf("chosen %q, active %v; want Seal Rock chosen and the search closed", chosen, search.Active)
 	}
 }

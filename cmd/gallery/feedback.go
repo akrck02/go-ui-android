@@ -60,6 +60,9 @@ func (feedback *feedbackState) draw(program *gallery, look material.Look) {
 			if look.TonalButton("panel-right", "Side sheet") {
 				overlays.sideShown = true
 			}
+			if look.TonalButton("map", "Standard sheet") {
+				overlays.placesShown, overlays.places.Expanded = true, false
+			}
 			if look.TonalButton("info", "Snackbar") {
 				overlays.snackbar.Show("Harbour Light switched off", "Undo", after(6))
 			}

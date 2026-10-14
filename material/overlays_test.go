@@ -107,3 +107,48 @@ func TestASideSheetClosesWithItsCross(t *testing.T) {
 		t.Fatal("touching the cross did not close the side sheet")
 	}
 }
+
+// sheetTop is where the standard sheet's panel starts, from its drawing.
+func sheetTop(screen *screen) float32 {
+	top := float32(1e9)
+	for _, command := range screen.context.Drawing().Commands {
+		if command.Kind == draw2d.RectangleKind && command.Radius == 28 && command.Area.Width > 300 {
+			top = min(top, command.Area.Y)
+		}
+	}
+	return top
+}
+
+func TestAStandardSheetIsDraggedUpAndSettles(t *testing.T) {
+	var sheet Sheet
+	screen := newScreen(t, func(look Look) {
+		look.StandardSheet("places", &sheet, 200, func() { look.Text("North Cape", 16, draw2d.Regular, look.Scheme.OnSurface) })
+	})
+	screen.clocked()
+	for range 3 {
+		screen.frame()
+	}
+	resting := sheetTop(screen)
+	if resting < 590 || resting > 610 {
+		t.Fatalf("the sheet starts at %v; want 200 pixels up from the 800-pixel screen's foot", resting)
+	}
+	handle, found := screen.context.Area("places", "places handle")
+	if !found {
+		t.Fatal("the sheet has no handle")
+	}
+	screen.drag(200, float64(handle.Y+handle.Height/2), 0, -260, false)
+	if held := sheetTop(screen); held > resting-200 {
+		t.Fatalf("the sheet is at %v while dragged 260 pixels up; want it following the finger", held)
+	}
+	for range 15 {
+		screen.frame()
+	}
+	screen.state.SetButton(input.MouseLeft, false)
+	screen.state.LiftTouch(1)
+	for range 30 {
+		screen.frame()
+	}
+	if !sheet.Expanded || sheetTop(screen) > 100 {
+		t.Fatalf("expanded %v, top at %v after letting go high; want it expanded to most of the screen", sheet.Expanded, sheetTop(screen))
+	}
+}

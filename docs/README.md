@@ -89,7 +89,9 @@ The package's files follow the same order (`doc.go` lists them).
 
 | Piece | What it is |
 |---|---|
-| `TextField(name, &text, Field{…})` | Material's outlined field: a label, the box, a hint or an error under it. The on-screen keyboard comes up while it is typed in |
+| `TextField(name, &text, Field{…})` | Material's text field, outlined or `Filled`: a label, the box with a `Prefix` and a `Suffix`, a hint or an error under it and a `Counter`; `Secret` with `Reveal` for a password and its eye. The on-screen keyboard comes up while it is typed in |
+| `Dropdown(name, label, choices, &dropdown)` | Material's exposed dropdown: a box showing the choice, opening the choices under it |
+| `SearchView(name, placeholder, &search, content)` | A search pill that opens over the whole screen, ready to type in, with what the program finds under it |
 | `SearchBar(name, &text, placeholder)` | A pill to search in, with a button to empty it |
 
 ### Containment — `containment.go`
@@ -110,6 +112,7 @@ The package's files follow the same order (`doc.go` lists them).
 |---|---|
 | `Dialog(name, Dialog{…})` | A question over the dimmed screen: an icon, a title, a text, more content, one or two actions. Returns `Open`, `Confirmed` or `Dismissed` |
 | `BottomSheet(name, content)` | Choices or a short form in a sheet rising from the bottom |
+| `StandardSheet(name, &sheet, peek, content)` | A sheet over the screen that does not dim it (a map's places): it rests low or expanded, and a finger drags it by its handle |
 | `SideSheet(name, title, content)` | Filters or details in a sheet sliding in from the end, with a title and a cross |
 | `Snackbar(&snackbar)` | A short note at the bottom for a few seconds, with an action (`snackbar.Show(text, action, duration)`) |
 | `Menu(icon, choices)` | A button that opens a list of choices; returns the one chosen |
@@ -391,7 +394,6 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 - The keyboard's composing text (predictions, emoji, Chinese and Japanese), selection handles,
   fonts for other scripts and right-to-left layout.
 - Sound: films play their pictures only.
-- A search view, an exposed dropdown, filled text fields and a bottom sheet that is dragged.
 
 ## Building
 

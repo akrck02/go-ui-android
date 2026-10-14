@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/akrck02/go-renderer/draw2d"
@@ -11,17 +12,21 @@ import (
 
 // inputsState is what the inputs screen remembers.
 type inputsState struct {
-	search, name, reach string
-	kind, view          int
-	nightly             bool
-	filters             [3]bool
-	tags                []string
-	volume              float32
-	date                time.Time
-	datePicker          material.DatePicker
-	timePicker          material.TimePicker
-	choosingDate        bool
-	choosingTime        bool
+	search       material.Search
+	name, reach  string
+	password     string
+	revealed     bool
+	light        material.Dropdown
+	kind, view   int
+	nightly      bool
+	filters      [3]bool
+	tags         []string
+	volume       float32
+	date         time.Time
+	datePicker   material.DatePicker
+	timePicker   material.TimePicker
+	choosingDate bool
+	choosingTime bool
 }
 
 func newInputs() inputsState {
@@ -33,7 +38,7 @@ func (inputs *inputsState) draw(program *gallery, look material.Look) {
 	context, scheme := look.Context, look.Scheme
 	program.largeTopBar(look, "Inputs", "Fields, choices and pickers", "inputs")
 	page(context, "inputs", func() {
-		look.SearchBar("search", &inputs.search, "Search the lighthouses")
+		inputs.searchLighthouses(program, look)
 		look.Heading("Text fields")
 		reachError := ""
 		for _, character := range inputs.reach {
@@ -42,8 +47,12 @@ func (inputs *inputsState) draw(program *gallery, look material.Look) {
 				break
 			}
 		}
-		look.TextField("name", &inputs.name, material.Field{Label: "Name", Placeholder: "Harbour Light", Supporting: "As the chart writes it"})
-		look.TextField("reach", &inputs.reach, material.Field{Label: "Reach", Placeholder: "18", Supporting: "In nautical miles", Error: reachError, MaxLength: 3})
+		look.TextField("name", &inputs.name, material.Field{Label: "Name", Placeholder: "Harbour Light", Supporting: "As the chart writes it",
+			MaxLength: 40, Counter: true, Filled: true})
+		look.TextField("reach", &inputs.reach, material.Field{Label: "Reach", Placeholder: "18", Supporting: "How far out it is seen",
+			Error: reachError, MaxLength: 3, Suffix: "miles"})
+		look.Dropdown("light", "Kind of light", []string{"Fixed", "Flashing", "Occulting", "Isophase"}, &inputs.light)
+		look.TextField("password", &inputs.password, material.Field{Label: "Keeper's password", Secret: true, Reveal: &inputs.revealed})
 		look.Heading("Choices")
 		look.Checkbox("Lit every night", &inputs.nightly)
 		for index, kind := range []string{"Fixed light", "Flashing", "Occulting"} {
@@ -135,4 +144,25 @@ func readable(colour draw2d.Color) draw2d.Color {
 		return draw2d.Color{0, 0, 0, 0.87}
 	}
 	return draw2d.Color{1, 1, 1, 1}
+}
+
+// searchLighthouses is the search at the top of the inputs: it opens over the screen and finds
+// lighthouses by name or place as they are typed; touching one goes to the lists.
+func (inputs *inputsState) searchLighthouses(program *gallery, look material.Look) {
+	query := &inputs.search
+	look.SearchView("search", "Search the lighthouses", query, func() {
+		if query.Query == "" {
+			look.SectionTitle("All the lighthouses")
+		}
+		wanted := strings.ToLower(query.Query)
+		for index, light := range program.lists.lighthouses {
+			if !strings.Contains(strings.ToLower(light.name+" "+light.place), wanted) {
+				continue
+			}
+			picture := coast()[index%len(coast())]
+			if look.ListItem(light.name, material.Item{Picture: picture, Headline: light.name, Supporting: light.place}) {
+				query.Active, program.screen = false, listsScreen
+			}
+		}
+	})
 }

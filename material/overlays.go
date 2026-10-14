@@ -201,3 +201,76 @@ func (look Look) Menu(icon string, choices []string) int {
 	})
 	return chosen
 }
+
+// Sheet is what a standard bottom sheet keeps: whether it is expanded, and how far a finger has
+// dragged it from where it rests.
+type Sheet struct {
+	Expanded bool
+	// Above is how far over the bottom of the window it sits: a navigation bar's height
+	// (NavigationBarHeight) when there is one.
+	Above   float32
+	dragged float32 // upward, in pixels, while a finger holds the handle
+}
+
+// StandardSheet is a bottom sheet that stays over the screen without dimming it, which goes on
+// working above it (a map under a list of its places): it rests showing peek pixels, or expanded
+// to most of the screen, and a finger drags it by its handle between the two; let go, it settles
+// where it was heading. Its content scrolls inside it. name tells sheets apart.
+func (look Look) StandardSheet(name string, sheet *Sheet, peek float32, content func()) {
+	scheme := look.Scheme
+	insets := look.Context.Insets()
+	width, height := look.Context.Size()
+	full := max(height-insets.Top-56-sheet.Above, peek)
+	rest := peek
+	if sheet.Expanded {
+		rest = full
+	}
+	motion := arrivingMotion
+	if sheet.dragged != 0 {
+		motion = 0 // the sheet follows the finger
+	}
+	shown := look.Context.Animate(name+" height", clampFloat(rest+sheet.dragged, peek*0.75, full), motion)
+	// at the window's foot the sheet reaches its edge and keeps its content clear of the gesture
+	// bar; over a navigation bar it sits on the bar, which is clear of the gesture bar already
+	lift, inside := float32(0), insets.Bottom
+	if sheet.Above > 0 {
+		lift, inside = sheet.Above+insets.Bottom, 0
+	}
+	const hiddenCorners = 28 // the panel's lower corners, cut off: a sheet has round corners on top only
+	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.End, Padding: ui.Padding{Bottom: lift},
+		Width: ui.Fixed(min(640, width)), Height: ui.Fixed(shown)}
+	look.Context.Overlay(name, options, func() {
+		cut := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Fixed(shown)}
+		look.Context.Frame(cut, ui.Look{Clip: true}, func() {
+			panel := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Fixed(shown + hiddenCorners),
+				Padding: ui.Padding{Bottom: hiddenCorners + inside}}
+			look.Context.Frame(panel, ui.Look{Fill: scheme.SurfaceContainerLow, Radius: 28}, func() {
+				look.sheetHandle(name, sheet, full-peek)
+				look.Context.ScrollArea(name+" content", ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow()}, content)
+			})
+		})
+	})
+}
+
+// sheetHandle is the bar a finger drags a standard sheet by: let go, the sheet expands past a
+// quarter of the way up or on a flick upwards, and folds down past a quarter of the way down or on
+// a flick downwards.
+func (look Look) sheetHandle(name string, sheet *Sheet, travel float32) {
+	look.Context.SwipeBox(name+" handle", ui.Layout{Width: ui.Grow(), Height: ui.Fixed(36), AlignX: ui.Center, AlignY: ui.Center}, ui.Vertical, func(swipe ui.Swipe) {
+		look.Context.Frame(ui.Layout{Width: ui.Fixed(32), Height: ui.Fixed(4)}, ui.Look{Fill: stateLayer(look.Scheme.OnSurfaceVariant, 0.4), Radius: 2}, nil)
+		sheet.dragged = 0
+		if swipe.Held {
+			sheet.dragged = -swipe.Offset
+		}
+		if !swipe.Released {
+			return
+		}
+		moved := -swipe.Offset
+		switch {
+		case moved > travel/4 || swipe.Velocity < -600:
+			sheet.Expanded = true
+		case moved < -travel/4 || swipe.Velocity > 600:
+			sheet.Expanded = false
+		}
+	})
+}
