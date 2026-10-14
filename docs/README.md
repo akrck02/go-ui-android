@@ -61,6 +61,7 @@ The package's files follow the same order (`doc.go` lists them).
 | `Tabs(name, labels, &selected)` | Primary tabs, the underline sliding to the one chosen |
 | `TabPager(name, labels, &pager, page)` | Tabs over pages a finger swipes from side to side, the underline following them |
 | `Body(besideRail, content)`, `Enter(key, content)` | A screen's content kept clear of the cutout and the gesture bar; a screen rising into place |
+| `Navigation`, `Screens(name, &navigation, screen)`, `GoBack(&navigation)` | A stack of screens inside one place: `Go(key)` opens one sliding in from the right, `GoBack` from the system's back slides it away; the place's first screen is the key `""` |
 | `Back()`, `StatusBarScrim()` | The system's back for the screen (see [Back and motion](#back-and-motion)); the strip under the status bar alone |
 
 ### Actions — `actions.go`

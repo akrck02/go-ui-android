@@ -174,3 +174,51 @@ func TestALargeBarAtRestShowsNoSmallTitle(t *testing.T) {
 		}
 	}
 }
+
+func TestScreensAreGoneToAndBackFrom(t *testing.T) {
+	var navigation Navigation
+	navigation.Reset("list")
+	drawn := map[string]bool{}
+	screen := newScreen(t, func(look Look) {
+		clear(drawn)
+		look.Screens("lights", &navigation, func(key string) {
+			drawn[key] = true
+			look.Text("screen "+key, 16, draw2d.Regular, look.Scheme.OnSurface)
+		})
+		look.GoBack(&navigation)
+	})
+	screen.clocked()
+	screen.frame()
+	navigation.Go("seal rock")
+	screen.frame()
+	if !drawn["list"] || !drawn["seal rock"] {
+		t.Fatalf("drawn %v while going to a screen; want both, the new one sliding in", drawn)
+	}
+	for range 30 {
+		screen.frame()
+	}
+	if drawn["list"] || !drawn["seal rock"] || navigation.Depth() != 2 {
+		t.Fatalf("drawn %v at depth %d once there; want the new screen alone", drawn, navigation.Depth())
+	}
+	screen.state.PressBack()
+	screen.frame()
+	if navigation.Current() != "list" || !drawn["seal rock"] {
+		t.Fatalf("on %q, drawn %v after the back; want the list, the details sliding out", navigation.Current(), drawn)
+	}
+	for range 30 {
+		screen.frame()
+	}
+	screen.state.PressBack()
+	screen.frame()
+	if navigation.Current() != "list" || navigation.Back() {
+		t.Fatal("the first screen was gone back from")
+	}
+}
+
+func TestANavigationStartsAtItsZeroValuesScreen(t *testing.T) {
+	var navigation Navigation
+	navigation.Go("details")
+	if navigation.Depth() != 2 || !navigation.Back() || navigation.Current() != "" {
+		t.Fatal("going back from the first screen gone to does not return to the zero value's")
+	}
+}

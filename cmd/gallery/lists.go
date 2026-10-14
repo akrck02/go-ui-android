@@ -18,6 +18,7 @@ type listsState struct {
 	refreshing  int // frames left of a pretend refresh
 	answers     [3]bool
 	bannerShown bool
+	navigation  material.Navigation // the list, then a lighthouse's details
 }
 
 func newLists() listsState {
@@ -70,9 +71,20 @@ func (lists *listsState) removeChosen() int {
 	return before - len(lists.lighthouses)
 }
 
-// draw shows a list that refreshes when pulled, rows swiped away or held to choose them, a banner
-// and rows that open.
+// draw shows the list of lighthouses, or one's details, which slide in when its row is touched.
 func (lists *listsState) draw(program *gallery, look material.Look) {
+	look.Screens("lists", &lists.navigation, func(key string) {
+		if key == "" {
+			lists.drawList(program, look)
+			return
+		}
+		lists.drawLighthouse(program, look, key)
+	})
+}
+
+// drawList shows a list that refreshes when pulled, rows swiped away or held to choose them, a
+// banner and rows that open.
+func (lists *listsState) drawList(program *gallery, look material.Look) {
 	context, scheme := look.Context, look.Scheme
 	notes := &program.overlays.snackbar
 	choosing := lists.choosing()
@@ -146,6 +158,8 @@ func (lists *listsState) row(look material.Look, light *lighthouse, picture *dra
 		light.chosen = true
 	case touched && choosing:
 		light.chosen = !light.chosen
+	case touched:
+		lists.navigation.Go(light.name)
 	}
 }
 
@@ -187,4 +201,37 @@ func lightsRemoved(count int) string {
 		return "1 lighthouse removed"
 	}
 	return fmt.Sprint(count, " lighthouses removed")
+}
+
+// drawLighthouse shows one lighthouse: its photo, where it is, whether it is lit, and ways to pass
+// it on.
+func (lists *listsState) drawLighthouse(program *gallery, look material.Look, name string) {
+	context, scheme := look.Context, look.Scheme
+	index := slices.IndexFunc(lists.lighthouses, func(light lighthouse) bool { return light.name == name })
+	if look.TopAppBar(material.TopBar{Title: name, Back: true}) {
+		lists.navigation.Back()
+	}
+	if index < 0 {
+		look.Paragraph("This lighthouse was taken out of the list.", 16, draw2d.Regular, scheme.OnSurfaceVariant)
+		return
+	}
+	light := &lists.lighthouses[index]
+	page(context, "light "+name, func() {
+		context.Image(coast()[index%len(coast())], ui.Layout{Width: ui.Grow(), Height: ui.Fixed(220)}, 16)
+		look.Text(light.place, 16, draw2d.Regular, scheme.OnSurfaceVariant)
+		look.ListItem("lit", material.Item{Icon: "lightbulb", Headline: "Lit tonight", Supporting: "Its keeper switches it on at sunset",
+			Trailing: func() { look.Switch("lit switch", &light.lit) }})
+		look.Paragraph("Touch the arrow or go back with the phone's back to return to the list; this screen slid in over it, and slides back out.",
+			14, draw2d.Regular, scheme.OnSurfaceVariant)
+		row(context, func() {
+			if look.FilledButton("share-2", "Share") && !window.Share(light.name, light.name+" — "+light.place) {
+				context.Copy(light.name + " — " + light.place)
+				program.overlays.snackbar.Show("Copied to the clipboard", "", after(3))
+			}
+			if look.OutlinedButton("copy", "Copy") {
+				context.Copy(light.name + " — " + light.place)
+				program.overlays.snackbar.Show("Copied to the clipboard", "", after(3))
+			}
+		})
+	})
 }

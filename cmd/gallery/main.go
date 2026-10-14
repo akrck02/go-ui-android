@@ -234,6 +234,9 @@ func (program *gallery) drawer(look material.Look) {
 // goBack answers the system's back the overlays and the drawer left: from any destination back to
 // the first; from the first, nobody answers, and the program goes to the background.
 func (program *gallery) goBack(look material.Look) {
+	if program.screen == listsScreen && look.GoBack(&program.lists.navigation) {
+		return // from a lighthouse's details back to the list
+	}
 	if program.screen == listsScreen && program.lists.choosing() {
 		if look.Back() {
 			program.lists.chooseNone() // the back leaves choosing before it leaves the screen

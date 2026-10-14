@@ -394,3 +394,93 @@ func (look Look) TabPager(name string, labels []string, pager *Pager, page func(
 		})
 	})
 }
+
+// Navigation is a program's screens, one gone to from another: a list, then one of its rows'
+// details, then a form about it. The program keeps one and names its screens as it likes; Screens
+// draws the one on top. The zero value starts at "".
+type Navigation struct {
+	stack   []string
+	leaving string // the screen going away, while it slides out
+	forward bool   // the last change went to a screen, rather than back from one
+	moves   int    // counts the changes, which Screens eases between
+}
+
+// Current is the screen on top.
+func (navigation *Navigation) Current() string {
+	if len(navigation.stack) == 0 {
+		return ""
+	}
+	return navigation.stack[len(navigation.stack)-1]
+}
+
+// Depth is how many screens there are, the first one included.
+func (navigation *Navigation) Depth() int { return max(len(navigation.stack), 1) }
+
+// Go goes to a screen, over the one shown.
+func (navigation *Navigation) Go(screen string) {
+	navigation.leaving, navigation.forward = navigation.Current(), true
+	if len(navigation.stack) == 0 {
+		navigation.stack = []string{""} // the zero value's first screen
+	}
+	navigation.stack = append(navigation.stack, screen)
+	navigation.moves++
+}
+
+// Back goes back to the screen before, and tells whether there was one.
+func (navigation *Navigation) Back() bool {
+	if len(navigation.stack) < 2 {
+		return false
+	}
+	navigation.leaving, navigation.forward = navigation.Current(), false
+	navigation.stack = navigation.stack[:len(navigation.stack)-1]
+	navigation.moves++
+	return true
+}
+
+// Reset starts again at one screen, with nothing to go back to: a destination of the navigation
+// bar.
+func (navigation *Navigation) Reset(screen string) {
+	navigation.stack, navigation.leaving = []string{screen}, ""
+}
+
+// Screens draws the screen on top of a navigation: one gone to slides in from the end over the one
+// it was gone to from, and slides back out when the program goes back. screen draws a screen by
+// its name. The program answers the system's back with GoBack, after what goes over the screens.
+func (look Look) Screens(name string, navigation *Navigation, screen func(key string)) {
+	context := look.Context
+	target := float32(navigation.moves)
+	at := context.Animate(name+" moves", target, arrivingMotion)
+	travelled := clampFloat(1-(target-at), 0, 1)
+	if travelled >= 1 || navigation.moves == 0 {
+		look.screenBox(name, navigation.Current(), screen, ui.Grow())
+		return
+	}
+	width, _ := context.Size()
+	// the two screens side by side, the strip moved as far as the change has gone
+	first, second := navigation.leaving, navigation.Current()
+	shift := travelled
+	if !navigation.forward {
+		first, second, shift = navigation.Current(), navigation.leaving, 1-travelled
+	}
+	strip := ui.Layout{Width: ui.Grow(), Height: ui.Grow(), Padding: ui.Padding{Left: -shift * width}}
+	context.Frame(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, ui.Look{Clip: true}, func() {
+		context.Box(strip, func() {
+			look.screenBox(name, first, screen, ui.Fixed(width))
+			look.screenBox(name, second, screen, ui.Fixed(width))
+		})
+	})
+}
+
+// screenBox draws one screen in a scope of its own, so two screens drawn at once keep their names
+// apart.
+func (look Look) screenBox(name, key string, screen func(key string), width ui.Sizing) {
+	look.Context.Push(name + " screen " + key)
+	defer look.Context.Pop()
+	look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: width, Height: ui.Grow()}, func() { screen(key) })
+}
+
+// GoBack answers the system's back by going back a screen, while there is one to go back to. Ask
+// for it after drawing what goes over the screens, so that answers first.
+func (look Look) GoBack(navigation *Navigation) bool {
+	return navigation.Depth() > 1 && look.Back() && navigation.Back()
+}

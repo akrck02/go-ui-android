@@ -90,7 +90,7 @@ func TestALighthouseHeldIsChosenAndTheBinRemovesIt(t *testing.T) {
 	for range 30 { // the screen rising into place
 		frame()
 	}
-	touch(40, "Seal Rock", "row")
+	touch(40, "lists screen ", "Seal Rock", "row")
 	if !program.lists.choosing() || program.lists.chosenCount() != 1 {
 		t.Fatal("holding Seal Rock did not choose it")
 	}
@@ -99,11 +99,58 @@ func TestALighthouseHeldIsChosenAndTheBinRemovesIt(t *testing.T) {
 	if program.lists.choosing() || program.screen != listsScreen {
 		t.Fatalf("after the back, choosing %v on screen %d; want nothing chosen, still on the lists", program.lists.choosing(), program.screen)
 	}
-	touch(40, "Seal Rock", "row")
-	touch(1, "icon trash-2")
+	touch(40, "lists screen ", "Seal Rock", "row")
+	touch(1, "lists screen ", "icon trash-2")
 	for _, light := range program.lists.lighthouses {
 		if light.name == "Seal Rock" {
 			t.Fatal("the bin left Seal Rock in the list")
 		}
+	}
+}
+
+// A lighthouse touched opens its details; the back returns to the list, and the next back leaves
+// the lists.
+func TestALighthouseTouchedOpensItsDetails(t *testing.T) {
+	program := &gallery{screen: listsScreen, inputs: newInputs(), lists: newLists(), tabs: newTabs()}
+	context, state := ui.NewWithMeasurer(measurer{}), input.NewState()
+	state.WindowWidth, state.WindowHeight = 412, 892
+	state.FramebufferWidth, state.FramebufferHeight = 412, 892
+	now := time.Unix(1000, 0)
+	state.Now = func() time.Time { return now }
+	var finger input.TouchPointer
+	frame := func() {
+		now = now.Add(16 * time.Millisecond)
+		context.Begin(state)
+		program.build(context)
+		context.End()
+		state.EndFrame()
+	}
+	settle := func() {
+		for range 30 {
+			frame()
+		}
+	}
+	settle()
+	area, found := context.Area("lists screen ", "Seal Rock", "row")
+	if !found {
+		t.Fatal("no Seal Rock row")
+	}
+	x, y := area.X+area.Width/2, area.Y+area.Height/2
+	finger.Begin(state, 1, x, y, 1)
+	frame()
+	finger.End(state, 1, x, y, 1)
+	settle()
+	if program.lists.navigation.Current() != "Seal Rock" {
+		t.Fatalf("on %q after touching Seal Rock; want its details", program.lists.navigation.Current())
+	}
+	state.PressBack()
+	settle()
+	if program.lists.navigation.Current() != "" || program.screen != listsScreen {
+		t.Fatalf("on %q of screen %d after the back; want the list", program.lists.navigation.Current(), program.screen)
+	}
+	state.PressBack()
+	settle()
+	if program.screen != actionsScreen {
+		t.Fatal("the next back did not leave the lists")
 	}
 }
