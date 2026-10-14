@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/akrck02/go-renderer/draw2d"
+	ui "github.com/akrck02/go-ui"
 	"github.com/akrck02/go-ui-android/material"
 )
 
@@ -56,6 +58,7 @@ func (inputs *inputsState) draw(program *gallery, look material.Look) {
 					program.setDark(dark)
 				}
 			}})
+		program.colourChoice(look)
 		look.SegmentedButtons("view", []string{"Day", "Week", "Month"}, &inputs.view)
 		row(context, func() {
 			for index, label := range []string{"Lit", "Dark", "Far out"} {
@@ -93,4 +96,43 @@ func (inputs *inputsState) draw(program *gallery, look material.Look) {
 	if inputs.choosingTime {
 		inputs.choosingTime = look.TimePicker("inspection time", &inputs.timePicker, &inputs.date) == material.Open
 	}
+}
+
+// colourChoice chooses where the scheme comes from: the wallpaper, or one colour made into a
+// whole scheme (material.FromColour).
+func (program *gallery) colourChoice(look material.Look) {
+	context, scheme := look.Context, look.Scheme
+	context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.PadXY(16, 4), Gap: 8, AlignY: ui.Center}, func() {
+		context.Box(ui.Layout{Width: ui.Grow()}, func() { look.Text("Colours", 16, draw2d.Regular, scheme.OnSurface) })
+		for index := range len(seeds) + 1 {
+			chosen := program.colour == index
+			fill, icon := scheme.SurfaceContainerHighest, "image" // the wallpaper's
+			if index > 0 {
+				fill, icon = seeds[index-1], ""
+			}
+			if chosen {
+				icon = "check"
+			}
+			ring := ui.Look{Fill: fill, Radius: 20, Border: scheme.Outline, BorderWidth: 1}
+			if chosen {
+				ring.Border, ring.BorderWidth = scheme.Primary, 3
+			}
+			layout := ui.Layout{Width: ui.Fixed(40), Height: ui.Fixed(40), AlignX: ui.Center, AlignY: ui.Center}
+			if context.Clickable(fmt.Sprint("colour ", index), layout, ui.Looks{Normal: ring, Hovered: ring, Pressed: ring}, func() {
+				if icon != "" {
+					context.IconSized(icon, 20, readable(fill))
+				}
+			}) {
+				program.colour = index
+			}
+		}
+	})
+}
+
+// readable is black or white, whichever shows better on a colour.
+func readable(colour draw2d.Color) draw2d.Color {
+	if 0.299*colour[0]+0.587*colour[1]+0.114*colour[2] > 0.6 {
+		return draw2d.Color{0, 0, 0, 0.87}
+	}
+	return draw2d.Color{1, 1, 1, 1}
 }

@@ -241,7 +241,12 @@ surface and the raised containers over it, the outlines, the error colours and t
   primary from the first accent palette, the containers from the second, the surfaces from the
   neutral ones; the error colours stay Material's.
 - **`material.Baseline(dark)`** is Material's own purple scheme, always the same.
-- **`scheme.WithPrimary(…)`** puts a brand's colour in the primary roles.
+- **`material.FromColour(colour, dark)`** makes a whole scheme from one colour (a brand's, a
+  place's), as Material's own tools do: palettes of its hue at every tone, as Android makes them
+  from a wallpaper, then the roles from them. Each tone is the colour's CIELAB lightness, as in
+  Material, so text keeps its contrast whatever the colour; the hues are worked in OKLCH, where
+  they stay even. `PalettesFromColour` gives the palettes themselves.
+- **`scheme.WithPrimary(…)`** puts a brand's colour in the primary roles only.
 - **`scheme.Theme(dark)`** gives go-ui's own controls (its slider, text fields, menus) the scheme and
   sizes for fingers; set it as the context's theme before the pieces.
 
@@ -337,7 +342,6 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 ## Not yet
 
 - App bundles (`.aab`), which Google Play asks for new applications: they need Google's `bundletool`.
-- A tool that turns a brand's single colour into a whole scheme, as Material's does.
 
 ## Building
 

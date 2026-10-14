@@ -16,6 +16,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
 	"github.com/akrck02/go-ui-android/material"
 	"github.com/akrck02/go-ui/window"
@@ -42,6 +43,7 @@ type gallery struct {
 	screen     int
 	dark       bool
 	themeSet   bool // chosen in the inputs or the menu; until then it follows the system's
+	colour     int  // the scheme's source: 0 the wallpaper, then one of seeds
 	drawerOpen bool
 
 	actions  actionsState
@@ -76,6 +78,18 @@ func (program *gallery) isDark() bool {
 
 func (program *gallery) setDark(dark bool) { program.dark, program.themeSet = dark, true }
 
+// seeds are the colours a scheme can be made from, besides the wallpaper.
+var seeds = []draw2d.Color{draw2d.Hex("#00897b"), draw2d.Hex("#e8743b"), draw2d.Hex("#c2185b"), draw2d.Hex("#558b2f")}
+
+// scheme is the wallpaper's colours (on Android 12 and later; Material's baseline elsewhere), or
+// a whole scheme made from the colour chosen.
+func (program *gallery) scheme(dark bool) material.Scheme {
+	if program.colour == 0 {
+		return material.System(dark)
+	}
+	return material.FromColour(seeds[program.colour-1], dark)
+}
+
 // places are the destinations, in the navigation bar, the rail and the drawer.
 func (program *gallery) places() []material.Destination {
 	return []material.Destination{{Icon: "mouse-pointer-click", Label: "Actions"}, {Icon: "text-cursor-input", Label: "Inputs"},
@@ -86,7 +100,7 @@ func (program *gallery) places() []material.Destination {
 // build describes the interface for this frame.
 func (program *gallery) build(context *ui.Context) {
 	dark := program.isDark()
-	scheme := material.System(dark) // the wallpaper's colours on Android 12 and later
+	scheme := program.scheme(dark)
 	context.Theme = scheme.Theme(dark)
 	look := material.New(context, scheme)
 	// last in the frame: what is over the screen answers the system's back before the screen does
