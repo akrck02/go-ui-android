@@ -54,9 +54,9 @@ func (tabs *tabsState) places(look material.Look) {
 		look.MultiBrowseCarousel("coast", &tabs.coast, len(names), 200, 180, func(index int, width float32) {
 			title := names[index]
 			if width < 120 {
-				title = "" // a narrow item shows its colour and its icon only
+				title = "" // a narrow item shows its photo only
 			}
-			look.CarouselItem(180, tints[(index+1)%len(tints)], icons[index], title)
+			look.CarouselPicture(coast()[index%len(coast())], 180, title)
 		})
 	})
 }
@@ -65,6 +65,11 @@ func (tabs *tabsState) places(look material.Look) {
 func (tabs *tabsState) cards(look material.Look) {
 	context, scheme := look.Context, look.Scheme
 	page(context, "cards", func() {
+		look.OutlinedCard(func() {
+			context.Image(coast()[3], ui.Layout{Width: ui.Grow(), Height: ui.Fixed(160)}, 12)
+			look.Text("The north light at night", 18, draw2d.Medium, scheme.OnSurface)
+			look.Paragraph("Its lamp turns every ten seconds, seen eighteen miles out.", 14, draw2d.Regular, scheme.OnSurfaceVariant)
+		})
 		look.Card(func() {
 			look.Text("Tonight's watch", 18, draw2d.Medium, scheme.OnSurface)
 			look.Paragraph("Two lighthouses lit, two dark. The wind turns west after midnight.", 14, draw2d.Regular, scheme.OnSurfaceVariant)

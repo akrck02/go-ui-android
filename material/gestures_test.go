@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/akrck02/go-renderer/draw2d"
 	"github.com/akrck02/go-renderer/input"
 	ui "github.com/akrck02/go-ui"
 )
@@ -164,5 +165,26 @@ func TestKeylinesKeepMoreLargeItemsOnAWideScreen(t *testing.T) {
 	keylines = browseKeylines(900, 200) // a medium of 4 pixels: the third large item takes its place
 	if len(keylines) != 5 || keylines[3] != 200 {
 		t.Fatalf("keylines %v on 900 pixels; want the medium item no narrower than the smallest", keylines)
+	}
+}
+
+func TestACarouselPictureWritesItsTitleOverAVeil(t *testing.T) {
+	photo := draw2d.NewBlankImage(40, 30)
+	screen := newScreen(t, func(look Look) { look.CarouselPicture(photo, 180, "North Cape") })
+	screen.frame()
+	screen.frame()
+	var image, veil, title bool
+	for _, command := range screen.context.Drawing().Commands {
+		switch {
+		case command.Kind == draw2d.ImageKind && command.Picture == photo:
+			image = true
+		case command.Kind == draw2d.RectangleKind && command.Fill[3] > 0.3 && command.Fill[0] == 0 && command.HasClip:
+			veil = image // drawn after the photo, over it
+		case command.Kind == draw2d.TextKind && command.Text == "North Cape":
+			title = veil
+		}
+	}
+	if !image || !veil || !title {
+		t.Fatalf("photo %v, veil over it %v, title over that %v; want all three in that order", image, veil, title)
 	}
 }

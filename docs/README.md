@@ -12,6 +12,7 @@ page, and on Android it is a shared library that Android's own `NativeActivity` 
 
 - [Using the pieces](#using-the-pieces)
 - [The pieces, by Material's catalogue](#the-pieces-by-materials-catalogue)
+- [Pictures](#pictures)
 - [Gestures](#gestures)
 - [Back and motion](#back-and-motion)
 - [Colours](#colours)
@@ -94,10 +95,10 @@ The package's files follow the same order (`doc.go` lists them).
 
 | Piece | What it is |
 |---|---|
-| `ListItem(name, Item{…})` | A list row: an icon in a round avatar, a headline, a supporting line, something at its end; `Selected` tints it and puts a tick in the avatar's place |
+| `ListItem(name, Item{…})` | A list row: an icon in a round avatar (or a photo, `Picture`), a headline, a supporting line, something at its end; `Selected` tints it and puts a tick in the avatar's place |
 | `ExpandableItem(name, item, &open, more)` | A row that unfolds to show more under it and folds back, its chevron turning |
 | `Card`, `ElevatedCard`, `OutlinedCard` | Containers for one subject: filled, raised over a scene, drawn by their border |
-| `Avatar(name, icon, tint, size)` | A person's initials or a thing's icon in a circle |
+| `Avatar(name, icon, tint, size)`, `PictureAvatar(picture, size)` | A person's initials or a thing's icon in a circle; a photo in one |
 | `Banner(icon, text, actions…)` | A message across the top of the content that stays until acted on |
 | `SectionTitle`, `Heading`, `Divider` | A small heading over a list's rows; one for content with its own margins; a line between groups |
 | `Text`, `Paragraph` (`look.go`) | One line; text that breaks into lines at the width it has |
@@ -142,8 +143,26 @@ a core on a OnePlus 7 Pro, and nothing once the screen is left.
 | `PullToRefresh(name, refreshing, layout, rows)` | A list that refreshes when pulled down past its top and let go; the indicator stays while `refreshing` |
 | `SwipeToDismiss(name, row)` | A row a finger slides away, a bin in the gap it leaves |
 | `Carousel(name, &carousel, count, itemWidth, item)`, `CarouselItem` | A row of tiles slid sideways, gliding on and settling at a tile |
+| `CarouselPicture(picture, height, title)` | A carousel item made of a photo, its title on a dark veil at its foot |
 | `MultiBrowseCarousel(name, &carousel, count, largeWidth, height, item)` | Material's multi-browse carousel: large tiles, then a medium and a small one; tiles shrink towards the edges and grow as they come in |
 | `Stick(name, &stick, size)` | An on-screen stick for walking or driving with a thumb |
+
+## Pictures
+
+Photos are go-renderer's `draw2d.Image`: decode one once (`draw2d.DecodeImage` reads a PNG, JPEG
+or GIF the program embeds) and keep it. `context.Image(picture, layout, radius)` draws it filling a
+box, cropped evenly where their shapes differ; the pieces take one where a photo belongs:
+`Item.Picture` in a list row's avatar, `PictureAvatar`, `CarouselPicture` in a carousel. The
+gallery paints its own pictures of a coast at different times of day, so it ships no photos.
+
+```go
+//go:embed north-cape.jpg
+var northCapeFile []byte
+
+northCape, err := draw2d.DecodeImage(bytes.NewReader(northCapeFile))
+…
+look.ListItem("north", material.Item{Picture: northCape, Headline: "North Cape"})
+```
 
 ## Gestures
 
@@ -288,11 +307,12 @@ What the program writes to its standard error (a panic, `log.Fatal`) is in Andro
 
 ## The gallery
 
-`cmd/gallery` has a screen for each part of the catalogue, one file each:
+`cmd/gallery` has a screen for each part of the catalogue, one file each (`-screen 0` to `4` opens on
+one, for captures):
 
 | Actions | Inputs | Lists | Feedback | Tabs |
 |---|---|---|---|---|
-| <img src="images/actions.png" width="150" alt="Buttons, a split button, a button group, assist chips, a floating toolbar and menu"> | <img src="images/inputs.png" width="150" alt="A search bar, text fields, check boxes, radio buttons and a switch"> | <img src="images/lists.png" width="150" alt="Two lighthouses chosen with a long press, a cross and a bin in the top bar, over a list pulled to refresh"> | <img src="images/feedback.png" width="150" alt="Loading indicators, wavy progress and skeletons"> | <img src="images/tabs.png" width="150" alt="Tabs over swiping pages, a carousel of places"> |
+| <img src="images/actions.png" width="150" alt="Buttons, a split button, a button group, assist chips, a floating toolbar and menu"> | <img src="images/inputs.png" width="150" alt="A search bar, text fields, check boxes, radio buttons and a switch"> | <img src="images/lists.png" width="150" alt="Two lighthouses chosen with a long press in a list of rows with photos, a cross and a bin in the top bar"> | <img src="images/feedback.png" width="150" alt="Loading indicators, wavy progress and skeletons"> | <img src="images/tabs.png" width="150" alt="Tabs over swiping pages, a carousel of places and a multi-browse carousel of photos of a coast"> |
 
 It was tried on a Pixel 6 Pro (Android 16, the wallpaper's colours, dark), the Android 16 emulator
 (light, turned all the way round) and a OnePlus 7 Pro (Android 10, Material's baseline): every

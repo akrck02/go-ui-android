@@ -232,6 +232,25 @@ func keylineWidth(keylines []float32, place float32) float32 {
 
 func clampFloat(value, minimum, maximum float32) float32 { return min(max(value, minimum), maximum) }
 
+// CarouselPicture is a carousel item made of a photo, with a title over its foot on a dark veil
+// that keeps the title readable on any photo; an empty title leaves the photo alone (a narrow item).
+func (look Look) CarouselPicture(picture *draw2d.Image, height float32, title string) {
+	layout := ui.Layout{Width: ui.Grow(), Height: ui.Fixed(height)}
+	look.Context.Paint(layout, func(area draw2d.Rect, drawing *draw2d.List) {
+		drawing.Image(picture, area, 28, draw2d.Color{1, 1, 1, 1})
+		if title == "" {
+			return
+		}
+		const veilHeight = 56
+		veil := draw2d.Rect{X: area.X, Y: area.Bottom() - veilHeight, Width: area.Width, Height: veilHeight}
+		// the photo's own shape, cut to its foot: the veil's corners are the photo's
+		drawing.PushClip(veil)
+		drawing.Rectangle(area, 28, draw2d.Color{0, 0, 0, 0.45}, draw2d.Color{}, 0)
+		drawing.PopClip()
+		drawing.Text(title, area.X+16, veil.Y+veilHeight/2+6, 16, draw2d.Medium, draw2d.Color{1, 1, 1, 1})
+	})
+}
+
 // CarouselItem is a carousel's usual item: a rounded tile in a colour, with a title over its foot.
 func (look Look) CarouselItem(height float32, tint draw2d.Color, icon, title string) {
 	tile := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Fixed(height), Padding: ui.Pad(16), AlignY: ui.End, Gap: 4}

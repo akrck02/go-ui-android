@@ -99,7 +99,8 @@ func (lists *listsState) draw(program *gallery, look material.Look) {
 		for index := 0; index < len(lists.lighthouses); index++ {
 			light := &lists.lighthouses[index]
 			context.Push(light.name)
-			if look.SwipeToDismiss("swipe", func() { lists.row(look, light, choosing) }) {
+			picture := coast()[index%len(coast())]
+			if look.SwipeToDismiss("swipe", func() { lists.row(look, light, picture, choosing) }) {
 				notes.Show(light.name+" removed", "", after(3))
 				lists.lighthouses = append(lists.lighthouses[:index], lists.lighthouses[index+1:]...)
 				index--
@@ -135,8 +136,8 @@ func (lists *listsState) draw(program *gallery, look material.Look) {
 }
 
 // row is a lighthouse's row: held, it is chosen; touched while choosing, it is chosen or let go.
-func (lists *listsState) row(look material.Look, light *lighthouse, choosing bool) {
-	touched := look.ListItem("row", material.Item{Icon: "lightbulb", Headline: light.name, Supporting: light.place,
+func (lists *listsState) row(look material.Look, light *lighthouse, picture *draw2d.Image, choosing bool) {
+	touched := look.ListItem("row", material.Item{Picture: picture, Headline: light.name, Supporting: light.place,
 		Selected: light.chosen, Trailing: func() { look.Switch("lit", &light.lit) }})
 	switch {
 	case look.LongPressed():

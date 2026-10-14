@@ -55,8 +55,9 @@ type gallery struct {
 func main() {
 	options := window.Options{Title: "Gallery", Width: 412, Height: 892}
 	options.RegisterFlags(flag.CommandLine)
+	screen := flag.Int("screen", actionsScreen, "the screen to open on, from 0 (Actions) to 4 (Tabs): for captures")
 	flag.Parse()
-	program := &gallery{dark: options.Dark, themeSet: options.Dark}
+	program := &gallery{screen: min(max(*screen, actionsScreen), tabsScreen), dark: options.Dark, themeSet: options.Dark}
 	program.inputs = newInputs()
 	program.lists = newLists()
 	program.tabs = newTabs()

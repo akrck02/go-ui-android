@@ -27,8 +27,10 @@ func (look Look) OutlinedCard(content func()) {
 
 // Item is what a list item shows.
 type Item struct {
-	Icon       string       // in a round avatar at the start; none when empty
-	Mark       draw2d.Color // the avatar's colour; the primary container when zero
+	Icon string       // in a round avatar at the start; none when empty
+	Mark draw2d.Color // the avatar's colour; the primary container when zero
+	// Picture is a photo in the round avatar instead of the icon (a person, a place).
+	Picture    *draw2d.Image
 	Headline   string
 	Supporting string // the line under the headline; none when empty
 	// Trailing draws what goes at the end (a Switch, an IconButton, a Tag); none when nil.
@@ -56,6 +58,8 @@ func (look Look) ListItem(name string, item Item) bool {
 		switch {
 		case item.Selected:
 			look.tick()
+		case item.Picture != nil:
+			look.PictureAvatar(item.Picture, 40)
 		case item.Icon != "":
 			look.avatar(item)
 		}
@@ -156,6 +160,11 @@ func (look Look) Avatar(name, icon string, tint draw2d.Color, size float32) {
 		}
 		look.Context.IconSized(icon, size*0.5, ink)
 	})
+}
+
+// PictureAvatar is a person or a place shown by a photo in a circle. size is its side, 40 in lists.
+func (look Look) PictureAvatar(picture *draw2d.Image, size float32) {
+	look.Context.Image(picture, ui.Layout{Width: ui.Fixed(size), Height: ui.Fixed(size)}, size/2)
 }
 
 // initialsOf is the first letters of a name's first two words, in capitals.
