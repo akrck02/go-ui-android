@@ -341,6 +341,8 @@ signed with the program's own key (below).
 | `-version-code`, `-version` | The version's number and the version people read |
 | `-min-sdk`, `-target-sdk` | The oldest Android it runs on (26, Android 8, at least) and the one it is made for |
 | `-icon` | A square PNG for the launcher |
+| `-icon-foreground`, `-icon-background`, `-icon-monochrome` | An adaptive icon, which each launcher cuts to its own shape: a PNG of 108 dp whose middle 66 dp always shows, a colour (`#rrggbb`) or a PNG behind it, and a one-colour PNG for themed icons (Android 13+) |
+| `-splash`, `-splash-dark` | The colour (`#rrggbb`) the window shows while the program starts, in the light and the dark theme; Android 12 and later draw the icon over it |
 | `-debuggable` | Lets `adb` read its folder and debug it; on by default |
 | `-notifications` | Names the permission Android 13 and later ask before showing notifications |
 | `-internet` | Lets the program use the network: on by default, granted when the package is installed with no question; `-internet=false` leaves it out |

@@ -85,21 +85,9 @@ func buildLibrary(pkg, library string, processor abi, compiler string) error {
 
 // packResources writes the manifest, the window theme and the icon, and links them into a package.
 func packResources(app application, tools sdk, work, unaligned string) error {
-	manifest, err := app.manifest()
+	files, err := app.resources()
 	if err != nil {
 		return err
-	}
-	files := map[string][]byte{
-		"AndroidManifest.xml":         manifest,
-		"res/values/styles.xml":       windowTheme(false),
-		"res/values-night/styles.xml": windowTheme(true),
-	}
-	if app.Icon != "" {
-		icon, err := os.ReadFile(app.Icon)
-		if err != nil {
-			return fmt.Errorf("the icon: %w", err)
-		}
-		files["res/mipmap/icon.png"] = icon
 	}
 	for name, contents := range files {
 		path := filepath.Join(work, name)

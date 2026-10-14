@@ -3,7 +3,9 @@
 // on a phone, on the desktop and in a web page:
 //
 //	go run ./cmd/gallery                                                   # a phone-sized window
-//	go run ./cmd/go-ui-apk -name Gallery -id io.github.akrck02.gallery -notifications ./cmd/gallery
+//	go run ./cmd/go-ui-apk -name Gallery -id io.github.akrck02.gallery -notifications \
+//	    -icon-foreground cmd/gallery/icon/foreground.png -icon-background '#6750a4' \
+//	    -icon-monochrome cmd/gallery/icon/monochrome.png -splash '#fef7ff' -splash-dark '#141218' ./cmd/gallery
 //	GOOS=js GOARCH=wasm go build -o gallery.wasm ./cmd/gallery             # a web page
 //
 // Each screen is a file of its own: actions.go, inputs.go, lists.go, feedback.go and tabs.go;
