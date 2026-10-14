@@ -23,10 +23,27 @@ type Stick struct {
 }
 
 // Stick draws the stick, its knob where the finger points it, and follows the fingers of this frame
-// (ui.Context.Touches). size is its side, 128 or so; name tells it apart. It asks for frames while
-// held, so what it drives keeps moving under a finger that stays still.
+// (ui.Context.Touches). size is its side, 128 or so; name tells it apart. It may sit anywhere: in a
+// Push scope, a scrolling list or swiping pages, whose finger it takes while it steers. It asks for
+// frames while held, so what it drives keeps moving under a finger that stays still.
 func (look Look) Stick(name string, stick *Stick, size float32) {
 	stick.Follow(look.Context.Touches())
+	layout := ui.Layout{Width: ui.Fixed(size), Height: ui.Fixed(size)}
+	// Two swipe boxes, one for each way, hold the finger that steers, so the pages or the list
+	// around the stick do not move with it; the outer one says where the stick was laid out.
+	look.Context.SwipeBox(name+" sideways", layout, ui.Horizontal, func(sideways ui.Swipe) {
+		if sideways.Area.Width > 0 {
+			stick.area, stick.size = sideways.Area, size
+		}
+		look.Context.SwipeBox(name+" up and down", layout, ui.Vertical, func(ui.Swipe) { look.stickRing(name, stick, size) })
+	})
+	if stick.Held {
+		look.Context.RequestFrame(0)
+	}
+}
+
+// stickRing draws the ring and the knob, pushed from the middle as far as the stick is pointed.
+func (look Look) stickRing(name string, stick *Stick, size float32) {
 	scheme := look.Scheme
 	knob := size * 0.4
 	reach := (size - knob) / 2
@@ -38,12 +55,6 @@ func (look Look) Stick(name string, stick *Stick, size float32) {
 		knobLayout := ui.Layout{Width: ui.Fixed(knob), Height: ui.Fixed(knob), AlignX: ui.Center, AlignY: ui.Center}
 		look.Context.Frame(knobLayout, ui.Look{Fill: scheme.Primary, Radius: knob / 2, Shadow: true}, nil)
 	})
-	if area, found := look.Context.Area(name); found {
-		stick.area, stick.size = area, size
-	}
-	if stick.Held {
-		look.Context.RequestFrame(0)
-	}
 }
 
 // Follow gives the stick to the finger that came down on it, and points it at that finger; a

@@ -37,3 +37,33 @@ func TestTheStickFollowsItsFingerAndNoOther(t *testing.T) {
 		t.Fatal("letting go does not bring the stick back")
 	}
 }
+
+func TestAStickInsideSwipingPagesTakesItsFingerFromThem(t *testing.T) {
+	var stick Stick
+	var pager Pager
+	screen := newScreen(t, func(look Look) {
+		look.TabPager("views", []string{"Bay", "List"}, &pager, func(index int) {
+			look.Stick("sail", &stick, 120)
+		})
+	})
+	screen.clocked()
+	screen.frame()
+	screen.frame()
+	area, found := screen.context.Area("views page 0", "sail")
+	if !found {
+		t.Fatal("the stick was not laid out inside the first page")
+	}
+	middleX, middleY := float64(area.X+area.Width/2), float64(area.Y+area.Height/2)
+
+	screen.drag(middleX, middleY, 200, 0, false) // far to the right, held
+	if !stick.Held || stick.Sideways < 0.99 {
+		t.Fatalf("held %v, sideways %v; want the stick held all the way right", stick.Held, stick.Sideways)
+	}
+	if pager.shown != 0 {
+		t.Fatalf("pages shown at %v while steering; want them still", pager.shown)
+	}
+	screen.drag(middleX+200, middleY, 0, 0, true)
+	if stick.Held || pager.Selected != 0 {
+		t.Fatalf("held %v, page %d after letting go; want the stick let go on the first page", stick.Held, pager.Selected)
+	}
+}

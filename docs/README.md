@@ -160,8 +160,8 @@ away inside a list pulled to refresh.
 - **Carousels.** Let go, they glide on with the finger's speed and settle at a tile's edge.
 - **The stick.** The finger that comes down on it holds it; `Forward` and `Sideways` go from -1 to 1.
   Other fingers stay free, so a program can turn a view with them (`context.Touches()`, leaving out
-  `stick.Touching(touch)`). It finds where it was laid out by its name, so it is drawn outside `Push`
-  scopes and scroll areas.
+  `stick.Touching(touch)`). It can sit anywhere, in a `Push` scope, a list or swiping pages: the
+  finger steering it is its own, so the pages and the list stay still under it.
 
 ## Back and motion
 
