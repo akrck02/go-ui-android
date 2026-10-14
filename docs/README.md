@@ -387,6 +387,11 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 
 ## Not yet
 
+- A screen reader (TalkBack): the pieces have names, but no accessibility tree reaches the system.
+- The keyboard's composing text (predictions, emoji, Chinese and Japanese), selection handles,
+  fonts for other scripts and right-to-left layout.
+- Sound: films play their pictures only.
+- A search view, an exposed dropdown, filled text fields and a bottom sheet that is dragged.
 
 ## Building
 
