@@ -14,6 +14,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/akrck02/go-renderer/draw2d"
@@ -59,14 +60,64 @@ func main() {
 	options.RegisterFlags(flag.CommandLine)
 	screen := flag.Int("screen", actionsScreen, "the screen to open on, from 0 (Actions) to 4 (Tabs): for captures")
 	flag.Parse()
-	program := &gallery{screen: min(max(*screen, actionsScreen), tabsScreen), dark: options.Dark, themeSet: options.Dark}
+	program := &gallery{dark: options.Dark, themeSet: options.Dark}
 	program.inputs = newInputs()
 	program.lists = newLists()
 	program.tabs = newTabs()
-	material.UseRoboto() // before the window makes its interface, which reads the fonts
+	program.restore()
+	if wasSet("screen") {
+		program.screen = min(max(*screen, actionsScreen), tabsScreen)
+	}
+	if wasSet("dark") {
+		program.dark, program.themeSet = options.Dark, true
+	}
+	options.Hidden = program.keep // a phone may end the gallery once it is out of sight
+	material.UseRoboto()          // before the window makes its interface, which reads the fonts
 	if err := window.Run(options, program.build); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// wasSet tells whether a flag was given on the command line.
+func wasSet(name string) bool {
+	given := false
+	flag.Visit(func(set *flag.Flag) { given = given || set.Name == name })
+	return given
+}
+
+// keep keeps the screen, the theme and the colours chosen, for the next run.
+func (program *gallery) keep() {
+	theme := ""
+	if program.themeSet {
+		theme = map[bool]string{false: "light", true: "dark"}[program.dark]
+	}
+	for name, value := range map[string]string{"screen": strconv.Itoa(program.screen), "theme": theme, "colour": strconv.Itoa(program.colour)} {
+		if err := window.KeepPreference(name, value); err != nil {
+			log.Print(err)
+			return
+		}
+	}
+}
+
+// restore takes up where the last run was left.
+func (program *gallery) restore() {
+	if screen, err := strconv.Atoi(preference("screen")); err == nil {
+		program.screen = min(max(screen, actionsScreen), tabsScreen)
+	}
+	if colour, err := strconv.Atoi(preference("colour")); err == nil {
+		program.colour = min(max(colour, 0), len(seeds))
+	}
+	switch preference("theme") {
+	case "light":
+		program.setDark(false)
+	case "dark":
+		program.setDark(true)
+	}
+}
+
+func preference(name string) string {
+	value, _ := window.Preference(name)
+	return value
 }
 
 func (program *gallery) isDark() bool {
@@ -77,6 +128,9 @@ func (program *gallery) isDark() bool {
 }
 
 func (program *gallery) setDark(dark bool) { program.dark, program.themeSet = dark, true }
+
+// projectPage is where the gallery's pieces come from.
+const projectPage = "https://github.com/akrck02/go-ui-android"
 
 // seeds are the colours a scheme can be made from, besides the wallpaper.
 var seeds = []draw2d.Color{draw2d.Hex("#00897b"), draw2d.Hex("#e8743b"), draw2d.Hex("#c2185b"), draw2d.Hex("#558b2f")}
@@ -157,11 +211,13 @@ func (program *gallery) bar(look material.Look, title, subtitle string) material
 		if look.IconButton("menu") {
 			program.drawerOpen = true
 		}
-		switch look.Menu("ellipsis-vertical", []string{"Light theme", "Dark theme"}) {
+		switch look.Menu("ellipsis-vertical", []string{"Light theme", "Dark theme", "About the gallery"}) {
 		case 0:
 			program.setDark(false)
 		case 1:
 			program.setDark(true)
+		case 2:
+			window.OpenLink(projectPage)
 		}
 	}}
 }

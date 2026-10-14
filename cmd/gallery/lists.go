@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
 	"github.com/akrck02/go-ui-android/material"
+	"github.com/akrck02/go-ui/window"
 )
 
 // listsState is what the lists screen remembers.
@@ -152,6 +154,14 @@ func (lists *listsState) row(look material.Look, light *lighthouse, picture *dra
 func (lists *listsState) choiceBar(look material.Look, notes *material.Snackbar) {
 	count := lists.chosenCount()
 	bar := material.TopBar{Title: fmt.Sprint(count, " chosen"), Back: true, Close: true, Actions: func() {
+		if look.IconButton("share-2") && !window.Share("Lighthouses", lists.chosenNames()) {
+			look.Context.Copy(lists.chosenNames()) // where there is no sheet to share through
+			notes.Show("Copied: paste them where you like", "", after(3))
+		}
+		if look.IconButton("copy") {
+			look.Context.Copy(lists.chosenNames())
+			notes.Show("Copied to the clipboard", "", after(3))
+		}
 		if look.IconButton("trash-2") {
 			notes.Show(lightsRemoved(lists.removeChosen()), "", after(3))
 		}
@@ -159,6 +169,17 @@ func (lists *listsState) choiceBar(look material.Look, notes *material.Snackbar)
 	if look.TopAppBar(bar) {
 		lists.chooseNone()
 	}
+}
+
+// chosenNames is the chosen lighthouses, one a line with where they are, to share or copy.
+func (lists *listsState) chosenNames() string {
+	var lines []string
+	for _, light := range lists.lighthouses {
+		if light.chosen {
+			lines = append(lines, light.name+" — "+light.place)
+		}
+	}
+	return strings.Join(lines, "\n")
 }
 
 func lightsRemoved(count int) string {

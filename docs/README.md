@@ -18,6 +18,7 @@ page, and on Android it is a shared library that Android's own `NativeActivity` 
 - [Colours](#colours)
 - [Turning the phone](#turning-the-phone)
 - [Notifications](#notifications)
+- [The phone's services](#the-phones-services)
 - [Packaging: go-ui-apk](#packaging-go-ui-apk)
 - [The gallery](#the-gallery)
 
@@ -299,6 +300,22 @@ Android 13 and later show them only once the person allows it: check `window.Not
 and ask with `window.AskForNotifications()` when they do something that needs them. Build the
 package with `go-ui-apk -notifications`, which names the permission. In a browser they are the
 page's notifications; on the desktop they are not shown yet.
+
+## The phone's services
+
+What a program asks of the phone goes through go-ui's window, and works in a browser too:
+
+- **Links and sharing.** `window.OpenLink(link)` opens a web page in the browser, `mailto:` in the
+  mail, `tel:` in the phone; `window.Share(title, text)` offers a text through the system's sheet.
+  The gallery shares the lighthouses chosen in its list, and opens its project page from the menu.
+- **The clipboard.** `look.Context.Copy(text)` puts a text on the phone's clipboard, and text fields
+  copy and paste through it.
+- **Preferences.** `window.Preference(name)` and `window.KeepPreference(name, value)` keep small
+  values between runs. Android may end a program in the background without a word, so keep them
+  in `Options.Hidden`, called when the program leaves the screen: the gallery keeps its screen, its
+  theme and its colours there, and comes back as it was left.
+- **The person's text size.** Text grows with the phone's font size setting; icons and paddings
+  keep theirs, as in Android's own applications.
 
 ## Packaging: go-ui-apk
 
