@@ -34,6 +34,7 @@ const (
 type lighthouse struct {
 	name, place string
 	lit         bool
+	chosen      bool // held, or touched while choosing, on the lists screen
 }
 
 // gallery is everything the program remembers between frames.
@@ -148,6 +149,12 @@ func (program *gallery) drawer(look material.Look) {
 // goBack answers the system's back the overlays and the drawer left: from any destination back to
 // the first; from the first, nobody answers, and the program goes to the background.
 func (program *gallery) goBack(look material.Look) {
+	if program.screen == listsScreen && program.lists.choosing() {
+		if look.Back() {
+			program.lists.chooseNone() // the back leaves choosing before it leaves the screen
+		}
+		return
+	}
 	if program.screen != actionsScreen && look.Back() {
 		program.screen = actionsScreen
 	}

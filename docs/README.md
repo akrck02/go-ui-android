@@ -52,7 +52,7 @@ The package's files follow the same order (`doc.go` lists them).
 
 | Piece | What it is |
 |---|---|
-| `TopAppBar(TopBar{…})` | The bar at the top, painted up under the status bar: a back arrow, a title and a subtitle, actions at its end; `Large` writes the title big under it |
+| `TopAppBar(TopBar{…})` | The bar at the top, painted up under the status bar: a back arrow (a cross with `Close`, to leave a mode), a title and a subtitle, actions at its end; `Large` writes the title big under it |
 | `NavigationBar(destinations, &selected)` | Three to five destinations at the bottom, painted down under the gesture bar; `Destination.Badge` marks one with a count or a dot |
 | `NavigationRail(destinations, &selected)` | The same down the left edge, on a wide screen (`Wide()`) |
 | `NavigationDrawer(name, title, destinations, &selected)` | Every destination in a drawer sliding in from the left |
@@ -94,7 +94,7 @@ The package's files follow the same order (`doc.go` lists them).
 
 | Piece | What it is |
 |---|---|
-| `ListItem(name, Item{…})` | A list row: an icon in a round avatar, a headline, a supporting line, something at its end |
+| `ListItem(name, Item{…})` | A list row: an icon in a round avatar, a headline, a supporting line, something at its end; `Selected` tints it and puts a tick in the avatar's place |
 | `ExpandableItem(name, item, &open, more)` | A row that opens to show more under it, its chevron turning |
 | `Card`, `ElevatedCard`, `OutlinedCard` | Containers for one subject: filled, raised over a scene, drawn by their border |
 | `Avatar(name, icon, tint, size)` | A person's initials or a thing's icon in a circle |
@@ -137,6 +137,7 @@ a core on a OnePlus 7 Pro, and nothing once the screen is left.
 
 | Piece | What it is |
 |---|---|
+| `LongPressed()` | Whether the piece drawn just before was held: the phone buzzes, and a list starts choosing rows |
 | `PullToRefresh(name, refreshing, layout, rows)` | A list that refreshes when pulled down past its top and let go; the indicator stays while `refreshing` |
 | `SwipeToDismiss(name, row)` | A row a finger slides away, a bin in the gap it leaves |
 | `Carousel(name, &carousel, count, itemWidth, item)`, `CarouselItem` | A row of tiles slid sideways, gliding on and settling at a tile |
@@ -151,6 +152,21 @@ down on is then not touched, and a finger that hardly moves stays a touch. So th
 each other freely: the gallery has a carousel inside a list inside swiping pages, and rows swiped
 away inside a list pulled to refresh.
 
+- **Long press.** A finger held still on a piece for half a second (go-ui's `LongPressed`; with a
+  mouse, its right button) long-presses it, and lifting it then is no touch. `look.LongPressed()`
+  after a piece tells, and gives the phone's short buzz, as Android's own applications do. A list
+  starts choosing with it: the row held is chosen (`Item.Selected`), touches choose more, and the
+  top bar says how many, with a cross to stop (`TopBar.Close`) and actions for what is chosen.
+
+  ```go
+  touched := look.ListItem("row", material.Item{Headline: light.name, Selected: light.chosen})
+  switch {
+  case look.LongPressed():
+  	light.chosen = true
+  case touched && choosing:
+  	light.chosen = !light.chosen
+  }
+  ```
 - **Pull to refresh.** The indicator follows the pull (go-ui's `ScrollPull`); let go past 64 pixels,
   `PullToRefresh` returns true, and the program refreshes, keeping `refreshing` set until done.
 - **Swiping pages.** A page let go past a third of the way, or flicked, turns to the next; the tab
@@ -166,9 +182,9 @@ away inside a list pulled to refresh.
 ## Back and motion
 
 A phone's back gesture reaches the program. Dialogs, sheets, the drawer and the floating menu answer
-it first and close; then `look.Back()` tells the screen, which goes back (to the first destination,
-to the list a detail came from). A back nobody answers sends the program to the background, as
-Android's own applications do at their first screen. Ask for it after drawing what goes over the
+it first and close; then `look.Back()` tells the screen, which stops choosing rows or goes back (to
+the first destination, to the list a detail came from). A back nobody answers sends the program to
+the background, as Android's own applications do at their first screen. Ask for it after drawing what goes over the
 screen, so that gets it first:
 
 ```go
@@ -267,7 +283,7 @@ What the program writes to its standard error (a panic, `log.Fatal`) is in Andro
 
 | Actions | Inputs | Lists | Feedback | Tabs |
 |---|---|---|---|---|
-| <img src="images/actions.png" width="150" alt="Buttons, a split button, a button group, assist chips, a floating toolbar and menu"> | <img src="images/inputs.png" width="150" alt="A search bar, text fields, check boxes, radio buttons and a switch"> | <img src="images/lists.png" width="150" alt="A banner over a list pulled to refresh, rows with switches"> | <img src="images/feedback.png" width="150" alt="Loading indicators, wavy progress and skeletons"> | <img src="images/tabs.png" width="150" alt="Tabs over swiping pages, a carousel of places"> |
+| <img src="images/actions.png" width="150" alt="Buttons, a split button, a button group, assist chips, a floating toolbar and menu"> | <img src="images/inputs.png" width="150" alt="A search bar, text fields, check boxes, radio buttons and a switch"> | <img src="images/lists.png" width="150" alt="Two lighthouses chosen with a long press, a cross and a bin in the top bar, over a list pulled to refresh"> | <img src="images/feedback.png" width="150" alt="Loading indicators, wavy progress and skeletons"> | <img src="images/tabs.png" width="150" alt="Tabs over swiping pages, a carousel of places"> |
 
 It was tried on a Pixel 6 Pro (Android 16, the wallpaper's colours, dark), the Android 16 emulator
 (light, turned all the way round) and a OnePlus 7 Pro (Android 10, Material's baseline): every
@@ -277,7 +293,7 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 
 ## Not yet
 
-- Long presses, and pieces leaving with motion.
+- Pieces leaving with motion.
 - A carousel's tiles changing size near its edges (Material's multi-browse carousel), side sheets,
   and a scrolling top bar that shrinks.
 - Packages for x86_64 emulators and for stores (a release key, an app bundle).

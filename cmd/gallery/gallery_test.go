@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 	"unicode/utf8"
 
 	"github.com/akrck02/go-renderer/draw2d"
@@ -52,6 +53,57 @@ func TestEveryScreenLeadsToEveryOther(t *testing.T) {
 			if program.screen != to {
 				t.Fatalf("from %s, touching %s left the gallery on screen %d", labels[from], labels[to], program.screen)
 			}
+		}
+	}
+}
+
+// A lighthouse held is chosen; the back lets it go, and the bin removes what is chosen.
+func TestALighthouseHeldIsChosenAndTheBinRemovesIt(t *testing.T) {
+	program := &gallery{screen: listsScreen, inputs: newInputs(), lists: newLists(), tabs: newTabs()}
+	context, state := ui.NewWithMeasurer(measurer{}), input.NewState()
+	state.WindowWidth, state.WindowHeight = 412, 892
+	state.FramebufferWidth, state.FramebufferHeight = 412, 892
+	now := time.Unix(1000, 0)
+	state.Now = func() time.Time { return now }
+	var finger input.TouchPointer
+	frame := func() {
+		now = now.Add(16 * time.Millisecond)
+		context.Begin(state)
+		program.build(context)
+		context.End()
+		state.EndFrame()
+	}
+	touch := func(frames int, path ...string) {
+		area, found := context.Area(path...)
+		if !found {
+			t.Fatalf("nothing called %v on the lists screen", path)
+		}
+		x, y := area.X+area.Width/2, area.Y+area.Height/2
+		finger.Begin(state, 1, x, y, 1)
+		for range frames {
+			frame()
+		}
+		finger.End(state, 1, x, y, 1)
+		frame()
+		frame()
+	}
+	for range 30 { // the screen rising into place
+		frame()
+	}
+	touch(40, "Seal Rock", "row")
+	if !program.lists.choosing() || program.lists.chosenCount() != 1 {
+		t.Fatal("holding Seal Rock did not choose it")
+	}
+	state.PressBack()
+	frame()
+	if program.lists.choosing() || program.screen != listsScreen {
+		t.Fatalf("after the back, choosing %v on screen %d; want nothing chosen, still on the lists", program.lists.choosing(), program.screen)
+	}
+	touch(40, "Seal Rock", "row")
+	touch(1, "icon trash-2")
+	for _, light := range program.lists.lighthouses {
+		if light.name == "Seal Rock" {
+			t.Fatal("the bin left Seal Rock in the list")
 		}
 	}
 }

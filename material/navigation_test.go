@@ -57,6 +57,20 @@ func TestTheBackArrowSaysItWasTouched(t *testing.T) {
 	}
 }
 
+func TestTheCrossLeavesAModeAsTheArrowLeavesAScreen(t *testing.T) {
+	left := false
+	screen := newScreen(t, func(look Look) {
+		if look.TopAppBar(TopBar{Title: "2 chosen", Back: true, Close: true}) {
+			left = true
+		}
+	})
+	screen.frame()
+	screen.tap("icon x")
+	if !left {
+		t.Fatal("touching the cross did not say so")
+	}
+}
+
 func TestOnItsSideTheScreenUsesARailAndKeepsClearOfTheEdges(t *testing.T) {
 	selected := 0
 	screen := newScreen(t, func(look Look) {

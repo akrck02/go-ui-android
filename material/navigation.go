@@ -12,6 +12,8 @@ type TopBar struct {
 	Title    string
 	Subtitle string // under the title, smaller; none when empty
 	Back     bool   // an arrow before the title, to go back
+	// Close makes that arrow a cross, for leaving a mode (rows chosen) rather than a screen.
+	Close bool
 	// Actions draws what goes at the bar's end, usually IconButtons; none when nil.
 	Actions func()
 	// OverScene paints the bar see-through (the scheme's scrim), over a scene behind the interface.
@@ -36,7 +38,7 @@ func (look Look) TopAppBar(bar TopBar) (back bool) {
 		Padding: ui.Padding{Left: 4, Top: insets.Top, Right: 4}, Gap: 4, AlignY: ui.Center}
 	look.Context.Frame(layout, ui.Look{Fill: fill}, func() {
 		if bar.Back {
-			back = look.IconButton("arrow-left")
+			back = look.IconButton(bar.backIcon())
 		} else {
 			look.Context.Box(ui.Layout{Width: ui.Fixed(12)}, nil)
 		}
@@ -51,6 +53,13 @@ func (look Look) TopAppBar(bar TopBar) (back bool) {
 		}
 	})
 	return back
+}
+
+func (bar TopBar) backIcon() string {
+	if bar.Close {
+		return "x"
+	}
+	return "arrow-left"
 }
 
 // Destination is a place the navigation bar leads to: an icon and a short label.
@@ -69,7 +78,7 @@ func (look Look) largeTopAppBar(bar TopBar, fill draw2d.Color) (back bool) {
 	look.Context.Frame(layout, ui.Look{Fill: fill}, func() {
 		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(64), AlignY: ui.Center}, func() {
 			if bar.Back {
-				back = look.IconButton("arrow-left")
+				back = look.IconButton(bar.backIcon())
 			}
 			look.Context.Spacer()
 			if bar.Actions != nil {

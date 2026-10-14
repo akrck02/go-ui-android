@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
@@ -18,10 +19,13 @@ type listsState struct {
 }
 
 func newLists() listsState {
-	return listsState{bannerShown: true, lighthouses: []lighthouse{{"North Cape", "Cliffs, north shore", true},
-		{"Harbour Light", "End of the pier", true}, {"Seal Rock", "Two miles out", false},
-		{"Old Tower", "The hill above the town", false}, {"East Point", "The lighthouse keeper's cottage", true},
-		{"Sand Bar", "On the bar at low tide", false}}}
+	return listsState{bannerShown: true, lighthouses: []lighthouse{
+		{name: "North Cape", place: "Cliffs, north shore", lit: true},
+		{name: "Harbour Light", place: "End of the pier", lit: true},
+		{name: "Seal Rock", place: "Two miles out"},
+		{name: "Old Tower", place: "The hill above the town"},
+		{name: "East Point", place: "The lighthouse keeper's cottage", lit: true},
+		{name: "Sand Bar", place: "On the bar at low tide"}}}
 }
 
 // darkCount is the navigation's badge: how many lighthouses are dark, none when all are lit.
@@ -38,11 +42,43 @@ func (lists *listsState) darkCount() string {
 	return fmt.Sprint(dark)
 }
 
-// draw shows a list that refreshes when pulled, rows swiped away, a banner and rows that open.
+// choosing tells whether lighthouses are being chosen: one was held, and touches choose more.
+func (lists *listsState) choosing() bool { return lists.chosenCount() > 0 }
+
+func (lists *listsState) chosenCount() int {
+	count := 0
+	for _, light := range lists.lighthouses {
+		if light.chosen {
+			count++
+		}
+	}
+	return count
+}
+
+func (lists *listsState) chooseNone() {
+	for index := range lists.lighthouses {
+		lists.lighthouses[index].chosen = false
+	}
+}
+
+// removeChosen takes the chosen lighthouses out of the list, and says how many went.
+func (lists *listsState) removeChosen() int {
+	before := len(lists.lighthouses)
+	lists.lighthouses = slices.DeleteFunc(lists.lighthouses, func(light lighthouse) bool { return light.chosen })
+	return before - len(lists.lighthouses)
+}
+
+// draw shows a list that refreshes when pulled, rows swiped away or held to choose them, a banner
+// and rows that open.
 func (lists *listsState) draw(program *gallery, look material.Look) {
 	context, scheme := look.Context, look.Scheme
 	notes := &program.overlays.snackbar
-	program.topBar(look, "Lists", "Pull to refresh, swipe a row away")
+	choosing := lists.choosing()
+	if choosing {
+		lists.choiceBar(look, notes)
+	} else {
+		program.topBar(look, "Lists", "Pull to refresh, hold a row to choose it")
+	}
 	if lists.bannerShown {
 		switch look.Banner("wifi-off", "The lights' positions were last brought up to date a week ago.", "Dismiss", "Refresh now") {
 		case 0:
@@ -63,10 +99,7 @@ func (lists *listsState) draw(program *gallery, look material.Look) {
 		for index := 0; index < len(lists.lighthouses); index++ {
 			light := &lists.lighthouses[index]
 			context.Push(light.name)
-			if look.SwipeToDismiss("swipe", func() {
-				look.ListItem("row", material.Item{Icon: "lightbulb", Headline: light.name, Supporting: light.place,
-					Trailing: func() { look.Switch("lit", &light.lit) }})
-			}) {
+			if look.SwipeToDismiss("swipe", func() { lists.row(look, light, choosing) }) {
 				notes.Show(light.name+" removed", "", after(3))
 				lists.lighthouses = append(lists.lighthouses[:index], lists.lighthouses[index+1:]...)
 				index--
@@ -99,4 +132,37 @@ func (lists *listsState) draw(program *gallery, look material.Look) {
 			lists.lighthouses = append(lists.lighthouses, lighthouse{name: fmt.Sprint("New light ", lists.added), place: "Not placed yet"})
 		}
 	})
+}
+
+// row is a lighthouse's row: held, it is chosen; touched while choosing, it is chosen or let go.
+func (lists *listsState) row(look material.Look, light *lighthouse, choosing bool) {
+	touched := look.ListItem("row", material.Item{Icon: "lightbulb", Headline: light.name, Supporting: light.place,
+		Selected: light.chosen, Trailing: func() { look.Switch("lit", &light.lit) }})
+	switch {
+	case look.LongPressed():
+		light.chosen = true
+	case touched && choosing:
+		light.chosen = !light.chosen
+	}
+}
+
+// choiceBar takes the top bar's place while lighthouses are chosen: how many, a cross to let them
+// go, and a bin to remove them.
+func (lists *listsState) choiceBar(look material.Look, notes *material.Snackbar) {
+	count := lists.chosenCount()
+	bar := material.TopBar{Title: fmt.Sprint(count, " chosen"), Back: true, Close: true, Actions: func() {
+		if look.IconButton("trash-2") {
+			notes.Show(lightsRemoved(lists.removeChosen()), "", after(3))
+		}
+	}}
+	if look.TopAppBar(bar) {
+		lists.chooseNone()
+	}
+}
+
+func lightsRemoved(count int) string {
+	if count == 1 {
+		return "1 lighthouse removed"
+	}
+	return fmt.Sprint(count, " lighthouses removed")
 }

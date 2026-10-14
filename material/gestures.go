@@ -7,11 +7,24 @@ import (
 
 	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
+	"github.com/akrck02/go-ui/window"
 )
 
 // Gestures a finger makes on lists and rows: pulling a list down to refresh it, swiping a row away,
 // and sliding a row of cards. go-ui gives a finger to the first part it moves for (a list for up
 // and down, these for sideways), so they sit inside each other freely.
+
+// LongPressed tells whether the piece drawn just before it was long-pressed in this frame: a
+// finger held still on it for half a second, or the mouse's right button. The phone gives its
+// buzz then, as Android's own applications do. A list uses it to start choosing rows (Item.Selected);
+// a touch that became a long press is no touch when it lifts.
+func (look Look) LongPressed() bool {
+	if !look.Context.LongPressed() {
+		return false
+	}
+	window.FeelLongPress()
+	return true
+}
 
 // refreshPull is how far a list is pulled before letting go refreshes it, and refreshSpace the room
 // the indicator keeps over the list while it refreshes.

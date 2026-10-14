@@ -33,6 +33,9 @@ type Item struct {
 	Supporting string // the line under the headline; none when empty
 	// Trailing draws what goes at the end (a Switch, an IconButton, a Tag); none when nil.
 	Trailing func()
+	// Selected marks the row chosen, in a list whose rows are chosen with a long press: it is tinted,
+	// and a tick takes the avatar's place.
+	Selected bool
 }
 
 // ListItem is a row of a list, 72 pixels tall with a supporting line and 56 without. It returns
@@ -45,8 +48,15 @@ func (look Look) ListItem(name string, item Item) bool {
 	}
 	layout := ui.Layout{Width: ui.Grow(), Height: ui.Fixed(height), Padding: ui.PadXY(16, 0), Gap: 16, AlignY: ui.Center}
 	looks := ui.Looks{Pressed: ui.Look{Fill: stateLayer(scheme.OnSurface, 0.1)}}
+	if item.Selected {
+		chosen := ui.Look{Fill: scheme.SecondaryContainer}
+		looks = ui.Looks{Normal: chosen, Hovered: chosen, Pressed: chosen}
+	}
 	return look.Context.Clickable(name, layout, looks, func() {
-		if item.Icon != "" {
+		switch {
+		case item.Selected:
+			look.tick()
+		case item.Icon != "":
 			look.avatar(item)
 		}
 		look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Gap: 2}, func() {
@@ -68,6 +78,14 @@ func (look Look) avatar(item Item) {
 	}
 	layout := ui.Layout{Width: ui.Fixed(40), Height: ui.Fixed(40), AlignX: ui.Center, AlignY: ui.Center}
 	look.Context.Frame(layout, ui.Look{Fill: fill, Radius: 20}, func() { look.Context.IconSized(item.Icon, 20, ink) })
+}
+
+// tick stands in a chosen row's avatar: a tick in a circle of the primary colour.
+func (look Look) tick() {
+	layout := ui.Layout{Width: ui.Fixed(40), Height: ui.Fixed(40), AlignX: ui.Center, AlignY: ui.Center}
+	look.Context.Frame(layout, ui.Look{Fill: look.Scheme.Primary, Radius: 20}, func() {
+		look.Context.IconSized("check", 20, look.Scheme.OnPrimary)
+	})
 }
 
 // readableOn is black or white, whichever reads better on a colour.
