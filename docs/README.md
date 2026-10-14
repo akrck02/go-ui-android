@@ -326,6 +326,7 @@ signed with the program's own key (below).
 | `-icon` | A square PNG for the launcher |
 | `-debuggable` | Lets `adb` read its folder and debug it; on by default |
 | `-notifications` | Names the permission Android 13 and later ask before showing notifications |
+| `-internet` | Lets the program use the network: on by default, granted when the package is installed with no question; `-internet=false` leaves it out |
 | `-abi` | The processors to carry a library for: `arm64` (phones, the default), `x86_64` (the emulator on a PC), `arm` (old 32-bit phones); `-abi arm64,x86_64` for several |
 | `-release`, `-keystore`, `-key-alias` | Signs with the program's own key instead of the debug key, and leaves the package not debuggable: for a store |
 

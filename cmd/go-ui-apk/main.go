@@ -51,6 +51,7 @@ func readArguments(arguments []string) (application, string, error) {
 	flags.StringVar(&app.Icon, "icon", "", "a square PNG for the launcher (default: Android's own)")
 	flags.BoolVar(&app.Debuggable, "debuggable", true, "let adb read its folder (run-as) and debug it")
 	flags.BoolVar(&app.Notifications, "notifications", false, "ask for the permission to show notifications (Android 13+)")
+	flags.BoolVar(&app.Internet, "internet", true, "let the program use the network (granted when installed, with no question)")
 	abiList := flags.String("abi", "arm64", "the processors to carry a library for: arm64, x86_64 (the emulator on a PC), arm (old phones)")
 	flags.BoolVar(&app.Release, "release", false, "sign with the program's own key (-keystore, -key-alias; the password in "+storePasswordVariable+"), not debuggable")
 	flags.StringVar(&app.Keystore, "keystore", "", "the key store of a release")

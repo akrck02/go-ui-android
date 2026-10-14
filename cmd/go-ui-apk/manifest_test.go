@@ -10,7 +10,7 @@ import (
 
 func TestTheManifestNamesTheProgramAndItsLibrary(t *testing.T) {
 	app := application{Name: `Tides & "Winds"`, ID: "io.example.tides", VersionCode: 3, VersionName: "1.2",
-		MinimumSDK: 26, TargetSDK: 34, Icon: "icon.png", Debuggable: true, Notifications: true}
+		MinimumSDK: 26, TargetSDK: 34, Icon: "icon.png", Debuggable: true, Notifications: true, Internet: true}
 	manifest, err := app.manifest()
 	if err != nil {
 		t.Fatal(err)
@@ -20,7 +20,7 @@ func TestTheManifestNamesTheProgramAndItsLibrary(t *testing.T) {
 	}
 	for _, wanted := range []string{`package="io.example.tides"`, `android:versionCode="3"`,
 		`android:label="Tides &amp; &quot;Winds&quot;"`, `android:value="main"`, `android:icon="@mipmap/icon"`,
-		`android:debuggable="true"`, `android:hasCode="false"`, `android.permission.POST_NOTIFICATIONS`,
+		`android:debuggable="true"`, `android:hasCode="false"`, `android.permission.POST_NOTIFICATIONS`, `android.permission.INTERNET`,
 		`adjustResize`} {
 		if !strings.Contains(string(manifest), wanted) {
 			t.Fatalf("the manifest has no %s:\n%s", wanted, manifest)
@@ -32,7 +32,7 @@ func TestAPlainBuildLeavesOutTheIconAndDebugging(t *testing.T) {
 	app := application{Name: "Tides", ID: "io.example.tides", VersionCode: 1, VersionName: "1.0", MinimumSDK: 26, TargetSDK: 34}
 	manifest, _ := app.manifest()
 	if strings.Contains(string(manifest), "android:icon") || strings.Contains(string(manifest), "debuggable") ||
-		strings.Contains(string(manifest), "POST_NOTIFICATIONS") {
+		strings.Contains(string(manifest), "POST_NOTIFICATIONS") || strings.Contains(string(manifest), "INTERNET") {
 		t.Fatalf("an icon or debugging that was not asked for:\n%s", manifest)
 	}
 }
@@ -122,5 +122,16 @@ func TestAReleaseNeedsItsKeyAndIsNotDebuggable(t *testing.T) {
 	app, _, err = readArguments(append(release, "-debuggable"))
 	if err != nil || !app.Debuggable {
 		t.Fatal("asking for a debuggable release was not heard")
+	}
+}
+
+func TestTheNetworkIsAllowedUnlessLeftOut(t *testing.T) {
+	app, _, err := readArguments([]string{"-name", "Tides", "-id", "io.example.tides"})
+	if err != nil || !app.Internet {
+		t.Fatalf("internet %v (%v) by default; want the network allowed", app.Internet, err)
+	}
+	app, _, err = readArguments([]string{"-name", "Tides", "-id", "io.example.tides", "-internet=false"})
+	if err != nil || app.Internet {
+		t.Fatal("-internet=false left the network allowed")
 	}
 }

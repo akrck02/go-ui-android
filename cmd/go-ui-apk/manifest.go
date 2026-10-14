@@ -21,8 +21,11 @@ type application struct {
 	// Notifications names the permission Android 13 and later ask the person for before the
 	// program's notifications show.
 	Notifications bool
-	Package       string // the Go package to build
-	ABIs          []abi  // the processors it carries a library for
+	// Internet names the permission to use the network, which Android grants when the package is
+	// installed, with no question to the person.
+	Internet bool
+	Package  string // the Go package to build
+	ABIs     []abi  // the processors it carries a library for
 	// Release signs with the program's own key (Keystore, KeyAlias) instead of the debug key.
 	Release            bool
 	Keystore, KeyAlias string
@@ -58,6 +61,9 @@ var manifestTemplate = template.Must(template.New("manifest").Funcs(template.Fun
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="{{.ID}}" android:versionCode="{{.VersionCode}}" android:versionName="{{xml .VersionName}}">
   <uses-sdk android:minSdkVersion="{{.MinimumSDK}}" android:targetSdkVersion="{{.TargetSDK}}" />
+  {{- if .Internet}}
+  <uses-permission android:name="android.permission.INTERNET" />
+  {{- end}}
   {{- if .Notifications}}
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   {{- end}}
