@@ -1,8 +1,10 @@
 package material
 
 import (
+	"fmt"
 	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
+	"math"
 )
 
 // TopBar is what the top app bar shows.
@@ -267,38 +269,101 @@ func (look Look) drawerItem(place Destination, selected bool) bool {
 	})
 }
 
-// Tabs are the primary tabs under a top bar: labels sharing the width, the chosen one underlined.
-// It changes selected and returns true when another is touched.
+// Tabs are the primary tabs under a top bar: labels sharing the width, an underline under the
+// chosen one that slides to the next one chosen. It changes selected and returns true when another
+// is touched.
 func (look Look) Tabs(name string, labels []string, selected *int) bool {
+	at := look.Context.Animate(name+" underline", float32(*selected), arrivingMotion)
+	return look.tabStrip(name, labels, selected, at)
+}
+
+// tabStrip draws the tabs with the underline at a position, in tabs: between two while a page is
+// dragged from one to the next.
+func (look Look) tabStrip(name string, labels []string, selected *int, at float32) bool {
 	scheme := look.Scheme
 	changed := false
 	look.Context.Push(name)
 	defer look.Context.Pop()
 	look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow()}, func() {
-		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(48)}, func() {
+		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(45)}, func() {
 			for index, label := range labels {
 				chosen := index == *selected
 				ink := scheme.OnSurfaceVariant
 				if chosen {
 					ink = scheme.Primary
 				}
-				layout := ui.Layout{Direction: ui.Vertical, Width: ui.Share(1), Height: ui.Grow(), AlignX: ui.Center, AlignY: ui.End}
-				touched := look.Context.Clickable(label, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(ink, 0.1)}}, func() {
-					look.Context.Box(ui.Layout{Height: ui.Grow(), AlignY: ui.Center}, func() {
-						look.Text(label, 14, draw2d.Medium, ink)
-					})
-					underline := ui.Look{}
-					if chosen {
-						underline = ui.Look{Fill: scheme.Primary, Radius: 1.5}
-					}
-					look.Context.Frame(ui.Layout{Width: ui.Fixed(min(look.Context.Theme.TextSize*float32(len(label))*0.55, 120)), Height: ui.Fixed(3)}, underline, nil)
-				})
-				if touched && !chosen {
+				layout := ui.Layout{Width: ui.Share(1), Height: ui.Grow(), AlignX: ui.Center, AlignY: ui.Center}
+				if look.Context.Clickable(label, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(ink, 0.1)}}, func() {
+					look.Text(label, 14, draw2d.Medium, ink)
+				}) && !chosen {
 					*selected, changed = index, true
 				}
 			}
 		})
+		// the underline, painted where the position says, as wide as a short label
+		look.Context.Paint(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(3)}, func(area draw2d.Rect, drawing *draw2d.List) {
+			if len(labels) == 0 {
+				return
+			}
+			tab := area.Width / float32(len(labels))
+			width := min(tab*0.6, 96)
+			x := area.X + at*tab + (tab-width)/2
+			drawing.Rectangle(draw2d.Rect{X: x, Y: area.Y, Width: width, Height: area.Height}, 1.5, scheme.Primary, draw2d.Transparent, 0)
+		})
 		look.Divider()
 	})
 	return changed
+}
+
+// Pager is what tabs with swiping pages remember: the page chosen, and where the pages were shown
+// in the last frame (between two while one is dragged).
+type Pager struct {
+	Selected int
+	shown    float32
+}
+
+// TabPager is tabs over pages a finger swipes from side to side: the underline follows the pages
+// as they move, a page let go past a third of the way (or flicked) turns to the next, and touching
+// a tab slides to its page. page draws one page, given its index; lists inside it still scroll up
+// and down. name tells pagers apart.
+func (look Look) TabPager(name string, labels []string, pager *Pager, page func(index int)) {
+	context := look.Context
+	look.tabStrip(name, labels, &pager.Selected, pager.shown)
+	context.SwipeBox(name+" pages", ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, ui.Horizontal, func(swipe ui.Swipe) {
+		width := swipe.Area.Width
+		if width <= 0 {
+			width, _ = context.Size()
+		}
+		dragged := -swipe.Offset / width // in pages: a finger moving left shows the next
+		last := float32(len(labels) - 1)
+		if swipe.Released {
+			next := pager.Selected
+			switch {
+			case dragged > 0.33 || swipe.Velocity < -600:
+				next++
+			case dragged < -0.33 || swipe.Velocity > 600:
+				next--
+			}
+			pager.Selected = int(clampFloat(float32(next), 0, last))
+		}
+		target, motion := float32(pager.Selected), 3*arrivingMotion/2
+		if swipe.Held {
+			// past the first and the last page the pages give only a little
+			target, motion = clampFloat(float32(pager.Selected)+dragged, -0.1, last+0.1), 0
+		}
+		pager.shown = context.Animate(name+" shown", target, motion)
+		first := int(math.Floor(float64(pager.shown)))
+		strip := ui.Layout{Width: ui.Grow(), Height: ui.Grow(), Padding: ui.Padding{Left: -(pager.shown - float32(first)) * width}}
+		context.Box(strip, func() {
+			for index := first; index <= first+1; index++ {
+				if index < 0 || index > int(last) {
+					context.Box(ui.Layout{Width: ui.Fixed(width), Height: ui.Grow()}, nil)
+					continue
+				}
+				context.Push(fmt.Sprint(name, " page ", index))
+				context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Fixed(width), Height: ui.Grow()}, func() { page(index) })
+				context.Pop()
+			}
+		})
+	})
 }

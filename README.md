@@ -23,13 +23,15 @@ adb install lighthouses.apk
 ```
 
 <p>
-<img src="docs/images/pieces-wallpaper.png" width="240" alt="The gallery's pieces in the colours of the phone's wallpaper">
-<img src="docs/images/list.png" width="240" alt="A list with switches and a floating button, in Material's own colours">
-<img src="docs/images/stick.png" width="240" alt="An on-screen stick sailing a boat across a bay">
-<img src="docs/images/forms-keyboard.png" width="240" alt="A text field typed in with the phone's on-screen keyboard">
+<img src="docs/images/actions.png" width="180" alt="Buttons, a split button, a button group and a floating toolbar">
+<img src="docs/images/lists.png" width="180" alt="A banner over a list pulled to refresh">
+<img src="docs/images/feedback.png" width="180" alt="Loading indicators, wavy progress and skeletons">
+<img src="docs/images/tabs.png" width="180" alt="Tabs over swiping pages with a carousel">
 </p>
 
-Start with [the docs](docs/README.md). `go run ./cmd/gallery` shows every piece.
+Start with [the docs](docs/README.md): every piece by Material's catalogue (navigation, actions,
+selection, inputs, containment, overlays, pickers, progress and gestures). `go run ./cmd/gallery`
+shows them all.
 
 ## AI disclosure
 

@@ -3,6 +3,8 @@ package material
 import (
 	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
+	"strings"
+	"unicode"
 )
 
 // Card is a filled container for one subject: a few lines, a picture, its actions.
@@ -84,7 +86,97 @@ func (look Look) SectionTitle(text string) {
 	})
 }
 
+// Heading is a section's small title in the primary colour, as SectionTitle, for content that
+// keeps its own margins (a page of cards and buttons) rather than a list across the screen.
+func (look Look) Heading(text string) {
+	look.Context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.Padding{Top: 12, Bottom: 4}}, func() {
+		look.Text(text, 14, draw2d.Medium, look.Scheme.Primary)
+	})
+}
+
 // Divider is a thin line across, between groups.
 func (look Look) Divider() {
 	look.Context.Frame(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(1)}, ui.Look{Fill: look.Scheme.OutlineVariant}, nil)
+}
+
+// ExpandableItem is a list row that opens to show more under it (an answer under its question, the
+// details of an order), its chevron turning. Touching the row opens or closes it; it returns true
+// when touched. name tells rows apart.
+func (look Look) ExpandableItem(name string, item Item, open *bool, more func()) bool {
+	scheme := look.Scheme
+	icon := "chevron-down"
+	if *open {
+		icon = "chevron-up"
+	}
+	item.Trailing = func() { look.Context.IconSized(icon, 24, scheme.OnSurfaceVariant) }
+	touched := look.ListItem(name, item)
+	if touched {
+		*open = !*open
+	}
+	if *open {
+		// it unfolds: the content rises into place under the row
+		arrived := look.Context.Appear(name+" more", arrivingMotion)
+		layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.Padding{Left: 16, Top: (1 - arrived) * -12, Right: 16, Bottom: 16}, Gap: 8}
+		look.Context.Box(layout, more)
+	}
+	return touched
+}
+
+// Avatar is a person or a thing shown in a circle: their initials (up to two letters of name) on a
+// colour, or an icon when name is empty. size is its side, 40 in lists.
+func (look Look) Avatar(name, icon string, tint draw2d.Color, size float32) {
+	if tint == (draw2d.Color{}) {
+		tint = look.Scheme.PrimaryContainer
+	}
+	ink := readableOn(tint)
+	layout := ui.Layout{Width: ui.Fixed(size), Height: ui.Fixed(size), AlignX: ui.Center, AlignY: ui.Center}
+	look.Context.Frame(layout, ui.Look{Fill: tint, Radius: size / 2}, func() {
+		if initials := initialsOf(name); initials != "" {
+			look.Text(initials, size*0.4, draw2d.Medium, ink)
+			return
+		}
+		look.Context.IconSized(icon, size*0.5, ink)
+	})
+}
+
+// initialsOf is the first letters of a name's first two words, in capitals.
+func initialsOf(name string) string {
+	var initials []rune
+	for _, word := range strings.Fields(name) {
+		for _, letter := range word {
+			initials = append(initials, unicode.ToUpper(letter))
+			break
+		}
+		if len(initials) == 2 {
+			break
+		}
+	}
+	return string(initials)
+}
+
+// Banner is a message across the top of the content that stays until acted on (no connection, an
+// update to install), with an icon and one or two actions under its text. It returns the index of
+// the action touched in this frame, or -1.
+func (look Look) Banner(icon, text string, actions ...string) int {
+	scheme := look.Scheme
+	touched := -1
+	look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow()}, func() {
+		look.Context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.Padding{Left: 16, Top: 24, Right: 16, Bottom: 8}, Gap: 16}, func() {
+			if icon != "" {
+				look.Avatar("", icon, scheme.Primary, 40)
+			}
+			look.Context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.Padding{Top: 10}}, func() {
+				look.Paragraph(text, 14, draw2d.Regular, scheme.OnSurface)
+			})
+		})
+		look.Context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.Padding{Right: 8, Bottom: 8}, Gap: 8, AlignX: ui.End}, func() {
+			for index, action := range actions {
+				if look.TextButton("", action) {
+					touched = index
+				}
+			}
+		})
+		look.Divider()
+	})
+	return touched
 }

@@ -2,6 +2,7 @@ package material
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/akrck02/go-renderer/draw2d"
@@ -125,4 +126,173 @@ func (look Look) dayCell(date time.Time, chosen, today bool, cell ui.Layout) boo
 // dayOf is a date's day, at midnight, in its own zone.
 func dayOf(date time.Time) time.Time {
 	return time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+}
+
+// TimeNames are the words a time picker shows, for a program in another language than English.
+type TimeNames struct {
+	Title   string
+	Confirm string
+	Dismiss string
+}
+
+// EnglishTimes are the words a time picker shows by default.
+var EnglishTimes = TimeNames{Title: "Select time", Confirm: "OK", Dismiss: "Cancel"}
+
+// TimePicker is what a time picker remembers while shown: the time chosen, not yet kept, and
+// whether the dial chooses the hour or the minute.
+type TimePicker struct {
+	Names   TimeNames // the zero value shows EnglishTimes
+	hour    int
+	minute  int
+	minutes bool // the dial shows minutes
+	open    bool
+	dial    draw2d.Rect // where the dial was painted in the last frame
+}
+
+// TimePicker asks for a time of day in a dialog, on Material's dial: the hour first, on a ring of
+// 1 to 12 with 13 to 00 inside it, then the minute, by touching or dragging round the dial. The
+// hour and the minute at the top choose which the dial shows. It starts at the time given; on
+// Confirmed it writes the time chosen there, keeping the day.
+func (look Look) TimePicker(name string, picker *TimePicker, date *time.Time) Answer {
+	names := picker.Names
+	if names.Confirm == "" {
+		names = EnglishTimes
+	}
+	if !picker.open {
+		picker.open, picker.hour, picker.minute, picker.minutes = true, date.Hour(), date.Minute(), false
+	}
+	answer := look.Dialog(name, Dialog{Title: names.Title, Confirm: names.Confirm, Dismiss: names.Dismiss, Content: func() {
+		look.timeHeader(picker)
+		look.dial(picker)
+	}})
+	if answer == Confirmed {
+		*date = time.Date(date.Year(), date.Month(), date.Day(), picker.hour, picker.minute, 0, 0, date.Location())
+	}
+	if answer != Open {
+		picker.open = false
+	}
+	return answer
+}
+
+// timeHeader shows the hour and the minute chosen, in large boxes that choose what the dial shows.
+func (look Look) timeHeader(picker *TimePicker) {
+	scheme := look.Scheme
+	box := func(text string, chosen bool) bool {
+		normal, ink := ui.Look{Fill: scheme.SurfaceContainerHighest, Radius: 8}, scheme.OnSurface
+		if chosen {
+			normal, ink = ui.Look{Fill: scheme.PrimaryContainer, Radius: 8}, scheme.OnPrimaryContainer
+		}
+		layout := ui.Layout{Width: ui.Fixed(96), Height: ui.Fixed(80), AlignX: ui.Center, AlignY: ui.Center}
+		return look.Context.Clickable("time "+text, layout, pressedOnly(normal, stateLayer(ink, 0.12)), func() {
+			look.Text(text, 48, draw2d.Regular, ink)
+		})
+	}
+	look.Context.Box(ui.Layout{Width: ui.Grow(), Gap: 8, AlignX: ui.Center, AlignY: ui.Center}, func() {
+		if box(fmt.Sprintf("%02d", picker.hour), !picker.minutes) {
+			picker.minutes = false
+		}
+		look.Text(":", 48, draw2d.Regular, scheme.OnSurface)
+		if box(fmt.Sprintf("%02d", picker.minute), picker.minutes) {
+			picker.minutes = true
+		}
+	})
+}
+
+// dialSize is the dial's side.
+const dialSize = 256
+
+// dial is the clock face: numbers round it, a hand to the value chosen, and a finger anywhere on it
+// choosing. Letting go of an hour goes on to the minutes.
+func (look Look) dial(picker *TimePicker) {
+	context := look.Context
+	layout := ui.Layout{Width: ui.Fixed(dialSize), Height: ui.Fixed(dialSize)}
+	context.Box(ui.Layout{Width: ui.Grow(), AlignX: ui.Center}, func() {
+		touched := context.Clickable("dial", layout, ui.Looks{}, func() {
+			context.Paint(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func(area draw2d.Rect, drawing *draw2d.List) {
+				look.paintDial(area, drawing, picker)
+			})
+		})
+		// a finger on the dial chooses as it moves; letting go of an hour goes on to the minutes
+		pointerX, pointerY := context.Pointer()
+		if picker.dial.Width > 0 && picker.dial.Contains(pointerX, pointerY) && (context.Pressing() || touched) {
+			picker.choose(picker.dial, pointerX, pointerY)
+		}
+		if touched && !picker.minutes {
+			picker.minutes = true
+		}
+	})
+}
+
+// choose sets the hour or the minute from where a finger is on the dial.
+func (picker *TimePicker) choose(area draw2d.Rect, x, y float32) {
+	middleX, middleY := float64(area.X+area.Width/2), float64(area.Y+area.Height/2)
+	angle := math.Atan2(float64(x)-middleX, middleY-float64(y)) // 0 at twelve o'clock, clockwise
+	if angle < 0 {
+		angle += 2 * math.Pi
+	}
+	if picker.minutes {
+		picker.minute = int(math.Round(angle/(2*math.Pi)*60)) % 60
+		return
+	}
+	position := int(math.Round(angle/(2*math.Pi)*12)) % 12
+	inner := math.Hypot(float64(x)-middleX, float64(y)-middleY) < float64(area.Width)*0.3
+	switch {
+	case inner && position == 0:
+		picker.hour = 0
+	case inner:
+		picker.hour = position + 12
+	case position == 0:
+		picker.hour = 12
+	default:
+		picker.hour = position
+	}
+}
+
+// paintDial draws the face, the numbers and the hand.
+func (look Look) paintDial(area draw2d.Rect, drawing *draw2d.List, picker *TimePicker) {
+	scheme := look.Scheme
+	picker.dial = area
+	drawing.Rectangle(area, area.Width/2, scheme.SurfaceContainerHighest, draw2d.Transparent, 0)
+	middleX, middleY := float64(area.X+area.Width/2), float64(area.Y+area.Height/2)
+	outer, inner := float64(area.Width)*0.4, float64(area.Width)*0.26
+	// the hand: from the middle to the value chosen, ending in a circle round it
+	var angle, reach float64
+	if picker.minutes {
+		angle, reach = float64(picker.minute)/60*2*math.Pi, outer
+	} else {
+		angle, reach = float64(picker.hour%12)/12*2*math.Pi, outer
+		if picker.hour == 0 || picker.hour > 12 {
+			reach = inner
+		}
+	}
+	handX, handY := middleX+reach*math.Sin(angle), middleY-reach*math.Cos(angle)
+	for step := 0.0; step <= 1; step += 0.02 {
+		dot(drawing, middleX+(handX-middleX)*step, middleY+(handY-middleY)*step, 2, scheme.Primary)
+	}
+	dot(drawing, middleX, middleY, 8, scheme.Primary)
+	dot(drawing, handX, handY, 48, scheme.Primary)
+	number := func(text string, angle, distance float64, chosen bool) {
+		x, y := middleX+distance*math.Sin(angle), middleY-distance*math.Cos(angle)
+		ink := scheme.OnSurface
+		if chosen {
+			ink = scheme.OnPrimary
+		}
+		size := float32(16)
+		if distance == inner {
+			size = 14
+		}
+		width := float32(len(text)) * size * 0.55 // close enough to centre digits
+		drawing.Text(text, float32(x)-width/2, float32(y)+size*0.35, size, draw2d.Regular, ink)
+	}
+	if picker.minutes {
+		for minute := 0; minute < 60; minute += 5 {
+			number(fmt.Sprintf("%02d", minute), float64(minute)/60*2*math.Pi, outer, minute == picker.minute)
+		}
+		return
+	}
+	for hour := 1; hour <= 12; hour++ {
+		number(fmt.Sprint(hour), float64(hour%12)/12*2*math.Pi, outer, hour == picker.hour)
+		innerHour := (hour + 12) % 24
+		number(fmt.Sprintf("%02d", innerHour), float64(hour%12)/12*2*math.Pi, inner, innerHour == picker.hour)
+	}
 }
