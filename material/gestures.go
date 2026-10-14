@@ -121,25 +121,14 @@ type Carousel struct {
 // pixels between them; item draws one, given its index. name tells carousels apart.
 func (look Look) Carousel(name string, carousel *Carousel, count int, itemWidth float32, item func(index int)) {
 	context := look.Context
-	const gap = 8
-	step := itemWidth + gap
+	step := itemWidth + carouselGap
 	context.SwipeBox(name, ui.Layout{Width: ui.Grow()}, ui.Horizontal, func(swipe ui.Swipe) {
 		shown := float32(count)
 		if swipe.Area.Width > 0 {
 			shown = (swipe.Area.Width - 16) / step
 		}
-		last := max(float32(count)-shown, 0)
-		position := carousel.rest - swipe.Offset/step
-		target, motion := clampFloat(position, -0.15, last+0.15), time.Duration(0) // a little give at the ends
-		if swipe.Released {
-			// on with the finger's speed, a quarter of a second's worth, then to an item's edge
-			carousel.rest = clampFloat(float32(math.Round(float64(position-swipe.Velocity*0.25/step))), 0, float32(math.Ceil(float64(last))))
-			target, motion = carousel.rest, 3*arrivingMotion/2
-		} else if !swipe.Held {
-			target, motion = carousel.rest, 3*arrivingMotion/2
-		}
-		at := context.Animate(name+" position", target, motion)
-		context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.Padding{Left: 16 - at*step, Right: 16}, Gap: gap}, func() {
+		at := look.carouselPosition(name, carousel, swipe, step, max(float32(count)-shown, 0))
+		context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.Padding{Left: 16 - at*step, Right: 16}, Gap: carouselGap}, func() {
 			for index := range count {
 				context.Push(fmt.Sprint(name, " item ", index))
 				context.Box(ui.Layout{Width: ui.Fixed(itemWidth)}, func() { item(index) })
@@ -147,6 +136,98 @@ func (look Look) Carousel(name string, carousel *Carousel, count int, itemWidth 
 			}
 		})
 	})
+}
+
+const (
+	carouselGap   = 8
+	smallItem     = 56 // Material's smallest carousel item, at the edge a row runs off
+	carouselInset = 16
+)
+
+// carouselPosition follows the finger on a carousel and settles it after: the index of the first
+// item shown, fractional while it moves. step is how far the finger goes for one item, last the
+// furthest it rests.
+func (look Look) carouselPosition(name string, carousel *Carousel, swipe ui.Swipe, step, last float32) float32 {
+	position := carousel.rest - swipe.Offset/step
+	target, motion := clampFloat(position, -0.15, last+0.15), time.Duration(0) // a little give at the ends
+	if swipe.Released {
+		// on with the finger's speed, a quarter of a second's worth, then to an item's edge
+		carousel.rest = clampFloat(float32(math.Round(float64(position-swipe.Velocity*0.25/step))), 0, float32(math.Ceil(float64(last))))
+		target, motion = carousel.rest, 3*arrivingMotion/2
+	} else if !swipe.Held {
+		target, motion = carousel.rest, 3*arrivingMotion/2
+	}
+	return look.Context.Animate(name+" position", target, motion)
+}
+
+// MultiBrowseCarousel is Material's carousel for browsing many items at once: large items, then a
+// medium one and a small one at the edge where the row runs off. Items shrink as they reach either
+// edge and grow as they come in, so the row always hints at more. largeWidth is the width items
+// have in the middle; item draws one at the width it has in this frame, and is clipped to it.
+func (look Look) MultiBrowseCarousel(name string, carousel *Carousel, count int, largeWidth, height float32, item func(index int, width float32)) {
+	context := look.Context
+	step := largeWidth + carouselGap
+	context.SwipeBox(name, ui.Layout{Width: ui.Grow(), Height: ui.Fixed(height)}, ui.Horizontal, func(swipe ui.Swipe) {
+		width := swipe.Area.Width
+		if width <= 0 {
+			width, _ = context.Size()
+		}
+		keylines := browseKeylines(width-2*carouselInset, largeWidth)
+		large := len(keylines) - 2
+		at := look.carouselPosition(name, carousel, swipe, step, max(float32(count-large), 0))
+		first := max(int(math.Floor(float64(at)))-1, 0)
+		// the item leaving at the start slides off after it has shrunk to the smallest
+		left := float32(carouselInset)
+		if place := float32(first) - at; place < -1 {
+			left -= (-1 - place) * (smallItem + carouselGap)
+		}
+		context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow(), Padding: ui.Padding{Left: left}, Gap: carouselGap}, func() {
+			for index := first; index < count; index++ {
+				itemWidth := keylineWidth(keylines, float32(index)-at)
+				if itemWidth <= 0 {
+					break // the rest are past the edge
+				}
+				context.Push(fmt.Sprint(name, " item ", index))
+				context.Frame(ui.Layout{Width: ui.Fixed(itemWidth), Height: ui.Grow()}, ui.Look{Clip: true, Radius: 28}, func() { item(index, itemWidth) })
+				context.Pop()
+			}
+		})
+	})
+}
+
+// browseKeylines are the widths of a multi-browse carousel's places from its start: as many large
+// items as fit, then a medium one filling what is left, then a small one.
+func browseKeylines(available, largeWidth float32) []float32 {
+	large := max(int((available-smallItem-carouselGap)/(largeWidth+carouselGap)), 1)
+	medium := available - float32(large)*(largeWidth+carouselGap) - smallItem - carouselGap
+	for medium < smallItem && large > 1 {
+		large--
+		medium += largeWidth + carouselGap
+	}
+	medium = clampFloat(medium, smallItem, largeWidth)
+	keylines := make([]float32, 0, large+2)
+	for range large {
+		keylines = append(keylines, largeWidth)
+	}
+	return append(keylines, medium, smallItem)
+}
+
+// keylineWidth is how wide an item is at a place (0 is the first keyline, fractional between
+// them): before the first, it shrinks to the smallest; past the last, it shrinks to nothing.
+func keylineWidth(keylines []float32, place float32) float32 {
+	if place <= -1 {
+		return smallItem
+	}
+	if place < 0 {
+		return smallItem + (keylines[0]-smallItem)*(place+1)
+	}
+	index := int(place)
+	if last := len(keylines) - 1; index >= last {
+		// past the last keyline it comes in from nothing at the edge
+		return max(keylines[last]*(1-(place-float32(last))), 0)
+	}
+	part := place - float32(index)
+	return keylines[index] + (keylines[index+1]-keylines[index])*part
 }
 
 func clampFloat(value, minimum, maximum float32) float32 { return min(max(value, minimum), maximum) }

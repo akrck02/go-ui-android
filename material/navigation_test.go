@@ -3,6 +3,7 @@ package material
 import (
 	"testing"
 
+	"github.com/akrck02/go-renderer/draw2d"
 	ui "github.com/akrck02/go-ui"
 )
 
@@ -132,5 +133,44 @@ func TestTheBackGoesToTheScreenWhenNoDialogIsOpen(t *testing.T) {
 	screen.frame()
 	if !wentBack {
 		t.Fatal("the screen did not go back")
+	}
+}
+
+func TestALargeBarShrinksIntoASmallOneAsTheContentScrolls(t *testing.T) {
+	scrolled := float32(0)
+	screen := newScreen(t, func(look Look) {
+		look.TopAppBar(TopBar{Title: "Lighthouses", Large: true, Scrolled: scrolled})
+		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, nil)
+	})
+	heightOfBar := func() float32 {
+		screen.frame()
+		for _, command := range screen.context.Drawing().Commands {
+			if command.Kind == draw2d.RectangleKind && command.Area.Y == 0 && command.Area.Width == 400 {
+				return command.Area.Height
+			}
+		}
+		t.Fatal("no bar across the top")
+		return 0
+	}
+	if height := heightOfBar(); height != 152 {
+		t.Fatalf("large bar %v tall at rest; want 152", height)
+	}
+	scrolled = 44
+	if height := heightOfBar(); height != 108 {
+		t.Fatalf("large bar %v tall half way; want 108", height)
+	}
+	scrolled = 400
+	if height := heightOfBar(); height != 64 {
+		t.Fatalf("large bar %v tall with the content well under it; want a small bar's 64", height)
+	}
+}
+
+func TestALargeBarAtRestShowsNoSmallTitle(t *testing.T) {
+	screen := newScreen(t, func(look Look) { look.TopAppBar(TopBar{Title: "Lighthouses", Large: true}) })
+	screen.frame()
+	for _, command := range screen.context.Drawing().Commands {
+		if command.Kind == draw2d.TextKind && command.Size == 22 && command.Fill[3] > 0.01 {
+			t.Fatalf("the small title shows with opacity %v on a large bar at rest", command.Fill[3])
+		}
 	}
 }

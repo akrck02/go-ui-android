@@ -126,7 +126,19 @@ func (program *gallery) show(look material.Look) {
 
 // topBar is every screen's bar: its title, the drawer's button and a menu to choose the theme.
 func (program *gallery) topBar(look material.Look, title, subtitle string) {
-	look.TopAppBar(material.TopBar{Title: title, Subtitle: subtitle, Actions: func() {
+	look.TopAppBar(program.bar(look, title, subtitle))
+}
+
+// largeTopBar is the bar of a screen whose content is one page: large, it shrinks into a small one
+// as the page scrolls up under it.
+func (program *gallery) largeTopBar(look material.Look, title, subtitle, page string) {
+	bar := program.bar(look, title, subtitle)
+	bar.Large, bar.Scrolled = true, look.Context.ScrollOffset(page)
+	look.TopAppBar(bar)
+}
+
+func (program *gallery) bar(look material.Look, title, subtitle string) material.TopBar {
+	return material.TopBar{Title: title, Subtitle: subtitle, Actions: func() {
 		if look.IconButton("menu") {
 			program.drawerOpen = true
 		}
@@ -136,7 +148,7 @@ func (program *gallery) topBar(look material.Look, title, subtitle string) {
 		case 1:
 			program.setDark(true)
 		}
-	}})
+	}}
 }
 
 // drawer shows every destination in a drawer from the left, opened from the top bar.

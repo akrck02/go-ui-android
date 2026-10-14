@@ -128,3 +128,41 @@ func TestACarouselSettlesOnAnItem(t *testing.T) {
 		t.Fatalf("rests at %v after a swipe; want a later item's edge", carousel.rest)
 	}
 }
+
+func TestAMultiBrowseCarouselShrinksItemsTowardsItsEdges(t *testing.T) {
+	var carousel Carousel
+	widths := map[int]float32{}
+	screen := newScreen(t, func(look Look) {
+		clear(widths)
+		look.MultiBrowseCarousel("bay", &carousel, 6, 200, 180, func(index int, width float32) { widths[index] = width })
+	})
+	screen.clocked()
+	screen.frame()
+	screen.frame()
+	if _, past := widths[3]; past || widths[0] != 200 || widths[1] != 96 || widths[2] != smallItem {
+		t.Fatalf("widths at rest %v; want a large item, a medium one filling what is left, and a small one", widths)
+	}
+	screen.drag(300, 90, -208, 0, false)
+	for range 15 { // the finger stays still before it lifts, so it is no flick
+		screen.frame()
+	}
+	screen.state.SetButton(input.MouseLeft, false)
+	screen.state.LiftTouch(1)
+	for range 30 {
+		screen.frame()
+	}
+	if carousel.rest != 1 || widths[0] != smallItem || widths[1] != 200 || widths[2] != 96 {
+		t.Fatalf("resting at %v with widths %v after sliding one item; want the first shrunk, the second large", carousel.rest, widths)
+	}
+}
+
+func TestKeylinesKeepMoreLargeItemsOnAWideScreen(t *testing.T) {
+	keylines := browseKeylines(860, 200)
+	if len(keylines) != 5 || keylines[2] != 200 || keylines[3] != 172 || keylines[4] != smallItem {
+		t.Fatalf("keylines %v on 860 pixels; want three large items, a medium of 172 and a small one", keylines)
+	}
+	keylines = browseKeylines(900, 200) // a medium of 4 pixels: the third large item takes its place
+	if len(keylines) != 5 || keylines[3] != 200 {
+		t.Fatalf("keylines %v on 900 pixels; want the medium item no narrower than the smallest", keylines)
+	}
+}

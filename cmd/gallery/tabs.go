@@ -12,6 +12,7 @@ import (
 type tabsState struct {
 	pager    material.Pager
 	carousel material.Carousel
+	coast    material.Carousel
 	stick    material.Stick
 	boatX    float32 // the boat's place in the bay, from 0 to 1 across and down
 	boatY    float32
@@ -49,6 +50,14 @@ func (tabs *tabsState) places(look material.Look) {
 		})
 		look.Paragraph("Slide the row sideways: it glides on and settles at a place. Up and down, the page scrolls.",
 			14, draw2d.Regular, scheme.OnSurfaceVariant)
+		look.Heading("Browse the coast")
+		look.MultiBrowseCarousel("coast", &tabs.coast, len(names), 200, 180, func(index int, width float32) {
+			title := names[index]
+			if width < 120 {
+				title = "" // a narrow item shows its colour and its icon only
+			}
+			look.CarouselItem(180, tints[(index+1)%len(tints)], icons[index], title)
+		})
 	})
 }
 

@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/akrck02/go-renderer/draw2d"
 	"github.com/akrck02/go-renderer/input"
 )
 
@@ -84,5 +85,25 @@ func TestADialogAnsweredFadesOutInsteadOfVanishing(t *testing.T) {
 	}
 	if screen.drawn("Light the north lamp?") {
 		t.Fatal("the dialog is still there after it had time to fade")
+	}
+}
+
+func TestASideSheetClosesWithItsCross(t *testing.T) {
+	shown := true
+	screen := newScreen(t, func(look Look) {
+		if shown && look.SideSheet("filters", "Filters", func() { look.Text("Only lit lights", 14, draw2d.Regular, look.Scheme.OnSurface) }) {
+			shown = false
+		}
+	})
+	screen.clocked()
+	for range 20 {
+		screen.frame()
+	}
+	if !screen.drawn("Filters") {
+		t.Fatal("the side sheet's title is not drawn")
+	}
+	screen.tap("filters", "icon x")
+	if shown {
+		t.Fatal("touching the cross did not close the side sheet")
 	}
 }

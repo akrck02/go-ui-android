@@ -29,7 +29,7 @@ func newInputs() inputsState {
 // draw shows the fields, the choices and the pickers.
 func (inputs *inputsState) draw(program *gallery, look material.Look) {
 	context, scheme := look.Context, look.Scheme
-	program.topBar(look, "Inputs", "Fields, choices and pickers")
+	program.largeTopBar(look, "Inputs", "Fields, choices and pickers", "inputs")
 	page(context, "inputs", func() {
 		look.SearchBar("search", &inputs.search, "Search the lighthouses")
 		look.Heading("Text fields")

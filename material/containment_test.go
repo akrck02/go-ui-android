@@ -14,14 +14,21 @@ func TestAnExpandableRowOpensAndCloses(t *testing.T) {
 		shownMore = false
 		look.ExpandableItem("faq", Item{Headline: "When is it lit?"}, &open, func() { shownMore = true })
 	})
+	screen.clocked()
 	screen.frame()
 	screen.tap("faq")
 	if !open || !shownMore {
 		t.Fatal("touching the row did not open it")
 	}
 	screen.tap("faq")
-	if open || shownMore {
-		t.Fatal("touching it again did not close it")
+	if open || !shownMore {
+		t.Fatalf("open %v, more shown %v after touching it again; want it closed, folding away", open, shownMore)
+	}
+	for range 20 {
+		screen.frame()
+	}
+	if shownMore {
+		t.Fatal("what was under the row is still there after it had time to fold")
 	}
 }
 

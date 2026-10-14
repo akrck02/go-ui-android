@@ -100,6 +100,33 @@ func (look Look) BottomSheet(name string, content func()) (dismissed bool) {
 	})
 }
 
+// SideSheet slides in from the end of the screen over the dimmed screen, headed by a title and a
+// cross: filters for a list, the details of what is chosen, room for a form on a wide screen. It
+// returns true when it should close: the cross touched, a touch outside, the system's back. name
+// tells side sheets apart.
+func (look Look) SideSheet(name, title string, content func()) (closed bool) {
+	scheme := look.Scheme
+	insets := look.Context.Insets()
+	width, _ := look.Context.Size()
+	sheetWidth := min(400, width-56)
+	arrived := look.Context.Appear("side sheet "+name, arrivingMotion)
+	options := ui.LayerOptions{AlignX: ui.End, AlignY: ui.Start, Padding: ui.Padding{Right: -(1 - arrived) * sheetWidth},
+		Width: ui.Fixed(sheetWidth), Height: ui.Grow(), Hidden: 1 - arrived,
+		Leave: ui.Leave{Duration: leavingMotion, X: sheetWidth}} // back off the side it came from
+	dismissed := look.Context.Modal(name, options, func() {
+		sheet := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow(),
+			Padding: ui.Padding{Left: 24, Top: 12 + insets.Top, Right: 12 + insets.Right, Bottom: 24 + insets.Bottom}, Gap: 8}
+		look.Context.Frame(sheet, ui.Look{Fill: scheme.SurfaceContainerLow, Radius: 16, Shadow: true}, func() {
+			look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(56), AlignY: ui.Center}, func() {
+				look.Context.Box(ui.Layout{Width: ui.Grow()}, func() { look.Text(title, 22, draw2d.Regular, scheme.OnSurfaceVariant) })
+				closed = look.IconButton("x")
+			})
+			content()
+		})
+	})
+	return closed || dismissed
+}
+
 // Snackbar is a short note at the bottom of the screen for a few seconds, with an action that
 // undoes or follows what was just done. A program keeps one, calls Show when something happens and
 // draws it with Look.Snackbar in every frame.

@@ -16,7 +16,7 @@ type actionsState struct {
 func (actions *actionsState) draw(program *gallery, look material.Look) {
 	context, scheme := look.Context, look.Scheme
 	notes := &program.overlays.snackbar
-	program.topBar(look, "Actions", "Buttons, floating buttons and toolbars")
+	program.largeTopBar(look, "Actions", "Buttons, floating buttons and toolbars", "actions")
 	page(context, "actions", func() {
 		look.Heading("Buttons")
 		row(context, func() {

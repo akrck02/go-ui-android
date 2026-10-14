@@ -20,7 +20,14 @@ type TopBar struct {
 	OverScene bool
 	// Large writes the title big under the arrow and the actions, for a screen's first level.
 	Large bool
+	// Scrolled is how far the content under the bar has scrolled up (ui.Context.ScrollOffset): a
+	// large bar shrinks into a small one as it goes, and any bar takes a container's colour once
+	// content is under it.
+	Scrolled float32
 }
+
+// largeCollapse is how far content scrolls for a large top bar to become a small one.
+const largeCollapse = 88
 
 // TopAppBar is the bar at the top, painted up under the status bar, so the screen reaches the top
 // edge as Android's own apps do. Inside Body, it keeps clear of a cutout at the sides too. It returns true when the back arrow is touched.
@@ -28,6 +35,9 @@ func (look Look) TopAppBar(bar TopBar) (back bool) {
 	insets := look.Context.Insets()
 	scheme := look.Scheme
 	fill := scheme.Surface
+	if bar.Scrolled > 0 {
+		fill = scheme.SurfaceContainer // content goes under it
+	}
 	if bar.OverScene {
 		fill = scheme.Scrim
 	}
@@ -73,23 +83,30 @@ type Destination struct {
 func (look Look) largeTopAppBar(bar TopBar, fill draw2d.Color) (back bool) {
 	insets := look.Context.Insets()
 	scheme := look.Scheme
-	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Fixed(152 + insets.Top),
-		Padding: ui.Padding{Left: 4, Top: insets.Top, Right: 4, Bottom: 24}}
-	look.Context.Frame(layout, ui.Look{Fill: fill}, func() {
-		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(64), AlignY: ui.Center}, func() {
+	collapsed := clampFloat(bar.Scrolled/largeCollapse, 0, 1)
+	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Fixed(64 + largeCollapse*(1-collapsed) + insets.Top),
+		Padding: ui.Padding{Left: 4, Top: insets.Top, Right: 4, Bottom: 24 * (1 - collapsed)}}
+	look.Context.Frame(layout, ui.Look{Fill: fill, Clip: true}, func() {
+		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(64), Gap: 4, AlignY: ui.Center}, func() {
 			if bar.Back {
 				back = look.IconButton(bar.backIcon())
+			} else {
+				look.Context.Box(ui.Layout{Width: ui.Fixed(12)}, nil)
 			}
-			look.Context.Spacer()
+			// the small title comes in as the large one goes
+			look.Context.Box(ui.Layout{Width: ui.Grow()}, func() {
+				look.Text(bar.Title, 22, draw2d.Regular, faded(scheme.OnSurface, max(collapsed*2-1, 0)))
+			})
 			if bar.Actions != nil {
 				bar.Actions()
 			}
 		})
-		look.Context.Spacer()
+		look.Context.Spacer() // the large title keeps to the bar's foot as it shrinks
 		look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.PadXY(12, 0), Gap: 4}, func() {
-			look.Text(bar.Title, 32, draw2d.Regular, scheme.OnSurface)
+			shown := 1 - collapsed
+			look.Text(bar.Title, 32, draw2d.Regular, faded(scheme.OnSurface, shown))
 			if bar.Subtitle != "" {
-				look.Text(bar.Subtitle, 14, draw2d.Regular, scheme.OnSurfaceVariant)
+				look.Text(bar.Subtitle, 14, draw2d.Regular, faded(scheme.OnSurfaceVariant, shown))
 			}
 		})
 	})

@@ -66,9 +66,11 @@ const (
 	leavingMotion  = 200 * time.Millisecond
 )
 
-// faded is a colour with only part of its opacity left, for something on its way out.
+// faded is a colour with only part of its opacity left, for something on its way out. It never
+// reaches nothing: go-ui reads a colour with no opacity as unset and writes in the theme's ink,
+// while 1/512 shows as nothing on an 8-bit screen.
 func faded(colour draw2d.Color, left float32) draw2d.Color {
-	colour[3] *= left
+	colour[3] = max(colour[3]*left, 1.0/512)
 	return colour
 }
 

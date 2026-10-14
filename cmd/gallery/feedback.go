@@ -20,7 +20,7 @@ type feedbackState struct {
 func (feedback *feedbackState) draw(program *gallery, look material.Look) {
 	context, scheme := look.Context, look.Scheme
 	overlays := &program.overlays
-	program.topBar(look, "Feedback", "Loading, progress, dialogs and notes")
+	program.largeTopBar(look, "Feedback", "Loading, progress, dialogs and notes", "feedback")
 	page(context, "feedback", func() {
 		look.Heading("Loading")
 		row(context, func() {
@@ -56,6 +56,9 @@ func (feedback *feedbackState) draw(program *gallery, look material.Look) {
 			}
 			if look.TonalButton("panel-bottom", "Sheet") {
 				overlays.sheetShown = true
+			}
+			if look.TonalButton("panel-right", "Side sheet") {
+				overlays.sideShown = true
 			}
 			if look.TonalButton("info", "Snackbar") {
 				overlays.snackbar.Show("Harbour Light switched off", "Undo", after(6))

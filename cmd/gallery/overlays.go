@@ -6,6 +6,9 @@ import "github.com/akrck02/go-ui-android/material"
 type overlaysState struct {
 	dialogShown bool
 	sheetShown  bool
+	sideShown   bool
+	onlyLit     bool
+	onlyKept    bool
 	snackbar    material.Snackbar
 }
 
@@ -32,6 +35,16 @@ func (overlays *overlaysState) draw(program *gallery, look material.Look) {
 		}
 	}) {
 		overlays.sheetShown = false
+	}
+	if overlays.sideShown && look.SideSheet("filters", "Filters", func() {
+		look.Checkbox("Only lights that are lit", &overlays.onlyLit)
+		look.Checkbox("Only lights with a keeper", &overlays.onlyKept)
+		look.Context.Spacer()
+		if look.FilledButton("", "Apply") {
+			overlays.sideShown = false
+		}
+	}) {
+		overlays.sideShown = false
 	}
 	overlays.snackbar.Above = aboveBars(look)
 	if look.Snackbar(&overlays.snackbar) {

@@ -131,12 +131,13 @@ func (look Look) ExpandableItem(name string, item Item, open *bool, more func())
 	if touched {
 		*open = !*open
 	}
-	if *open {
-		// it unfolds: the content rises into place under the row
-		arrived := look.Context.Appear(name+" more", arrivingMotion)
-		layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.Padding{Left: 16, Top: (1 - arrived) * -12, Right: 16, Bottom: 16}, Gap: 8}
-		look.Context.Box(layout, more)
+	// it unfolds under the row, and folds back when closed
+	duration := arrivingMotion
+	if !*open {
+		duration = leavingMotion
 	}
+	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.Padding{Left: 16, Right: 16, Bottom: 16}, Gap: 8}
+	look.Context.Fold(name+" more", *open, duration, layout, more)
 	return touched
 }
 

@@ -52,7 +52,7 @@ The package's files follow the same order (`doc.go` lists them).
 
 | Piece | What it is |
 |---|---|
-| `TopAppBar(TopBar{…})` | The bar at the top, painted up under the status bar: a back arrow (a cross with `Close`, to leave a mode), a title and a subtitle, actions at its end; `Large` writes the title big under it |
+| `TopAppBar(TopBar{…})` | The bar at the top, painted up under the status bar: a back arrow (a cross with `Close`, to leave a mode), a title and a subtitle, actions at its end; `Large` writes the title big under it, and with `Scrolled` (go-ui's `ScrollOffset` of the page under it) it shrinks into a small bar as the page goes up |
 | `NavigationBar(destinations, &selected)` | Three to five destinations at the bottom, painted down under the gesture bar; `Destination.Badge` marks one with a count or a dot |
 | `NavigationRail(destinations, &selected)` | The same down the left edge, on a wide screen (`Wide()`) |
 | `NavigationDrawer(name, title, destinations, &selected)` | Every destination in a drawer sliding in from the left |
@@ -95,7 +95,7 @@ The package's files follow the same order (`doc.go` lists them).
 | Piece | What it is |
 |---|---|
 | `ListItem(name, Item{…})` | A list row: an icon in a round avatar, a headline, a supporting line, something at its end; `Selected` tints it and puts a tick in the avatar's place |
-| `ExpandableItem(name, item, &open, more)` | A row that opens to show more under it, its chevron turning |
+| `ExpandableItem(name, item, &open, more)` | A row that unfolds to show more under it and folds back, its chevron turning |
 | `Card`, `ElevatedCard`, `OutlinedCard` | Containers for one subject: filled, raised over a scene, drawn by their border |
 | `Avatar(name, icon, tint, size)` | A person's initials or a thing's icon in a circle |
 | `Banner(icon, text, actions…)` | A message across the top of the content that stays until acted on |
@@ -108,6 +108,7 @@ The package's files follow the same order (`doc.go` lists them).
 |---|---|
 | `Dialog(name, Dialog{…})` | A question over the dimmed screen: an icon, a title, a text, more content, one or two actions. Returns `Open`, `Confirmed` or `Dismissed` |
 | `BottomSheet(name, content)` | Choices or a short form in a sheet rising from the bottom |
+| `SideSheet(name, title, content)` | Filters or details in a sheet sliding in from the end, with a title and a cross |
 | `Snackbar(&snackbar)` | A short note at the bottom for a few seconds, with an action (`snackbar.Show(text, action, duration)`) |
 | `Menu(icon, choices)` | A button that opens a list of choices; returns the one chosen |
 
@@ -141,6 +142,7 @@ a core on a OnePlus 7 Pro, and nothing once the screen is left.
 | `PullToRefresh(name, refreshing, layout, rows)` | A list that refreshes when pulled down past its top and let go; the indicator stays while `refreshing` |
 | `SwipeToDismiss(name, row)` | A row a finger slides away, a bin in the gap it leaves |
 | `Carousel(name, &carousel, count, itemWidth, item)`, `CarouselItem` | A row of tiles slid sideways, gliding on and settling at a tile |
+| `MultiBrowseCarousel(name, &carousel, count, largeWidth, height, item)` | Material's multi-browse carousel: large tiles, then a medium and a small one; tiles shrink towards the edges and grow as they come in |
 | `Stick(name, &stick, size)` | An on-screen stick for walking or driving with a thumb |
 
 ## Gestures
@@ -203,7 +205,8 @@ place when it is first shown.
 
 They leave with motion too, though a program simply stops drawing them: a dialog answered fades
 out, a sheet slides back down, the drawer slides back off the side, the snackbar fades when its time
-is up, and a floating menu's actions sink and fade as it closes. go-ui keeps what such a layer
+is up, a side sheet slides back off its side, a floating menu's actions sink and fade as it
+closes, and a row's more folds back under it. go-ui keeps what such a layer
 painted last (`LayerOptions.Leave`) and lets that picture go; nothing in it can be touched on its
 way out.
 
@@ -299,9 +302,6 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 
 ## Not yet
 
-- A row that opens folding back with motion when it closes (it closes at once).
-- A carousel's tiles changing size near its edges (Material's multi-browse carousel), side sheets,
-  and a scrolling top bar that shrinks.
 - Packages for x86_64 emulators and for stores (a release key, an app bundle).
 - A tool that turns a brand's single colour into a whole scheme, as Material's does.
 
