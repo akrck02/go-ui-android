@@ -199,7 +199,13 @@ Pieces move as Material's do, and only while they move does the window draw: the
 slides and grows, the navigation bar's pill widens under the chosen icon, the tabs' underline slides,
 dialogs rise in as the screen darkens, sheets and the drawer slide in, the snackbar slides up, the
 floating menu's actions rise one after another, and `look.Enter(key, …)` lets a screen rise into
-place when it is first shown. Pieces leave at once: a program stops drawing them.
+place when it is first shown.
+
+They leave with motion too, though a program simply stops drawing them: a dialog answered fades
+out, a sheet slides back down, the drawer slides back off the side, the snackbar fades when its time
+is up, and a floating menu's actions sink and fade as it closes. go-ui keeps what such a layer
+painted last (`LayerOptions.Leave`) and lets that picture go; nothing in it can be touched on its
+way out.
 
 ## Colours
 
@@ -293,7 +299,7 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 
 ## Not yet
 
-- Pieces leaving with motion.
+- A row that opens folding back with motion when it closes (it closes at once).
 - A carousel's tiles changing size near its edges (Material's multi-browse carousel), side sheets,
   and a scrolling top bar that shrinks.
 - Packages for x86_64 emulators and for stores (a release key, an app bundle).

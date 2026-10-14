@@ -38,7 +38,8 @@ func (look Look) Dialog(name string, dialog Dialog) Answer {
 	padding := look.safePadding(24)
 	padding.Top += (1 - arrived) * 48
 	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.Center, Padding: padding,
-		Width: ui.Fixed(min(560, max(width-48, 200))), Hidden: 1 - arrived}
+		Width: ui.Fixed(min(560, max(width-48, 200))), Hidden: 1 - arrived,
+		Leave: ui.Leave{Duration: leavingMotion * 3 / 4}} // it fades out where it is
 	card := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.Pad(24), Gap: 16}
 	dismissed := look.Context.Modal(name, options, func() {
 		look.Context.Frame(card, ui.Look{Fill: scheme.SurfaceContainerHigh, Radius: 28, Shadow: true}, func() {
@@ -84,7 +85,8 @@ func (look Look) BottomSheet(name string, content func()) (dismissed bool) {
 	// it slides up from below the screen as the screen darkens
 	arrived := look.Context.Appear("sheet "+name, arrivingMotion)
 	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.End, Padding: ui.Padding{Top: insets.Top + 72, Bottom: -(1 - arrived) * 400},
-		Width: ui.Fixed(min(640, width)), Hidden: 1 - arrived}
+		Width: ui.Fixed(min(640, width)), Hidden: 1 - arrived,
+		Leave: ui.Leave{Duration: leavingMotion, Y: 400}} // it slides back down
 	sheet := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(),
 		Padding: ui.Padding{Left: 16 + insets.Left, Top: 16, Right: 16 + insets.Right, Bottom: 16 + insets.Bottom}, Gap: 8}
 	return look.Context.Modal(name, options, func() {
@@ -136,7 +138,7 @@ func (look Look) Snackbar(snackbar *Snackbar) (actionTouched bool) {
 	padding := ui.Padding{Left: 16 + insets.Left, Right: 16 + insets.Right,
 		Bottom: 16 + insets.Bottom + snackbar.Above - (1-arrived)*(80+insets.Bottom+snackbar.Above)}
 	options := ui.LayerOptions{AlignX: ui.Center, AlignY: ui.End, Padding: padding,
-		Width: ui.Fixed(min(600, width-padding.Left-padding.Right))}
+		Width: ui.Fixed(min(600, width-padding.Left-padding.Right)), Leave: ui.Leave{Duration: leavingMotion}}
 	look.Context.Overlay("snackbar", options, func() {
 		bar := ui.Layout{Width: ui.Grow(), Height: ui.Fixed(48), Padding: ui.Padding{Left: 16, Right: 8}, Gap: 8, AlignY: ui.Center}
 		look.Context.Frame(bar, ui.Look{Fill: scheme.InverseSurface, Radius: 4, Shadow: true}, func() {

@@ -58,11 +58,19 @@ func (look Look) Paragraph(text string, size float32, weight draw2d.Weight, colo
 	})
 }
 
-// Material's short motions: a control's own change, and something arriving on the screen.
+// Material's short motions: a control's own change, something arriving on the screen, and
+// something leaving it, which goes quicker than it came.
 const (
 	switchMotion   = 150 * time.Millisecond
 	arrivingMotion = 250 * time.Millisecond
+	leavingMotion  = 200 * time.Millisecond
 )
+
+// faded is a colour with only part of its opacity left, for something on its way out.
+func faded(colour draw2d.Color, left float32) draw2d.Color {
+	colour[3] *= left
+	return colour
+}
 
 func boolFloat(value bool) float32 {
 	if value {

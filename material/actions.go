@@ -120,18 +120,14 @@ func (look Look) FloatingMenu(name string, menu *FloatingMenu) int {
 	padding := ui.Padding{Right: 16 + insets.Right, Bottom: 16 + insets.Bottom + menu.Above}
 	look.Context.Overlay(name, ui.LayerOptions{AlignX: ui.End, AlignY: ui.End, Padding: padding}, func() {
 		look.Context.Box(ui.Layout{Direction: ui.Vertical, Gap: 8, AlignX: ui.End}, func() {
-			if menu.Open {
-				for index, action := range menu.Actions {
-					// the actions rise in one after another
-					arrived := look.Context.Appear(fmt.Sprint(name, " action ", index), time.Duration(150+50*index)*time.Millisecond)
-					layout := ui.Layout{Height: ui.Fixed(56), Padding: ui.Padding{Left: 16, Right: 20, Top: (1 - arrived) * 16}, Gap: 12, AlignY: ui.Center}
-					normal := ui.Look{Fill: scheme.PrimaryContainer, Radius: 28, Shadow: true}
-					if look.Context.Clickable("action "+action.Label, layout, pressedOnly(normal, scheme.SecondaryContainer), func() {
-						look.Context.IconSized(action.Icon, 24, scheme.OnPrimaryContainer)
-						look.Text(action.Label, 16, draw2d.Medium, scheme.OnPrimaryContainer)
-					}) {
-						chosen, menu.Open = index, false
-					}
+			// closed, the actions sink and fade before they go
+			shown := look.Context.Animate(name+" open", boolFloat(menu.Open), leavingMotion)
+			for index, action := range menu.Actions {
+				switch {
+				case menu.Open && look.floatingAction(name, index, action):
+					chosen, menu.Open = index, false
+				case !menu.Open && shown > 0:
+					look.leavingAction(action, shown)
 				}
 			}
 			// open, the button is a smaller round cross in the main colour
@@ -149,6 +145,31 @@ func (look Look) FloatingMenu(name string, menu *FloatingMenu) int {
 		})
 	})
 	return chosen
+}
+
+// floatingAction is one of an open floating menu's actions, rising in after the ones before it. It
+// returns true when touched.
+func (look Look) floatingAction(name string, index int, action Destination) bool {
+	scheme := look.Scheme
+	arrived := look.Context.Appear(fmt.Sprint(name, " action ", index), time.Duration(150+50*index)*time.Millisecond)
+	layout := ui.Layout{Height: ui.Fixed(56), Padding: ui.Padding{Left: 16, Right: 20, Top: (1 - arrived) * 16}, Gap: 12, AlignY: ui.Center}
+	normal := ui.Look{Fill: scheme.PrimaryContainer, Radius: 28, Shadow: true}
+	return look.Context.Clickable("action "+action.Label, layout, pressedOnly(normal, scheme.SecondaryContainer), func() {
+		look.Context.IconSized(action.Icon, 24, scheme.OnPrimaryContainer)
+		look.Text(action.Label, 16, draw2d.Medium, scheme.OnPrimaryContainer)
+	})
+}
+
+// leavingAction is an action of a menu just closed, on its way out: shown is how much of it is
+// left, from 1 to 0. It cannot be touched, and casts no shadow, which would not fade with it.
+func (look Look) leavingAction(action Destination, shown float32) {
+	scheme := look.Scheme
+	layout := ui.Layout{Height: ui.Fixed(56), Padding: ui.Padding{Left: 16, Right: 20, Top: (1 - shown) * 16}, Gap: 12, AlignY: ui.Center}
+	ink := faded(scheme.OnPrimaryContainer, shown)
+	look.Context.Frame(layout, ui.Look{Fill: faded(scheme.PrimaryContainer, shown), Radius: 28}, func() {
+		look.Context.IconSized(action.Icon, 24, ink)
+		look.Text(action.Label, 16, draw2d.Medium, ink)
+	})
 }
 
 // SplitButton is a main action joined to a small button that opens its other choices (send, and

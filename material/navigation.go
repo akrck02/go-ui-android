@@ -244,7 +244,8 @@ func (look Look) NavigationDrawer(name, title string, destinations []Destination
 	drawerWidth := min(360, width-56)
 	arrived := look.Context.Appear("drawer "+name, arrivingMotion)
 	options := ui.LayerOptions{AlignX: ui.Start, AlignY: ui.Start, Padding: ui.Padding{Left: -(1 - arrived) * drawerWidth},
-		Width: ui.Fixed(drawerWidth), Height: ui.Grow(), Hidden: 1 - arrived}
+		Width: ui.Fixed(drawerWidth), Height: ui.Grow(), Hidden: 1 - arrived,
+		Leave: ui.Leave{Duration: leavingMotion, X: -drawerWidth}} // back off the side it came from
 	dismissed := look.Context.Modal(name, options, func() {
 		sheet := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow(),
 			Padding: ui.Padding{Left: 12 + insets.Left, Top: 12 + insets.Top, Right: 12, Bottom: 12 + insets.Bottom}, Gap: 4}

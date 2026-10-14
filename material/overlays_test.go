@@ -59,3 +59,30 @@ func TestASnackbarShowsForItsTimeAndItsActionAnswers(t *testing.T) {
 		t.Fatal("the note outlived its time")
 	}
 }
+
+func TestADialogAnsweredFadesOutInsteadOfVanishing(t *testing.T) {
+	asking := true
+	screen := newScreen(t, func(look Look) {
+		if asking && look.Dialog("light", Dialog{Title: "Light the north lamp?", Confirm: "Light"}) != Open {
+			asking = false
+		}
+	})
+	screen.clocked()
+	for range 20 {
+		screen.frame()
+	}
+	screen.tap("light", "button Light")
+	if asking {
+		t.Fatal("touching Light did not answer the dialog")
+	}
+	screen.frame()
+	if !screen.drawn("Light the north lamp?") {
+		t.Fatal("the dialog vanished at once")
+	}
+	for range 20 {
+		screen.frame()
+	}
+	if screen.drawn("Light the north lamp?") {
+		t.Fatal("the dialog is still there after it had time to fade")
+	}
+}

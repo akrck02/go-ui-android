@@ -2,6 +2,8 @@ package material
 
 import (
 	"testing"
+
+	"github.com/akrck02/go-renderer/draw2d"
 )
 
 func TestTheFloatingMenuOpensChoosesAndCloses(t *testing.T) {
@@ -47,5 +49,45 @@ func TestGroupedAndSplitButtonsAnswerTheirParts(t *testing.T) {
 	screen.tap("tools", "tool trash-2")
 	if selected != 2 || action || !more || tool != 2 {
 		t.Fatalf("selected %d, action %v, more %v, tool %d: want L, the menu half alone, and the bin", selected, action, more, tool)
+	}
+}
+
+// drawn tells whether a text is in the last frame's drawing.
+func (screen *screen) drawn(text string) bool {
+	for _, command := range screen.context.Drawing().Commands {
+		if command.Kind == draw2d.TextKind && command.Text == text {
+			return true
+		}
+	}
+	return false
+}
+
+func TestAClosedFloatingMenusActionsFadeAwayUntouchable(t *testing.T) {
+	menu := &FloatingMenu{Icon: "plus", Actions: []Destination{{Icon: "file", Label: "Note"}}}
+	chosen := -1
+	screen := newScreen(t, func(look Look) {
+		if index := look.FloatingMenu("create", menu); index >= 0 {
+			chosen = index
+		}
+	})
+	screen.clocked()
+	screen.frame()
+	screen.tap("create", "toggle")
+	for range 20 {
+		screen.frame()
+	}
+	screen.tap("create", "toggle") // it closes in the frame the finger lifts
+	screen.frame()
+	if !screen.drawn("Note") {
+		t.Fatal("the action went at once when the menu closed")
+	}
+	if _, found := screen.context.Area("create", "action Note"); found {
+		t.Fatal("an action on its way out can still be touched")
+	}
+	for range 20 {
+		screen.frame()
+	}
+	if screen.drawn("Note") || chosen != -1 {
+		t.Fatalf("drawn %v, chosen %d after the menu had time to close; want it gone, nothing chosen", screen.drawn("Note"), chosen)
 	}
 }
