@@ -18,12 +18,17 @@ import (
 type sdk struct {
 	buildTools string // aapt2, zipalign, apksigner
 	platform   string // android.jar
-	compiler   string // the NDK's clang for arm64
+	compilers  string // the NDK's folder of clang compilers
+}
+
+// compiler is the NDK's clang for a processor and the oldest Android the package runs on.
+func (tools sdk) compiler(processor abi, minimumSDK int) string {
+	return filepath.Join(tools.compilers, fmt.Sprintf("%s%d-clang", processor.compiler, minimumSDK))
 }
 
 // build makes the package: the library, the resources and manifest, then aligned and signed.
 func build(app application, output string) error {
-	tools, err := findSDK(app.MinimumSDK)
+	tools, err := findSDK()
 	if err != nil {
 		return err
 	}
@@ -32,30 +37,41 @@ func build(app application, output string) error {
 		return err
 	}
 	defer os.RemoveAll(work)
-	library := filepath.Join(work, "lib", "arm64-v8a", "lib"+libraryName+".so")
-	if err := buildLibrary(app.Package, library, tools.compiler); err != nil {
-		return err
+	libraries := map[string]string{} // the package's name for each library, and where it was built
+	for _, processor := range app.ABIs {
+		name := "lib/" + processor.name + "/lib" + libraryName + ".so"
+		library := filepath.Join(work, filepath.FromSlash(name))
+		if err := buildLibrary(app.Package, library, processor, tools.compiler(processor, app.MinimumSDK)); err != nil {
+			return err
+		}
+		libraries[name] = library
 	}
 	unaligned := filepath.Join(work, "unaligned.apk")
 	if err := packResources(app, tools, work, unaligned); err != nil {
 		return err
 	}
-	if err := addLibrary(unaligned, library); err != nil {
+	if err := addLibraries(unaligned, libraries); err != nil {
 		return err
 	}
 	aligned := filepath.Join(work, "aligned.apk")
 	if err := run(filepath.Join(tools.buildTools, "zipalign"), "-f", "-p", "16", unaligned, aligned); err != nil {
 		return err
 	}
-	return sign(tools, aligned, output)
+	return sign(app, tools, aligned, output)
 }
 
-// buildLibrary builds the program as a shared library for arm64 phones, aligned to 16 KB pages,
+// buildLibrary builds the program as a shared library for a processor, aligned to 16 KB pages,
 // which phones with such pages (Android 15 and later) need.
-func buildLibrary(pkg, library, compiler string) error {
+func buildLibrary(pkg, library string, processor abi, compiler string) error {
+	if _, err := os.Stat(compiler); err != nil {
+		return fmt.Errorf("the NDK has no compiler for %s: %w", processor.name, err)
+	}
 	command := exec.Command("go", "build", "-buildmode=c-shared", "-trimpath",
 		"-ldflags=-extldflags=-Wl,-z,max-page-size=16384", "-o", library, pkg)
-	command.Env = append(os.Environ(), "CGO_ENABLED=1", "GOOS=android", "GOARCH=arm64", "CC="+compiler)
+	command.Env = append(os.Environ(), "CGO_ENABLED=1", "GOOS=android", "GOARCH="+processor.goArch, "CC="+compiler)
+	if processor.goArm != "" {
+		command.Env = append(command.Env, "GOARM="+processor.goArm)
+	}
 	command.Stdout, command.Stderr = os.Stdout, os.Stderr
 	if err := command.Run(); err != nil {
 		return fmt.Errorf("building %s for Android: %w", pkg, err)
@@ -103,9 +119,9 @@ func packResources(app application, tools sdk, work, unaligned string) error {
 		"--manifest", filepath.Join(work, "AndroidManifest.xml"), "-R", compiled, "--auto-add-overlay")
 }
 
-// addLibrary adds the library to the package, stored rather than compressed: Android maps it
+// addLibraries adds the libraries to the package, stored rather than compressed: Android maps them
 // straight from the package.
-func addLibrary(packagePath, library string) error {
+func addLibraries(packagePath string, libraries map[string]string) error {
 	original, err := zip.OpenReader(packagePath)
 	if err != nil {
 		return err
@@ -123,8 +139,15 @@ func addLibrary(packagePath, library string) error {
 			return err
 		}
 	}
-	if err := storeFile(writer, "lib/arm64-v8a/"+filepath.Base(library), library); err != nil {
-		return err
+	names := make([]string, 0, len(libraries))
+	for name := range libraries {
+		names = append(names, name)
+	}
+	sort.Strings(names) // the same package from the same program
+	for _, name := range names {
+		if err := storeFile(writer, name, libraries[name]); err != nil {
+			return err
+		}
 	}
 	if err := writer.Close(); err != nil {
 		return err
@@ -149,30 +172,44 @@ func storeFile(writer *zip.Writer, name, path string) error {
 	return err
 }
 
-// sign signs with the debug key, making it the first time as Android's own tools do.
-func sign(tools sdk, aligned, output string) error {
-	home, err := os.UserHomeDir()
+// sign signs a release with the program's own key, and anything else with the debug key.
+func sign(app application, tools sdk, aligned, output string) error {
+	signing, err := debugSigning()
+	if app.Release {
+		signing, err = app.releaseSigning(), nil
+	}
 	if err != nil {
 		return err
 	}
-	keystore := filepath.Join(home, ".android", "debug.keystore")
-	if _, err := os.Stat(keystore); errors.Is(err, os.ErrNotExist) {
-		if err := os.MkdirAll(filepath.Dir(keystore), 0o755); err != nil {
-			return err
-		}
-		if err := run("keytool", "-genkeypair", "-keystore", keystore, "-storepass", "android",
-			"-alias", "androiddebugkey", "-keypass", "android", "-keyalg", "RSA", "-validity", "10000",
-			"-dname", "CN=Android Debug,O=Android,C=US"); err != nil {
-			return err
-		}
-	}
-	if err := run(filepath.Join(tools.buildTools, "apksigner"), "sign", "--ks", keystore,
-		"--ks-pass", "pass:android", "--ks-key-alias", "androiddebugkey", "--key-pass", "pass:android",
-		"--out", output, aligned); err != nil {
+	arguments := append([]string{"sign"}, signing...)
+	arguments = append(arguments, "--out", output, aligned)
+	if err := run(filepath.Join(tools.buildTools, "apksigner"), arguments...); err != nil {
 		return err
 	}
 	_ = os.Remove(output + ".idsig") // apksigner's v4 signature, for streaming installs only
 	return nil
+}
+
+// debugSigning is apksigner's arguments for the debug key, made the first time as Android's own
+// tools do.
+func debugSigning() ([]string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+	keystore := filepath.Join(home, ".android", "debug.keystore")
+	if _, err := os.Stat(keystore); errors.Is(err, os.ErrNotExist) {
+		if err := os.MkdirAll(filepath.Dir(keystore), 0o755); err != nil {
+			return nil, err
+		}
+		if err := run("keytool", "-genkeypair", "-keystore", keystore, "-storepass", "android",
+			"-alias", "androiddebugkey", "-keypass", "android", "-keyalg", "RSA", "-validity", "10000",
+			"-dname", "CN=Android Debug,O=Android,C=US"); err != nil {
+			return nil, err
+		}
+	}
+	// the debug key's passwords are Android's well-known ones
+	return []string{"--ks", keystore, "--ks-pass", "pass:android", "--ks-key-alias", "androiddebugkey", "--key-pass", "pass:android"}, nil
 }
 
 func run(program string, arguments ...string) error {
@@ -184,9 +221,8 @@ func run(program string, arguments ...string) error {
 	return nil
 }
 
-// findSDK finds the newest build tools and platform in ANDROID_HOME, and the NDK's compiler for
-// the oldest Android the package runs on.
-func findSDK(minimumSDK int) (sdk, error) {
+// findSDK finds the newest build tools and platform in ANDROID_HOME, and the NDK's compilers.
+func findSDK() (sdk, error) {
 	home, ndk := os.Getenv("ANDROID_HOME"), os.Getenv("ANDROID_NDK_HOME")
 	if home == "" || ndk == "" {
 		return sdk{}, errors.New("set ANDROID_HOME to the Android SDK and ANDROID_NDK_HOME to the NDK")
@@ -199,12 +235,11 @@ func findSDK(minimumSDK int) (sdk, error) {
 	if err != nil {
 		return sdk{}, fmt.Errorf("no platform in the SDK: %w", err)
 	}
-	compiler := filepath.Join(ndk, "toolchains", "llvm", "prebuilt", runtime.GOOS+"-x86_64", "bin",
-		fmt.Sprintf("aarch64-linux-android%d-clang", minimumSDK))
-	if _, err := os.Stat(compiler); err != nil {
-		return sdk{}, fmt.Errorf("the NDK has no compiler for Android API %d: %w", minimumSDK, err)
+	compilers := filepath.Join(ndk, "toolchains", "llvm", "prebuilt", runtime.GOOS+"-x86_64", "bin")
+	if _, err := os.Stat(compilers); err != nil {
+		return sdk{}, fmt.Errorf("the NDK has no compilers for this computer: %w", err)
 	}
-	return sdk{buildTools: buildTools, platform: platform, compiler: compiler}, nil
+	return sdk{buildTools: buildTools, platform: platform, compilers: compilers}, nil
 }
 
 // newest is the folder whose name, after a prefix, is the highest version (36.0.0 above 9.0.0).

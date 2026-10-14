@@ -11,7 +11,8 @@
 // ANDROID_NDK_HOME (the NDK).
 //
 // The package is signed with the debug key in ~/.android/debug.keystore, made when missing: for
-// trying on a device, not for a store.
+// trying on a device. A release (-release) is signed with the program's own key and is not
+// debuggable, for a store; -abi adds libraries for other processors.
 package main
 
 import (
@@ -50,7 +51,18 @@ func readArguments(arguments []string) (application, string, error) {
 	flags.StringVar(&app.Icon, "icon", "", "a square PNG for the launcher (default: Android's own)")
 	flags.BoolVar(&app.Debuggable, "debuggable", true, "let adb read its folder (run-as) and debug it")
 	flags.BoolVar(&app.Notifications, "notifications", false, "ask for the permission to show notifications (Android 13+)")
+	abiList := flags.String("abi", "arm64", "the processors to carry a library for: arm64, x86_64 (the emulator on a PC), arm (old phones)")
+	flags.BoolVar(&app.Release, "release", false, "sign with the program's own key (-keystore, -key-alias; the password in "+storePasswordVariable+"), not debuggable")
+	flags.StringVar(&app.Keystore, "keystore", "", "the key store of a release")
+	flags.StringVar(&app.KeyAlias, "key-alias", "", "the key's name in the store")
 	if err := flags.Parse(arguments); err != nil {
+		return application{}, "", err
+	}
+	if app.Release && !wasSet(flags, "debuggable") {
+		app.Debuggable = false // a store refuses a debuggable package
+	}
+	var err error
+	if app.ABIs, err = readABIs(*abiList); err != nil {
 		return application{}, "", err
 	}
 	app.Package = "."
@@ -71,4 +83,11 @@ func readArguments(arguments []string) (application, string, error) {
 		output = strings.ToLower(filepath.Base(folder)) + ".apk"
 	}
 	return app, output, nil
+}
+
+// wasSet tells whether a flag was given on the command line.
+func wasSet(flags *flag.FlagSet, name string) bool {
+	given := false
+	flags.Visit(func(set *flag.Flag) { given = given || set.Name == name })
+	return given
 }

@@ -22,6 +22,10 @@ type application struct {
 	// program's notifications show.
 	Notifications bool
 	Package       string // the Go package to build
+	ABIs          []abi  // the processors it carries a library for
+	// Release signs with the program's own key (Keystore, KeyAlias) instead of the debug key.
+	Release            bool
+	Keystore, KeyAlias string
 }
 
 // libraryName is the shared library's name in the package (libmain.so), which the manifest names.
@@ -43,7 +47,7 @@ func (app application) check() error {
 	case app.TargetSDK < app.MinimumSDK:
 		return errors.New("-target-sdk must not be under -min-sdk")
 	}
-	return nil
+	return app.checkRelease()
 }
 
 // The manifest: Android's NativeActivity runs the program's library, with no Java (hasCode false).

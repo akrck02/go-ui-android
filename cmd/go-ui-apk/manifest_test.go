@@ -79,3 +79,48 @@ func TestTheWindowThemeFollowsNightMode(t *testing.T) {
 		t.Fatal("dark icons on a light interface and light ones on a dark interface, please")
 	}
 }
+
+func TestProcessorsAreChosenByName(t *testing.T) {
+	app, _, err := readArguments([]string{"-name", "Tides", "-id", "io.example.tides", "-abi", "arm64, x86_64,arm64"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(app.ABIs) != 2 || app.ABIs[0].name != "arm64-v8a" || app.ABIs[1].goArch != "amd64" {
+		t.Fatalf("processors %+v; want arm64 and x86_64, once each", app.ABIs)
+	}
+	if _, _, err := readArguments([]string{"-name", "Tides", "-id", "io.example.tides", "-abi", "mips"}); err == nil {
+		t.Fatal("an unknown processor was taken")
+	}
+}
+
+func TestAReleaseNeedsItsKeyAndIsNotDebuggable(t *testing.T) {
+	keystore := filepath.Join(t.TempDir(), "release.keystore")
+	if err := os.WriteFile(keystore, []byte("a store"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	release := []string{"-name", "Tides", "-id", "io.example.tides", "-release", "-keystore", keystore, "-key-alias", "tides"}
+	t.Setenv(storePasswordVariable, "")
+	if _, _, err := readArguments(release); err == nil {
+		t.Fatal("a release was taken with no password for its store")
+	}
+	t.Setenv(storePasswordVariable, "secret")
+	app, _, err := readArguments(release)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if app.Debuggable {
+		t.Fatal("a release is debuggable")
+	}
+	for _, argument := range app.releaseSigning() {
+		if strings.Contains(argument, "secret") {
+			t.Fatal("the password is on apksigner's command line")
+		}
+	}
+	if _, _, err := readArguments([]string{"-name", "Tides", "-id", "io.example.tides", "-release"}); err == nil {
+		t.Fatal("a release was taken with no key")
+	}
+	app, _, err = readArguments(append(release, "-debuggable"))
+	if err != nil || !app.Debuggable {
+		t.Fatal("asking for a debuggable release was not heard")
+	}
+}

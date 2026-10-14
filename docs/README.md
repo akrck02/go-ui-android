@@ -284,12 +284,13 @@ export ANDROID_NDK_HOME=…/ndk/<version>
 go run github.com/akrck02/go-ui-android/cmd/go-ui-apk -name Gallery -id io.example.gallery ./cmd/gallery
 ```
 
-It builds the program as a shared library for arm64 phones with the NDK's compiler (aligned to 16 KB
+It builds the program as a shared library for each processor asked for (arm64 phones by default) with the NDK's compiler (aligned to 16 KB
 pages, which Android 15 and later phones need), writes the manifest and a window theme that lets the
 program paint under the system's bars (light or dark with the phone) and beside a camera's cutout,
 and packs, aligns and signs the package with the SDK's own `aapt2`, `zipalign` and `apksigner`. The
 window shrinks while the on-screen keyboard is up. It signs with the debug key in
-`~/.android/debug.keystore`, making it when missing: for phones and the emulator, not for a store.
+`~/.android/debug.keystore`, making it when missing, for phones and the emulator; a release is
+signed with the program's own key (below).
 
 | Flag | What it sets |
 |---|---|
@@ -301,6 +302,19 @@ window shrinks while the on-screen keyboard is up. It signs with the debug key i
 | `-icon` | A square PNG for the launcher |
 | `-debuggable` | Lets `adb` read its folder and debug it; on by default |
 | `-notifications` | Names the permission Android 13 and later ask before showing notifications |
+| `-abi` | The processors to carry a library for: `arm64` (phones, the default), `x86_64` (the emulator on a PC), `arm` (old 32-bit phones); `-abi arm64,x86_64` for several |
+| `-release`, `-keystore`, `-key-alias` | Signs with the program's own key instead of the debug key, and leaves the package not debuggable: for a store |
+
+**A release** is signed with a key of the program's own, which a store knows it by from then on:
+keep the key store safe and out of the repository. The store's password is read from
+`GO_UI_APK_STORE_PASSWORD` (and the key's, when different, from `GO_UI_APK_KEY_PASSWORD`), never
+from the command line, which other users of the computer can see:
+
+```bash
+keytool -genkeypair -keystore lighthouses.keystore -alias lighthouses -keyalg RSA -validity 10000
+GO_UI_APK_STORE_PASSWORD=… go run ./cmd/go-ui-apk -name Lighthouses -id io.example.lighthouses \
+    -release -keystore lighthouses.keystore -key-alias lighthouses -version-code 2 -version 1.1 ./cmd/lighthouses
+```
 
 What the program writes to its standard error (a panic, `log.Fatal`) is in Android's log:
 `adb logcat -s Go`.
@@ -322,7 +336,7 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 
 ## Not yet
 
-- Packages for x86_64 emulators and for stores (a release key, an app bundle).
+- App bundles (`.aab`), which Google Play asks for new applications: they need Google's `bundletool`.
 - A tool that turns a brand's single colour into a whole scheme, as Material's does.
 
 ## Building
