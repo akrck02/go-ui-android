@@ -57,7 +57,7 @@ func writeBundle(linked string, libraries map[string]string, output string) erro
 	}
 	sort.Strings(names)
 	for _, name := range names {
-		if err := storeFile(writer, "base/"+name, libraries[name]); err != nil {
+		if err := storeFile(writer, moduleFile(name), libraries[name]); err != nil {
 			return err
 		}
 	}
@@ -83,6 +83,15 @@ func bundlePath(name string) string {
 		return "base/" + name
 	}
 	return "base/root/" + name // anything else travels as a file of the package's root
+}
+
+// moduleFile is where a file of a package goes in the base module: the classes under dex/, the
+// libraries as they are.
+func moduleFile(name string) string {
+	if name == dexName {
+		return "base/dex/" + name
+	}
+	return "base/" + name
 }
 
 // copyEntry copies a zip entry under another name, without compressing it again.

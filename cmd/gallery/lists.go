@@ -168,15 +168,15 @@ func (lists *listsState) row(look material.Look, light *lighthouse, picture *dra
 func (lists *listsState) choiceBar(look material.Look, notes *material.Snackbar) {
 	count := lists.chosenCount()
 	bar := material.TopBar{Title: fmt.Sprint(count, " chosen"), Back: true, Close: true, Actions: func() {
-		if look.IconButton("share-2") && !window.Share("Lighthouses", lists.chosenNames()) {
+		if look.NamedIconButton("share-2", "Share") && !window.Share("Lighthouses", lists.chosenNames()) {
 			look.Context.Copy(lists.chosenNames()) // where there is no sheet to share through
 			notes.Show("Copied: paste them where you like", "", after(3))
 		}
-		if look.IconButton("copy") {
+		if look.NamedIconButton("copy", "Copy") {
 			look.Context.Copy(lists.chosenNames())
 			notes.Show("Copied to the clipboard", "", after(3))
 		}
-		if look.IconButton("trash-2") {
+		if look.NamedIconButton("trash-2", "Remove") {
 			notes.Show(lightsRemoved(lists.removeChosen()), "", after(3))
 		}
 	}}

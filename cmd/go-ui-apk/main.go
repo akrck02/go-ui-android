@@ -4,11 +4,12 @@
 //	go-ui-apk -name "Lighthouses" -id io.example.lighthouses -o lighthouses.apk ./cmd/lighthouses
 //
 // The program is the same main package that opens a window on the desktop (go-ui's window.Run).
-// On Android it is a shared library that Android's own NativeActivity loads: no Java, no Gradle.
+// On Android it is a shared library that Android's own NativeActivity loads: no Gradle, and no Java
+// but go-renderer's one class for the screen reader, compiled here with javac and d8.
 // The tool builds the library with the NDK's compiler, writes the manifest and a window theme that
 // lets the program paint under the system's bars, and packs, aligns and signs the package with the
-// Android SDK's own tools. It needs ANDROID_HOME (the SDK, with build-tools and a platform) and
-// ANDROID_NDK_HOME (the NDK).
+// Android SDK's own tools. It needs ANDROID_HOME (the SDK, with build-tools and a platform),
+// ANDROID_NDK_HOME (the NDK) and a JDK (javac, from JAVA_HOME or the path).
 //
 // The package is signed with the debug key in ~/.android/debug.keystore, made when missing: for
 // trying on a device. A release (-release) is signed with the program's own key and is not

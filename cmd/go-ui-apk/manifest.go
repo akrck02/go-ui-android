@@ -79,7 +79,8 @@ func (app application) check() error {
 	return app.checkRelease()
 }
 
-// The manifest: Android's NativeActivity runs the program's library, with no Java (hasCode false).
+// The manifest: Android's NativeActivity runs the program's library. The package's only Java is
+// the screen reader's class (hasCode), which the library loads itself.
 // The activity keeps running through rotations and theme changes, which the program follows itself,
 // and the on-screen keyboard shrinks the window rather than covering what is typed in.
 var manifestTemplate = template.Must(template.New("manifest").Funcs(template.FuncMap{"xml": escapeXML}).Parse(
@@ -93,7 +94,7 @@ var manifestTemplate = template.Must(template.New("manifest").Funcs(template.Fun
   {{- if .Notifications}}
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   {{- end}}
-  <application android:label="{{xml .Name}}" android:hasCode="false" android:theme="@style/WindowTheme"
+  <application android:label="{{xml .Name}}" android:hasCode="true" android:theme="@style/WindowTheme"
       {{- if or .Icon .IconForeground}} android:icon="@mipmap/icon"{{end}}{{if .Debuggable}} android:debuggable="true"{{end}}>
     <activity android:name="android.app.NativeActivity" android:label="{{xml .Name}}"
         android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|density"

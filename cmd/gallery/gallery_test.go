@@ -154,3 +154,48 @@ func TestALighthouseTouchedOpensItsDetails(t *testing.T) {
 		t.Fatal("the next back did not leave the lists")
 	}
 }
+
+// With a screen reader, every destination is reached by double taps alone, and every control on it
+// has a name to read.
+func TestAScreenReaderReachesAndNamesEveryScreen(t *testing.T) {
+	program := &gallery{inputs: newInputs(), lists: newLists(), tabs: newTabs()}
+	context, state := ui.NewWithMeasurer(measurer{}), input.NewState()
+	state.WindowWidth, state.WindowHeight = 412, 892
+	state.FramebufferWidth, state.FramebufferHeight = 412, 892
+	context.SetScreenReader(true)
+	frame := func() {
+		context.Begin(state)
+		program.build(context)
+		context.End()
+		state.EndFrame()
+	}
+	find := func(label string) (ui.AccessibleNode, bool) {
+		for _, node := range context.ScreenReaderNodes() {
+			if node.Label == label && node.Pressable {
+				return node, true
+			}
+		}
+		return ui.AccessibleNode{}, false
+	}
+	frame()
+	for index, label := range []string{"Actions", "Inputs", "Lists", "Feedback", "Tabs"} {
+		node, found := find(label)
+		if !found {
+			for _, each := range context.ScreenReaderNodes() {
+				t.Logf("%q role %d pressable %v area %+v parent %d", each.Label, each.Role, each.Pressable, each.Area, each.Parent)
+			}
+			t.Fatalf("no destination %s to double tap on screen %d", label, program.screen)
+		}
+		context.ScreenReaderAct(node.ID, ui.ReaderPress)
+		frame()
+		frame()
+		if program.screen != index {
+			t.Fatalf("a double tap on %s left the gallery on screen %d", label, program.screen)
+		}
+		for _, node := range context.ScreenReaderNodes() {
+			if node.Pressable && node.Label == "" {
+				t.Errorf("on %s, a control has no name: %+v", label, node)
+			}
+		}
+	}
+}

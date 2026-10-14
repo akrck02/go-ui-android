@@ -20,7 +20,7 @@ func TestTheManifestNamesTheProgramAndItsLibrary(t *testing.T) {
 	}
 	for _, wanted := range []string{`package="io.example.tides"`, `android:versionCode="3"`,
 		`android:label="Tides &amp; &quot;Winds&quot;"`, `android:value="main"`, `android:icon="@mipmap/icon"`,
-		`android:debuggable="true"`, `android:hasCode="false"`, `android.permission.POST_NOTIFICATIONS`, `android.permission.INTERNET`,
+		`android:debuggable="true"`, `android:hasCode="true"`, `android.permission.POST_NOTIFICATIONS`, `android.permission.INTERNET`,
 		`adjustResize`} {
 		if !strings.Contains(string(manifest), wanted) {
 			t.Fatalf("the manifest has no %s:\n%s", wanted, manifest)

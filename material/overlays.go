@@ -52,6 +52,7 @@ func (look Look) Dialog(name string, dialog Dialog) Answer {
 			}
 			look.Context.Box(ui.Layout{Width: ui.Grow(), AlignX: alignX}, func() {
 				look.Text(dialog.Title, 24, draw2d.Regular, scheme.OnSurface)
+				look.Context.Describe(ui.Description{Role: ui.HeadingRole})
 			})
 			if dialog.Text != "" {
 				look.Paragraph(dialog.Text, 14, draw2d.Regular, scheme.OnSurfaceVariant)
@@ -119,7 +120,7 @@ func (look Look) SideSheet(name, title string, content func()) (closed bool) {
 		look.Context.Frame(sheet, ui.Look{Fill: scheme.SurfaceContainerLow, Radius: 16, Shadow: true}, func() {
 			look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(56), AlignY: ui.Center}, func() {
 				look.Context.Box(ui.Layout{Width: ui.Grow()}, func() { look.Text(title, 22, draw2d.Regular, scheme.OnSurfaceVariant) })
-				closed = look.IconButton("x")
+				closed = look.NamedIconButton("x", look.words().Close)
 			})
 			content()
 		})

@@ -37,7 +37,7 @@ func build(app application, output string) error {
 		return err
 	}
 	defer os.RemoveAll(work)
-	libraries := map[string]string{} // the package's name for each library, and where it was built
+	libraries := map[string]string{} // the package's name for each library (and the classes), and where it was built
 	for _, processor := range app.ABIs {
 		name := "lib/" + processor.name + "/lib" + libraryName + ".so"
 		library := filepath.Join(work, filepath.FromSlash(name))
@@ -46,6 +46,11 @@ func build(app application, output string) error {
 		}
 		libraries[name] = library
 	}
+	dex, err := buildDex(tools, work, app.MinimumSDK)
+	if err != nil {
+		return err
+	}
+	libraries[dexName] = dex
 	if app.Bundle {
 		return buildBundle(app, tools, work, libraries, output)
 	}
@@ -115,8 +120,8 @@ func packResources(app application, tools sdk, work, unaligned string, proto boo
 	return run(aapt, arguments...)
 }
 
-// addLibraries adds the libraries to the package, stored rather than compressed: Android maps them
-// straight from the package.
+// addLibraries adds the libraries and the classes to the package, stored rather than compressed:
+// Android maps the libraries straight from the package.
 func addLibraries(packagePath string, libraries map[string]string) error {
 	original, err := zip.OpenReader(packagePath)
 	if err != nil {

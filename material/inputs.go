@@ -38,6 +38,7 @@ func (look Look) TextField(name string, text *string, field Field) bool {
 	look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Gap: 4}, func() {
 		if field.Label != "" {
 			look.Text(field.Label, 12, draw2d.Medium, look.fieldColour(field, focused, scheme.OnSurfaceVariant))
+			look.Context.Describe(ui.Description{Hidden: true}) // read with the field, which it names
 		}
 		look.fieldBox(field, focused, func() {
 			if field.Prefix != "" {
@@ -46,12 +47,15 @@ func (look Look) TextField(name string, text *string, field Field) bool {
 			hidden := field.Secret && (field.Reveal == nil || !*field.Reveal)
 			changed = look.Context.TextFieldWith(name, text, ui.TextFieldOptions{Placeholder: field.Placeholder,
 				MaxLength: field.MaxLength, Plain: true, Secret: hidden})
+			// the label over the box names the field; a screen reader reads it with what is typed
+			look.Context.Describe(ui.Description{Label: field.Label})
 			if field.Suffix != "" {
 				look.Text(field.Suffix, 16, draw2d.Regular, scheme.OnSurfaceVariant)
 			}
 			if field.Secret && field.Reveal != nil {
 				icon := map[bool]string{false: "eye", true: "eye-off"}[*field.Reveal]
-				if look.IconButton(icon) {
+				word := map[bool]string{false: look.words().ShowPassword, true: look.words().HidePassword}[*field.Reveal]
+				if look.NamedIconButton(icon, word) {
 					*field.Reveal = !*field.Reveal
 				}
 			}
@@ -131,7 +135,7 @@ func (look Look) SearchBar(name string, text *string, placeholder string) bool {
 		look.Context.IconSized("search", 24, scheme.OnSurfaceVariant)
 		// the pill is the field's box: the field draws none of its own, nor a focus ring inside it
 		changed = look.Context.TextFieldWith(name, text, ui.TextFieldOptions{Placeholder: placeholder, Plain: true})
-		if *text != "" && look.IconButton("x") {
+		if *text != "" && look.NamedIconButton("x", look.words().Clear) {
 			*text, changed = "", true
 		}
 	})
@@ -189,12 +193,14 @@ func (look Look) dropdownChoice(choice string, chosen bool) bool {
 		normal.Fill = scheme.SecondaryContainer
 	}
 	layout := ui.Layout{Width: ui.Grow(), Height: ui.Fixed(48), Padding: ui.PadXY(12, 0), Gap: 12, AlignY: ui.Center}
-	return look.Context.Clickable("choice "+choice, layout, pressedOnly(normal, stateLayer(scheme.OnSurface, 0.1)), func() {
+	touched := look.Context.Clickable("choice "+choice, layout, pressedOnly(normal, stateLayer(scheme.OnSurface, 0.1)), func() {
 		look.Context.Box(ui.Layout{Width: ui.Grow()}, func() { look.Text(choice, 16, draw2d.Regular, scheme.OnSurface) })
 		if chosen {
 			look.Context.IconSized("check", 20, scheme.OnSurface)
 		}
 	})
+	look.Context.Describe(ui.Description{Selected: chosen})
+	return touched
 }
 
 // Search is what a search view keeps: what is typed, and whether it is open over the screen.
@@ -223,14 +229,14 @@ func (look Look) SearchView(name, placeholder string, search *Search, content fu
 		look.Context.Frame(view, ui.Look{Fill: scheme.SurfaceContainerHigh}, func() {
 			bar := ui.Layout{Width: ui.Grow(), Height: ui.Fixed(72), Padding: ui.Padding{Left: 4 + insets.Left, Right: 4 + insets.Right}, Gap: 4, AlignY: ui.Center}
 			look.Context.Box(bar, func() {
-				if look.IconButton("arrow-left") {
+				if look.NamedIconButton("arrow-left", look.words().Back) {
 					search.Active = false
 				}
 				if arrived == 0 {
 					look.Context.FocusField("query") // open ready to type in
 				}
 				changed = look.Context.TextFieldWith("query", &search.Query, ui.TextFieldOptions{Placeholder: placeholder, Plain: true})
-				if search.Query != "" && look.IconButton("x") {
+				if search.Query != "" && look.NamedIconButton("x", look.words().Clear) {
 					search.Query, changed = "", true
 				}
 			})

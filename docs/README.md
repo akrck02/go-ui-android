@@ -321,18 +321,49 @@ What a program asks of the phone goes through go-ui's window, and works in a bro
 - **The person's text size.** Text grows with the phone's font size setting; icons and paddings
   keep theirs, as in Android's own applications.
 
+## Screen readers
+
+Every piece reads under TalkBack as Android's own do: a finger moved over the screen reads what is
+under it ("Lamp, switch, on"), a swipe goes to the next thing, a double tap presses it, and the
+thing read is ringed. go-ui works the list out from the boxes ([its docs](../../go-ui/docs/README.md#screen-readers)):
+a control is read by the texts inside it, texts side by side are read together, a list holds its
+rows, and what is behind a dialog or a sheet is left out. The pieces add what the boxes cannot
+tell:
+
+| Piece | Read as |
+|---|---|
+| `Switch`, `Checkbox`, `RadioButton` | A switch, a checkbox, a radio button, and whether it is on |
+| `SegmentedButtons`, `ButtonGroup`, a dropdown's choices, the date picker's days | The chosen one selected |
+| `NavigationBar`, `NavigationRail`, `Tabs` | Tabs, the one shown selected; a badge after the label |
+| `TopAppBar`, `Dialog` | The title as a heading; the arrow as "Back" (or "Close") |
+| `TextField` | The label over the box names the field, read with what is typed (not a secret one's) |
+| `Slider` | Its range; the volume keys or a swipe up or down move it a step |
+| Icons with no label (a field's cross, the month's arrows) | What they do: `Look.Words`, English by default (`EnglishWords`) |
+
+An icon button of the program's own reads its icon's name ("share 2") unless it has one:
+`NamedIconButton("share-2", "Share")`, or `Describe` after any piece. The gallery's test goes to
+every screen with double taps alone, and checks that every control has a name.
+
+The package carries one small Java class for it (`go-ui-apk` compiles it in, below). It was tried
+on the Android 14 emulator with an accessibility service acting as TalkBack does: the gallery's
+tree reaches the system with every name, role and state, and a click goes to another destination,
+the focus rings a checkbox, a second click ticks it and a scroll moves the list on. TalkBack itself,
+on a phone, is not tried yet.
+
 ## Packaging: go-ui-apk
 
 ```bash
 export ANDROID_HOME=…/android-sdk      # with build-tools and a platform
 export ANDROID_NDK_HOME=…/ndk/<version>
+# and a JDK, 17 or later: javac on the path or in JAVA_HOME
 go run github.com/akrck02/go-ui-android/cmd/go-ui-apk -name Gallery -id io.example.gallery ./cmd/gallery
 ```
 
 It builds the program as a shared library for each processor asked for (arm64 phones by default) with the NDK's compiler (aligned to 16 KB
 pages, which Android 15 and later phones need), writes the manifest and a window theme that lets the
 program paint under the system's bars (light or dark with the phone) and beside a camera's cutout,
-and packs, aligns and signs the package with the SDK's own `aapt2`, `zipalign` and `apksigner`. The
+compiles go-renderer's one Java class (what a screen reader reads) with `javac` and the build tools'
+`d8`, and packs, aligns and signs the package with the SDK's own `aapt2`, `zipalign` and `apksigner`. The
 window shrinks while the on-screen keyboard is up. It signs with the debug key in
 `~/.android/debug.keystore`, making it when missing, for phones and the emulator; a release is
 signed with the program's own key (below).
@@ -391,7 +422,9 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 
 ## Not yet
 
-- A screen reader (TalkBack): the pieces have names, but no accessibility tree reaches the system.
+- TalkBack itself, on a phone (see [screen readers](#screen-readers)); a `Menu`'s button, the split
+  button's arrow and the floating toolbar's tools still read their icons' names, and text fields cannot be typed in by the screen reader's own actions (it
+  presses the field, and the keyboard comes up).
 - The keyboard's composing text (predictions, emoji, Chinese and Japanese), selection handles,
   fonts for other scripts and right-to-left layout.
 - Sound: films play their pictures only.

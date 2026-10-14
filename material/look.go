@@ -22,6 +22,35 @@ func (look Look) safePadding(margin float32) ui.Padding {
 type Look struct {
 	Context *ui.Context
 	Scheme  Scheme
+	Words   Words // what a screen reader calls the icons with no label; the zero value reads EnglishWords
+}
+
+// Words are what a screen reader (TalkBack) calls the pieces' icons that have no label beside them:
+// the arrow that goes back, the cross that clears a field.
+type Words struct {
+	Back, Close, Clear         string
+	ShowPassword, HidePassword string
+	PreviousMonth, NextMonth   string
+}
+
+// EnglishWords are the words a screen reader reads by default.
+var EnglishWords = Words{Back: "Back", Close: "Close", Clear: "Clear", ShowPassword: "Show password",
+	HidePassword: "Hide password", PreviousMonth: "Previous month", NextMonth: "Next month"}
+
+// words are the Look's words, or English ones.
+func (look Look) words() Words {
+	if look.Words == (Words{}) {
+		return EnglishWords
+	}
+	return look.Words
+}
+
+// NamedIconButton is an IconButton a screen reader (TalkBack) reads by a name, what it does ("Share"),
+// rather than by its icon's.
+func (look Look) NamedIconButton(icon, name string) bool {
+	touched := look.IconButton(icon)
+	look.Context.Describe(ui.Description{Label: name})
+	return touched
 }
 
 // New makes the frame's Look.
@@ -72,6 +101,13 @@ const (
 func faded(colour draw2d.Color, left float32) draw2d.Color {
 	colour[3] = max(colour[3]*left, 1.0/512)
 	return colour
+}
+
+// shownName is the part of a name that is shown and read: what comes before "##", which only
+// tells two pieces with the same label apart.
+func shownName(name string) string {
+	shown, _, _ := strings.Cut(name, "##")
+	return shown
 }
 
 func boolFloat(value bool) float32 {

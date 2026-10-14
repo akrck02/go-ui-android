@@ -48,12 +48,13 @@ func (look Look) TopAppBar(bar TopBar) (back bool) {
 		Padding: ui.Padding{Left: 4, Top: insets.Top, Right: 4}, Gap: 4, AlignY: ui.Center}
 	look.Context.Frame(layout, ui.Look{Fill: fill}, func() {
 		if bar.Back {
-			back = look.IconButton(bar.backIcon())
+			back = look.NamedIconButton(bar.backIcon(), look.backWord(bar))
 		} else {
 			look.Context.Box(ui.Layout{Width: ui.Fixed(12)}, nil)
 		}
 		look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Gap: 2}, func() {
 			look.Text(bar.Title, 22, draw2d.Regular, scheme.OnSurface)
+			look.Context.Describe(ui.Description{Role: ui.HeadingRole})
 			if bar.Subtitle != "" {
 				look.Text(bar.Subtitle, 14, draw2d.Regular, scheme.OnSurfaceVariant)
 			}
@@ -63,6 +64,14 @@ func (look Look) TopAppBar(bar TopBar) (back bool) {
 		}
 	})
 	return back
+}
+
+// backWord is what a screen reader calls the bar's arrow, or its cross.
+func (look Look) backWord(bar TopBar) string {
+	if bar.Close {
+		return look.words().Close
+	}
+	return look.words().Back
 }
 
 func (bar TopBar) backIcon() string {
@@ -89,13 +98,14 @@ func (look Look) largeTopAppBar(bar TopBar, fill draw2d.Color) (back bool) {
 	look.Context.Frame(layout, ui.Look{Fill: fill, Clip: true}, func() {
 		look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(64), Gap: 4, AlignY: ui.Center}, func() {
 			if bar.Back {
-				back = look.IconButton(bar.backIcon())
+				back = look.NamedIconButton(bar.backIcon(), look.backWord(bar))
 			} else {
 				look.Context.Box(ui.Layout{Width: ui.Fixed(12)}, nil)
 			}
-			// the small title comes in as the large one goes
+			// the small title comes in as the large one goes; a screen reader reads the one shown more
 			look.Context.Box(ui.Layout{Width: ui.Grow()}, func() {
 				look.Text(bar.Title, 22, draw2d.Regular, faded(scheme.OnSurface, max(collapsed*2-1, 0)))
+				look.Context.Describe(ui.Description{Role: ui.HeadingRole, Hidden: collapsed < 0.5})
 			})
 			if bar.Actions != nil {
 				bar.Actions()
@@ -105,6 +115,7 @@ func (look Look) largeTopAppBar(bar TopBar, fill draw2d.Color) (back bool) {
 		look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Padding: ui.PadXY(12, 0), Gap: 4}, func() {
 			shown := 1 - collapsed
 			look.Text(bar.Title, 32, draw2d.Regular, faded(scheme.OnSurface, shown))
+			look.Context.Describe(ui.Description{Role: ui.HeadingRole, Hidden: collapsed >= 0.5})
 			if bar.Subtitle != "" {
 				look.Text(bar.Subtitle, 14, draw2d.Regular, faded(scheme.OnSurfaceVariant, shown))
 			}
@@ -164,11 +175,14 @@ func (look Look) navigationItem(place Destination, selected bool) bool {
 	shown := look.Context.Animate("pill "+place.Label, boolFloat(selected), arrivingMotion)
 	pill := ui.Look{Fill: stateLayer(scheme.SecondaryContainer, shown*scheme.SecondaryContainer[3]), Radius: 16}
 	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Share(1), Height: ui.Grow(), Gap: 4, AlignX: ui.Center}
-	return look.Context.Clickable("navigate "+place.Label, layout, ui.Looks{}, func() {
+	touched := look.Context.Clickable("navigate "+place.Label, layout, ui.Looks{}, func() {
 		indicator := ui.Layout{Width: ui.Fixed(32 + 32*shown), Height: ui.Fixed(32), AlignX: ui.Center, AlignY: ui.Center}
 		look.Context.Frame(indicator, pill, func() { look.destinationIcon(place, ink) })
 		look.Text(place.Label, 12, weight, label)
 	})
+	// read by its label, then its badge, rather than the badge first as it is drawn
+	look.Context.Describe(ui.Description{Role: ui.TabRole, Label: place.Label, Value: place.Badge, Selected: selected})
+	return touched
 }
 
 // StatusBarScrim paints the strip under the status bar alone, for a screen whose top is a scene
@@ -206,11 +220,14 @@ func (look Look) railItem(place Destination, selected bool) bool {
 		pill.Fill, ink, label, weight = scheme.SecondaryContainer, scheme.OnSecondaryContainer, scheme.OnSurface, draw2d.Bold
 	}
 	layout := ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Fixed(56), Gap: 4, AlignX: ui.Center}
-	return look.Context.Clickable("navigate "+place.Label, layout, ui.Looks{}, func() {
+	touched := look.Context.Clickable("navigate "+place.Label, layout, ui.Looks{}, func() {
 		indicator := ui.Layout{Width: ui.Fixed(56), Height: ui.Fixed(32), AlignX: ui.Center, AlignY: ui.Center}
 		look.Context.Frame(indicator, pill, func() { look.destinationIcon(place, ink) })
 		look.Text(place.Label, 12, weight, label)
 	})
+	// read by its label, then its badge, rather than the badge first as it is drawn
+	look.Context.Describe(ui.Description{Role: ui.TabRole, Label: place.Label, Value: place.Badge, Selected: selected})
+	return touched
 }
 
 // Wide tells whether the screen is wide enough for a navigation rail instead of a bar: wider than
@@ -287,13 +304,15 @@ func (look Look) drawerItem(place Destination, selected bool) bool {
 		normal, ink = ui.Look{Fill: scheme.SecondaryContainer, Radius: 28}, scheme.OnSecondaryContainer
 	}
 	layout := ui.Layout{Width: ui.Grow(), Height: ui.Fixed(56), Padding: ui.Padding{Left: 16, Right: 24}, Gap: 12, AlignY: ui.Center}
-	return look.Context.Clickable("drawer "+place.Label, layout, pressedOnly(normal, stateLayer(ink, 0.12)), func() {
+	touched := look.Context.Clickable("drawer "+place.Label, layout, pressedOnly(normal, stateLayer(ink, 0.12)), func() {
 		look.Context.IconSized(place.Icon, 24, ink)
 		look.Context.Box(ui.Layout{Width: ui.Grow()}, func() { look.Text(place.Label, 14, draw2d.Medium, ink) })
 		if place.Badge != "" {
 			look.Text(place.Badge, 14, draw2d.Medium, ink)
 		}
 	})
+	look.Context.Describe(ui.Description{Selected: selected})
+	return touched
 }
 
 // Tabs are the primary tabs under a top bar: labels sharing the width, an underline under the
@@ -320,9 +339,11 @@ func (look Look) tabStrip(name string, labels []string, selected *int, at float3
 					ink = scheme.Primary
 				}
 				layout := ui.Layout{Width: ui.Share(1), Height: ui.Grow(), AlignX: ui.Center, AlignY: ui.Center}
-				if look.Context.Clickable(label, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(ink, 0.1)}}, func() {
+				touched := look.Context.Clickable(label, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(ink, 0.1)}}, func() {
 					look.Text(label, 14, draw2d.Medium, ink)
-				}) && !chosen {
+				})
+				look.Context.Describe(ui.Description{Role: ui.TabRole, Selected: chosen})
+				if touched && !chosen {
 					*selected, changed = index, true
 				}
 			}

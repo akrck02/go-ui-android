@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/akrck02/go-renderer/draw2d"
+	ui "github.com/akrck02/go-ui"
 	"github.com/akrck02/go-ui-android/material"
 )
 
@@ -26,10 +27,12 @@ func (actions *actionsState) draw(program *gallery, look material.Look) {
 			look.TextButton("", "Text")
 		})
 		row(context, func() {
-			look.IconButton("heart")
-			look.IconButton("bookmark")
+			look.NamedIconButton("heart", "Like")
+			look.NamedIconButton("bookmark", "Keep")
 			look.RoundButton("map", 48, false)
+			look.Context.Describe(ui.Description{Label: "Show the map"}) // what a screen reader calls it
 			look.RoundButton("locate-fixed", 48, true)
+			look.Context.Describe(ui.Description{Label: "Where am I"})
 		})
 		look.Heading("Split button and group")
 		if action, more := look.SplitButton("send", "Send the report"); action {

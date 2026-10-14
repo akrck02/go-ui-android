@@ -210,7 +210,7 @@ func (program *gallery) largeTopBar(look material.Look, title, subtitle, page st
 
 func (program *gallery) bar(look material.Look, title, subtitle string) material.TopBar {
 	return material.TopBar{Title: title, Subtitle: subtitle, Actions: func() {
-		if look.IconButton("menu") {
+		if look.NamedIconButton("menu", "Open the drawer") {
 			program.drawerOpen = true
 		}
 		switch look.Menu("ellipsis-vertical", []string{"Light theme", "Dark theme", "About the gallery"}) {

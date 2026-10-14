@@ -65,10 +65,10 @@ func (look Look) monthBar(picker *DatePicker, names DateNames) {
 		look.Context.Box(ui.Layout{Width: ui.Grow(), Padding: ui.Padding{Left: 12}}, func() {
 			look.Text(fmt.Sprintf("%s %d", names.Months[picker.month.Month()-1], picker.month.Year()), 14, draw2d.Medium, look.Scheme.OnSurfaceVariant)
 		})
-		if look.IconButton("chevron-left") {
+		if look.NamedIconButton("chevron-left", look.words().PreviousMonth) {
 			picker.month = picker.month.AddDate(0, -1, 0)
 		}
-		if look.IconButton("chevron-right") {
+		if look.NamedIconButton("chevron-right", look.words().NextMonth) {
 			picker.month = picker.month.AddDate(0, 1, 0)
 		}
 	})
@@ -119,6 +119,7 @@ func (look Look) dayCell(date time.Time, chosen, today bool, cell ui.Layout) boo
 		touched = look.Context.Clickable(date.Format("day 2006-01-02"), layout, pressedOnly(circle, stateLayer(scheme.OnSurface, 0.12)), func() {
 			look.Text(fmt.Sprint(date.Day()), 14, draw2d.Regular, ink)
 		})
+		look.Context.Describe(ui.Description{Selected: chosen})
 	})
 	return touched
 }
@@ -183,9 +184,11 @@ func (look Look) timeHeader(picker *TimePicker) {
 			normal, ink = ui.Look{Fill: scheme.PrimaryContainer, Radius: 8}, scheme.OnPrimaryContainer
 		}
 		layout := ui.Layout{Width: ui.Fixed(96), Height: ui.Fixed(80), AlignX: ui.Center, AlignY: ui.Center}
-		return look.Context.Clickable("time "+text, layout, pressedOnly(normal, stateLayer(ink, 0.12)), func() {
+		touched := look.Context.Clickable("time "+text, layout, pressedOnly(normal, stateLayer(ink, 0.12)), func() {
 			look.Text(text, 48, draw2d.Regular, ink)
 		})
+		look.Context.Describe(ui.Description{Selected: chosen})
+		return touched
 	}
 	look.Context.Box(ui.Layout{Width: ui.Grow(), Gap: 8, AlignX: ui.Center, AlignY: ui.Center}, func() {
 		if box(fmt.Sprintf("%02d", picker.hour), !picker.minutes) {

@@ -37,6 +37,7 @@ func (look Look) Switch(name string, on *bool) bool {
 	if touched {
 		*on = !*on
 	}
+	look.Context.Describe(ui.Description{Role: ui.SwitchRole, Label: shownName(name), Checked: *on})
 	return touched
 }
 
@@ -62,6 +63,7 @@ func (look Look) SegmentedButtons(name string, options []string, selected *int) 
 				}
 				look.Text(option, 14, draw2d.Medium, ink)
 			})
+			look.Context.Describe(ui.Description{Selected: chosen})
 			if touched && !chosen {
 				*selected, changed = index, true
 			}
@@ -91,6 +93,7 @@ func (look Look) Checkbox(label string, on *bool) bool {
 	if touched {
 		*on = !*on
 	}
+	look.Context.Describe(ui.Description{Role: ui.CheckboxRole, Checked: *on})
 	return touched
 }
 
@@ -99,7 +102,7 @@ func (look Look) Checkbox(label string, on *bool) bool {
 func (look Look) RadioButton(label string, chosen bool) bool {
 	scheme := look.Scheme
 	layout := ui.Layout{Height: ui.Fixed(48), Padding: ui.Padding{Right: 8}, Gap: 4, AlignY: ui.Center}
-	return look.Context.Clickable("radio "+label, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(scheme.OnSurface, 0.08), Radius: 24}}, func() {
+	touched := look.Context.Clickable("radio "+label, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(scheme.OnSurface, 0.08), Radius: 24}}, func() {
 		look.Context.Box(ui.Layout{Width: ui.Fixed(48), Height: ui.Fixed(48), AlignX: ui.Center, AlignY: ui.Center}, func() {
 			ring := ui.Layout{Width: ui.Fixed(20), Height: ui.Fixed(20), AlignX: ui.Center, AlignY: ui.Center}
 			colour := scheme.OnSurfaceVariant
@@ -114,4 +117,6 @@ func (look Look) RadioButton(label string, chosen bool) bool {
 		})
 		look.Text(label, 16, draw2d.Regular, scheme.OnSurface)
 	})
+	look.Context.Describe(ui.Description{Role: ui.RadioRole, Checked: chosen})
+	return touched
 }

@@ -215,9 +215,11 @@ func (look Look) ButtonGroup(name string, labels []string, selected *int) bool {
 				normal.Fill, ink = scheme.Primary, scheme.OnPrimary
 			}
 			layout := ui.Layout{Width: ui.Share(1), Height: ui.Grow(), AlignX: ui.Center, AlignY: ui.Center}
-			if look.Context.Clickable(label, layout, pressedOnly(normal, stateLayer(ink, 0.2)), func() {
+			touched := look.Context.Clickable(label, layout, pressedOnly(normal, stateLayer(ink, 0.2)), func() {
 				look.Text(label, 14, draw2d.Medium, ink)
-			}) && !chosen {
+			})
+			look.Context.Describe(ui.Description{Selected: chosen})
+			if touched && !chosen {
 				*selected, changed = index, true
 			}
 		}
