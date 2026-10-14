@@ -38,6 +38,9 @@ type application struct {
 	// Release signs with the program's own key (Keystore, KeyAlias) instead of the debug key.
 	Release            bool
 	Keystore, KeyAlias string
+	// Bundle writes an App Bundle (.aab), which Google Play asks for and turns into packages for
+	// each phone, instead of a package; it is signed with the release key.
+	Bundle bool
 }
 
 // libraryName is the shared library's name in the package (libmain.so), which the manifest names.
@@ -63,6 +66,8 @@ func (app application) check() error {
 		return errors.New("-target-sdk must not be under -min-sdk")
 	case (app.IconBackground != "" || app.IconMonochrome != "") && app.IconForeground == "":
 		return errors.New("-icon-background and -icon-monochrome go with -icon-foreground")
+	case app.Bundle && !app.Release:
+		return errors.New("-bundle is for a store: it goes with -release and the program's own key")
 	case app.IconForeground != "" && app.IconBackground == "":
 		return errors.New("-icon-foreground needs -icon-background: a colour (#rrggbb) or a PNG")
 	}

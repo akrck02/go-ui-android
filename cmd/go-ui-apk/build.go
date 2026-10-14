@@ -46,8 +46,11 @@ func build(app application, output string) error {
 		}
 		libraries[name] = library
 	}
+	if app.Bundle {
+		return buildBundle(app, tools, work, libraries, output)
+	}
 	unaligned := filepath.Join(work, "unaligned.apk")
-	if err := packResources(app, tools, work, unaligned); err != nil {
+	if err := packResources(app, tools, work, unaligned, false); err != nil {
 		return err
 	}
 	if err := addLibraries(unaligned, libraries); err != nil {
@@ -83,8 +86,9 @@ func buildLibrary(pkg, library string, processor abi, compiler string) error {
 	return nil
 }
 
-// packResources writes the manifest, the window theme and the icon, and links them into a package.
-func packResources(app application, tools sdk, work, unaligned string) error {
+// packResources writes the manifest, the window theme and the icon, and links them into a package:
+// in the binary form a phone reads, or in the protocol buffers an App Bundle holds (proto).
+func packResources(app application, tools sdk, work, unaligned string, proto bool) error {
 	files, err := app.resources()
 	if err != nil {
 		return err
@@ -103,8 +107,12 @@ func packResources(app application, tools sdk, work, unaligned string) error {
 	if err := run(aapt, "compile", "--dir", filepath.Join(work, "res"), "-o", compiled); err != nil {
 		return err
 	}
-	return run(aapt, "link", "-o", unaligned, "-I", filepath.Join(tools.platform, "android.jar"),
-		"--manifest", filepath.Join(work, "AndroidManifest.xml"), "-R", compiled, "--auto-add-overlay")
+	arguments := []string{"link", "-o", unaligned, "-I", filepath.Join(tools.platform, "android.jar"),
+		"--manifest", filepath.Join(work, "AndroidManifest.xml"), "-R", compiled, "--auto-add-overlay"}
+	if proto {
+		arguments = append(arguments, "--proto-format")
+	}
+	return run(aapt, arguments...)
 }
 
 // addLibraries adds the libraries to the package, stored rather than compressed: Android maps them

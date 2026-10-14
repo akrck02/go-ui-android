@@ -61,6 +61,7 @@ func readArguments(arguments []string) (application, string, error) {
 	flags.BoolVar(&app.Release, "release", false, "sign with the program's own key (-keystore, -key-alias; the password in "+storePasswordVariable+"), not debuggable")
 	flags.StringVar(&app.Keystore, "keystore", "", "the key store of a release")
 	flags.StringVar(&app.KeyAlias, "key-alias", "", "the key's name in the store")
+	flags.BoolVar(&app.Bundle, "bundle", false, "write an App Bundle (.aab) for Google Play instead of a package; with -release")
 	if err := flags.Parse(arguments); err != nil {
 		return application{}, "", err
 	}
@@ -86,7 +87,11 @@ func readArguments(arguments []string) (application, string, error) {
 		if err != nil {
 			return application{}, "", err
 		}
-		output = strings.ToLower(filepath.Base(folder)) + ".apk"
+		extension := ".apk"
+		if app.Bundle {
+			extension = ".aab"
+		}
+		output = strings.ToLower(filepath.Base(folder)) + extension
 	}
 	return app, output, nil
 }
