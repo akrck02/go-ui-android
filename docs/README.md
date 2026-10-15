@@ -336,7 +336,7 @@ tell:
 | `SegmentedButtons`, `ButtonGroup`, a dropdown's choices, the date picker's days | The chosen one selected |
 | `NavigationBar`, `NavigationRail`, `Tabs` | Tabs, the one shown selected; a badge after the label |
 | `TopAppBar`, `Dialog` | The title as a heading; the arrow as "Back" (or "Close") |
-| `TextField` | The label over the box names the field, read with what is typed (not a secret one's) |
+| `TextField` | The label over the box names the field, read with what is typed (not a secret one's); the screen reader's own typing, pasting and dictation fill it |
 | `Slider` | Its range; the volume keys or a swipe up or down move it a step |
 | `FloatingMenu`, `FloatingToolbar` | The menu's `Label` ("Create"), "Close" while open; each tool's label |
 | Icons with no label (a field's cross, the month's arrows, a `Menu`'s button, the split button's arrow) | What they do ("More options"): `Look.Words`, English by default (`EnglishWords`) |
@@ -348,8 +348,8 @@ every screen with double taps alone, and checks that every control has a name.
 The package carries one small Java class for it (`go-ui-apk` compiles it in, below). It was tried
 on the Android 14 emulator with an accessibility service acting as TalkBack does: the gallery's
 tree reaches the system with every name, role and state, and a click goes to another destination,
-the focus rings a checkbox, a second click ticks it and a scroll moves the list on. TalkBack itself,
-on a phone, is not tried yet.
+the focus rings a checkbox, a second click ticks it, a scroll moves the list on and text set on a
+field ("North light 🌊") lands in it whole. TalkBack itself, on a phone, is not tried yet.
 
 ## Packaging: go-ui-apk
 
@@ -423,8 +423,7 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 
 ## Not yet
 
-- TalkBack itself, on a phone (see [screen readers](#screen-readers)); text fields cannot be typed in
-  by the screen reader's own actions (it presses the field, and the keyboard comes up).
+- TalkBack itself, on a phone (see [screen readers](#screen-readers)).
 - The keyboard's composing text (predictions, emoji, Chinese and Japanese), selection handles,
   fonts for other scripts and right-to-left layout.
 - Sound: films play their pictures only.

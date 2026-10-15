@@ -81,7 +81,7 @@ func TestNavigationIsReadWithWhereThePersonIs(t *testing.T) {
 	}
 }
 
-func TestAFieldIsReadByItsLabelWithWhatIsTyped(t *testing.T) {
+func TestAFieldIsReadByItsLabelAndTypedInByTheReader(t *testing.T) {
 	name := "Keeper"
 	screen := newScreen(t, func(look Look) {
 		look.TextField("name", &name, Field{Label: "Name", Placeholder: "Who keeps it"})
@@ -90,6 +90,11 @@ func TestAFieldIsReadByItsLabelWithWhatIsTyped(t *testing.T) {
 	screen.frame()
 	if node := screen.read("Name"); node.Role != ui.FieldRole || node.Value != "Keeper" {
 		t.Fatalf("the label over the box names the field: %+v", node)
+	}
+	screen.context.ScreenReaderSetText(screen.read("Name").ID, "Lamp keeper")
+	screen.frame()
+	if name != "Lamp keeper" {
+		t.Fatalf("the screen reader types in the field: %q", name)
 	}
 }
 
