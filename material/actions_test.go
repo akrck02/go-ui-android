@@ -39,7 +39,7 @@ func TestGroupedAndSplitButtonsAnswerTheirParts(t *testing.T) {
 		if main, menu := look.SplitButton("send", "Send"); main || menu {
 			action, more = action || main, more || menu
 		}
-		if index := look.FloatingToolbar("tools", []string{"pencil", "share-2", "trash-2"}, 0); index >= 0 {
+		if index := look.FloatingToolbar("tools", []Destination{{Icon: "pencil", Label: "Edit"}, {Icon: "share-2", Label: "Share"}, {Icon: "trash-2", Label: "Delete"}}, 0); index >= 0 {
 			tool = index
 		}
 	})

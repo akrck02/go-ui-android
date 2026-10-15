@@ -100,6 +100,7 @@ func (look Look) ExtendedFloatingButton(icon, label string) bool {
 // it, its icon turning into a cross. A program keeps one, and draws it with Look.FloatingMenu.
 type FloatingMenu struct {
 	Icon    string        // the button's icon while closed
+	Label   string        // what a screen reader reads for the button while closed ("Create")
 	Actions []Destination // what it opens into: an icon and a label each
 	// Above is how far over the bottom of the window it sits: a navigation bar's height
 	// (NavigationBarHeight) when there is one.
@@ -142,9 +143,19 @@ func (look Look) FloatingMenu(name string, menu *FloatingMenu) int {
 			}) {
 				menu.Open = !menu.Open
 			}
+			look.Context.Describe(ui.Description{Label: look.floatingMenuName(menu)})
 		})
 	})
 	return chosen
+}
+
+// floatingMenuName is what a screen reader reads for a floating menu's button: its label while
+// closed (its icon's name if it has none), and "Close" while open, as it shows a cross.
+func (look Look) floatingMenuName(menu *FloatingMenu) string {
+	if menu.Open {
+		return look.words().Close
+	}
+	return menu.Label
 }
 
 // floatingAction is one of an open floating menu's actions, rising in after the ones before it. It
@@ -192,6 +203,7 @@ func (look Look) SplitButton(icon, label string) (action, more bool) {
 		more = look.Context.Clickable("more", layout, pressedOnly(trailing, scheme.PrimaryContainer), func() {
 			look.Context.IconSized("chevron-down", 18, scheme.OnPrimary)
 		})
+		look.Context.Describe(ui.Description{Label: look.words().MoreOptions})
 	})
 	return action, more
 }
@@ -228,9 +240,10 @@ func (look Look) ButtonGroup(name string, labels []string, selected *int) bool {
 }
 
 // FloatingToolbar is a row of actions in a pill floating over the content at the bottom of the
-// screen, for what is done to the content on show (edit, share, delete). above is how far over the
-// bottom it sits. It returns the index of the icon touched in this frame, or -1.
-func (look Look) FloatingToolbar(name string, icons []string, above float32) int {
+// screen, for what is done to the content on show (edit, share, delete): each tool shows its icon,
+// and a screen reader reads its label. above is how far over the bottom it sits. It returns the
+// index of the tool touched in this frame, or -1.
+func (look Look) FloatingToolbar(name string, tools []Destination, above float32) int {
 	scheme := look.Scheme
 	insets := look.Context.Insets()
 	touched := -1
@@ -238,13 +251,14 @@ func (look Look) FloatingToolbar(name string, icons []string, above float32) int
 	look.Context.Overlay(name, ui.LayerOptions{AlignX: ui.Center, AlignY: ui.End, Padding: padding}, func() {
 		bar := ui.Layout{Height: ui.Fixed(64), Padding: ui.PadXY(8, 0), Gap: 4, AlignY: ui.Center}
 		look.Context.Frame(bar, ui.Look{Fill: scheme.PrimaryContainer, Radius: 32, Shadow: true}, func() {
-			for index, icon := range icons {
+			for index, tool := range tools {
 				layout := ui.Layout{Width: ui.Fixed(48), Height: ui.Fixed(48), AlignX: ui.Center, AlignY: ui.Center}
-				if look.Context.Clickable("tool "+icon, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(scheme.OnPrimaryContainer, 0.12), Radius: 24}}, func() {
-					look.Context.IconSized(icon, 24, scheme.OnPrimaryContainer)
+				if look.Context.Clickable("tool "+tool.Icon, layout, ui.Looks{Pressed: ui.Look{Fill: stateLayer(scheme.OnPrimaryContainer, 0.12), Radius: 24}}, func() {
+					look.Context.IconSized(tool.Icon, 24, scheme.OnPrimaryContainer)
 				}) {
 					touched = index
 				}
+				look.Context.Describe(ui.Description{Label: tool.Label})
 			}
 		})
 	})

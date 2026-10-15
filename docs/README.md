@@ -71,10 +71,10 @@ The package's files follow the same order (`doc.go` lists them).
 | `FilledButton`, `TonalButton`, `OutlinedButton`, `TextButton` | Actions, from the most to the least important; an icon before the label when given |
 | `IconButton(icon)`, `RoundButton(icon, size, primary)` | A round 48-pixel target with an icon; a round button floating over a map or a scene |
 | `FloatingButton(icon)`, `ExtendedFloatingButton(icon, label)` | The floating action button, alone or with its action written |
-| `FloatingMenu(name, &menu)` | The floating action button opening into a few actions stacked above it |
+| `FloatingMenu(name, &menu)` | The floating action button opening into a few actions stacked above it; `menu.Label` names it for a screen reader |
 | `SplitButton(icon, label)` | A main action joined to a button opening its other choices; tells which half was touched |
 | `ButtonGroup(name, labels, &selected)` | Expressive's connected buttons: the chosen one fills and rounds out |
-| `FloatingToolbar(name, icons, above)` | A pill of actions floating over the content at the bottom |
+| `FloatingToolbar(name, tools, above)` | A pill of actions floating over the content at the bottom: an icon each, its label read by a screen reader |
 
 ### Selection — `selection.go` and `chips.go`
 
@@ -338,7 +338,8 @@ tell:
 | `TopAppBar`, `Dialog` | The title as a heading; the arrow as "Back" (or "Close") |
 | `TextField` | The label over the box names the field, read with what is typed (not a secret one's) |
 | `Slider` | Its range; the volume keys or a swipe up or down move it a step |
-| Icons with no label (a field's cross, the month's arrows) | What they do: `Look.Words`, English by default (`EnglishWords`) |
+| `FloatingMenu`, `FloatingToolbar` | The menu's `Label` ("Create"), "Close" while open; each tool's label |
+| Icons with no label (a field's cross, the month's arrows, a `Menu`'s button, the split button's arrow) | What they do ("More options"): `Look.Words`, English by default (`EnglishWords`) |
 
 An icon button of the program's own reads its icon's name ("share 2") unless it has one:
 `NamedIconButton("share-2", "Share")`, or `Describe` after any piece. The gallery's test goes to
@@ -422,9 +423,8 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 
 ## Not yet
 
-- TalkBack itself, on a phone (see [screen readers](#screen-readers)); a `Menu`'s button, the split
-  button's arrow and the floating toolbar's tools still read their icons' names, and text fields cannot be typed in by the screen reader's own actions (it
-  presses the field, and the keyboard comes up).
+- TalkBack itself, on a phone (see [screen readers](#screen-readers)); text fields cannot be typed in
+  by the screen reader's own actions (it presses the field, and the keyboard comes up).
 - The keyboard's composing text (predictions, emoji, Chinese and Japanese), selection handles,
   fonts for other scripts and right-to-left layout.
 - Sound: films play their pictures only.

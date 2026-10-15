@@ -54,7 +54,8 @@ func (actions *actionsState) draw(program *gallery, look material.Look) {
 			14, draw2d.Regular, scheme.OnSurfaceVariant)
 	})
 	above := aboveBars(look)
-	switch look.FloatingToolbar("tools", []string{"pencil", "share-2", "trash-2"}, above) {
+	tools := []material.Destination{{Icon: "pencil", Label: "Edit"}, {Icon: "share-2", Label: "Share"}, {Icon: "trash-2", Label: "Delete"}}
+	switch look.FloatingToolbar("tools", tools, above) {
 	case 0:
 		notes.Show("Edit", "", after(2))
 	case 1:
@@ -62,7 +63,7 @@ func (actions *actionsState) draw(program *gallery, look material.Look) {
 	case 2:
 		notes.Show("Deleted", "Undo", after(4))
 	}
-	actions.create.Icon, actions.create.Above = "plus", above
+	actions.create.Icon, actions.create.Label, actions.create.Above = "plus", "Create", above
 	actions.create.Actions = []material.Destination{{Icon: "file", Label: "Note"}, {Icon: "image", Label: "Picture"}, {Icon: "clock", Label: "Reminder"}}
 	if chosen := look.FloatingMenu("create", &actions.create); chosen >= 0 {
 		notes.Show("New "+actions.create.Actions[chosen].Label, "", after(2))

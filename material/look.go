@@ -31,11 +31,13 @@ type Words struct {
 	Back, Close, Clear         string
 	ShowPassword, HidePassword string
 	PreviousMonth, NextMonth   string
+	MoreOptions                string // a menu's button, a split button's arrow
 }
 
 // EnglishWords are the words a screen reader reads by default.
 var EnglishWords = Words{Back: "Back", Close: "Close", Clear: "Clear", ShowPassword: "Show password",
-	HidePassword: "Hide password", PreviousMonth: "Previous month", NextMonth: "Next month"}
+	HidePassword: "Hide password", PreviousMonth: "Previous month", NextMonth: "Next month",
+	MoreOptions: "More options"}
 
 // words are the Look's words, or English ones.
 func (look Look) words() Words {

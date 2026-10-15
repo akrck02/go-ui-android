@@ -189,8 +189,9 @@ func (look Look) Snackbar(snackbar *Snackbar) (actionTouched bool) {
 	return actionTouched
 }
 
-// Menu is a button with an icon (three dots, usually) that opens a list of choices under it. It
-// returns the index of the one chosen in this frame, or -1.
+// Menu is a button with an icon (three dots, usually) that opens a list of choices under it; a
+// screen reader reads the button as "More options". It returns the index of the one chosen in this
+// frame, or -1.
 func (look Look) Menu(icon string, choices []string) int {
 	chosen := -1
 	look.Context.MenuButton(icon, "", func() {
@@ -200,6 +201,7 @@ func (look Look) Menu(icon string, choices []string) int {
 			}
 		}
 	})
+	look.Context.Describe(ui.Description{Label: look.words().MoreOptions})
 	return chosen
 }
 

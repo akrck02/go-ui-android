@@ -111,3 +111,44 @@ func TestADialogHidesTheScreenBehindIt(t *testing.T) {
 	}
 	screen.read("Put it out")
 }
+
+func TestButtonsWithAnIconAloneSayWhatTheyDo(t *testing.T) {
+	menu := &FloatingMenu{Icon: "plus", Label: "Create", Actions: []Destination{{Icon: "flag", Label: "A beacon"}}}
+	tools := []Destination{{Icon: "pencil", Label: "Edit"}, {Icon: "share-2", Label: "Share"}}
+	screen := newScreen(t, func(look Look) {
+		look.Menu("ellipsis-vertical", []string{"Tides"})
+		look.SplitButton("send", "Send")
+		look.FloatingToolbar("tools", tools, 0)
+		look.FloatingMenu("create", menu)
+	})
+	screen.context.SetScreenReader(true)
+	screen.frame()
+	screen.read("Send")
+	screen.read("Edit")
+	screen.read("Share")
+	screen.read("Create")
+	for _, node := range screen.context.ScreenReaderNodes() {
+		if node.Label == "chevron-down" || node.Label == "ellipsis-vertical" {
+			t.Fatalf("an icon's name is read: %+v", node)
+		}
+	}
+	options := 0
+	for _, node := range screen.context.ScreenReaderNodes() {
+		if node.Label == "More options" {
+			options++
+		}
+	}
+	if options != 2 {
+		t.Fatalf("the menu's button and the split button's arrow read %q, found %d", "More options", options)
+	}
+	screen.context.ScreenReaderAct(screen.read("Create").ID, ui.ReaderPress)
+	screen.frame()
+	if !menu.Open {
+		t.Fatal("a double tap opens the floating menu")
+	}
+	screen.read("Close")
+	screen.context.ScreenReaderAct(screen.read("More options").ID, ui.ReaderPress)
+	screen.frame()
+	screen.read("Tides")
+	screen.read("More options") // the menu's button, while its menu is open
+}
