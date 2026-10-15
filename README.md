@@ -1,10 +1,77 @@
+<div align="center">
+
 # go-ui-android
 
-> [AI disclosure](#ai-disclosure).
+**Android apps in Go that look like Android's own.** Material Design 3 pieces for
+[go-ui](https://github.com/akrck02/go-ui), and a tool that packages a go-ui program as an Android
+app: no Java, Gradle or Android Studio. The same program still runs on the desktop and in a web page.
 
-[go-ui](https://github.com/akrck02/go-ui) interfaces that look like Android's own applications
-(Material Design 3), and a tool that packages any go-ui program as an Android application. The same
-program still runs on the desktop and in a web page.
+[![Go](https://img.shields.io/github/go-mod/go-version/akrck02/go-ui-android)](go.mod)
+![Android](https://img.shields.io/badge/Android-8%2B-3DDC84)
+![Platforms](https://img.shields.io/badge/also-desktop%20%7C%20web-informational)
+[![Licence](https://img.shields.io/github/license/akrck02/go-ui-android)](LICENSE)
+
+</div>
+
+## 🤖 AI disclosure
+
+I write most of my code by hand, so I want to be clear about this project: **it was written by an
+AI assistant (Claude, by Anthropic) under my direction, in October 2026.** I decided what to build
+and how it should behave; the material package, the go-ui-apk tool, the gallery and the docs were
+written by the AI. Every commit made this way carries a `Co-Authored-By: Claude` line.
+
+**Status: pending thorough review.** The code compiles and its tests pass, and the gallery was tried
+on phones and the emulator, but I have not yet reviewed it line by line. Treat it as a working
+draft, not as code I vouch for.
+
+---
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/hero-dark.png">
+  <img alt="Three screens of the gallery: buttons and a floating toolbar, a list of lighthouses with photos, and tabs over carousels of a coast" src="docs/images/hero-light.png" width="720">
+</picture>
+</p>
+
+## ✨ What it looks like
+
+<table>
+<tr>
+<th width="33%">Fields that type like the phone's</th>
+<th width="33%">Expressive's indicators</th>
+<th width="33%">Navigation</th>
+</tr>
+<tr>
+<td>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/inputs-dark.png">
+  <img alt="A search bar, text fields with a counter and a suffix, a dropdown and a password field" src="docs/images/inputs-light.png">
+</picture>
+</td>
+<td>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/feedback-dark.png">
+  <img alt="Loading indicators, wavy and linear progress, and skeletons" src="docs/images/feedback-light.png">
+</picture>
+</td>
+<td>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/drawer-dark.png">
+  <img alt="The navigation drawer open, with five destinations" src="docs/images/drawer-light.png">
+</picture>
+</td>
+</tr>
+<tr>
+<td>The keyboard suggests words and underlines the one it composes; the eye shows a password.</td>
+<td>Shapes that morph, wavy progress and skeletons, drawing only while they move.</td>
+<td>A bar, a rail on a wide screen, a drawer, tabs, and the back gesture.</td>
+</tr>
+<tr>
+<td colspan="3" align="center">The wallpaper's colours on Android 12 and later, light or dark with the phone, and readable by TalkBack.</td>
+</tr>
+</table>
+
+## 🚀 Quick start
 
 ```go
 dark := window.SystemPrefersDark()
@@ -17,34 +84,38 @@ if look.FilledButton("plus", "Add one") { … }
 look.NavigationBar(places, &screen)
 ```
 
+With the Android SDK, the NDK and a JDK installed:
+
 ```bash
 go run github.com/akrck02/go-ui-android/cmd/go-ui-apk -name Lighthouses -id io.example.lighthouses ./cmd/lighthouses
 adb install lighthouses.apk
 ```
 
-<p>
-<img src="docs/images/actions.png" width="180" alt="Buttons, a split button, a button group and a floating toolbar">
-<img src="docs/images/lists.png" width="180" alt="A banner over a list pulled to refresh">
-<img src="docs/images/feedback.png" width="180" alt="Loading indicators, wavy progress and skeletons">
-<img src="docs/images/tabs.png" width="180" alt="Tabs over swiping pages with a carousel">
+`go run ./cmd/gallery` shows every piece on the desktop. [More on getting started →](docs/getting-started.md)
+
+## 🔍 How it works
+
+<p align="center">
+  <img alt="main.go, your program → material/, Material 3 pieces drawn with go-ui → an Android app (go-ui-apk), a desktop window (go run) or a web page (GOOS=js)" src="docs/images/how-it-works.svg" width="880">
 </p>
 
-Start with [the docs](docs/README.md): every piece by Material's catalogue (navigation, actions,
-selection, inputs, containment, overlays, pickers, progress and gestures). `go run ./cmd/gallery`
-shows them all.
+Your program stays an ordinary Go `main` package. On Android it is a shared library that Android's
+own `NativeActivity` loads; go-ui-apk builds it with the NDK and packs it with the SDK's own tools.
+[More on packaging →](docs/packaging.md)
 
-## AI disclosure
+## 📚 Documentation
 
-I write most of my code by hand, so I want to be clear about where AI was used here.
-
-- **Written by an AI assistant (Claude, by Anthropic) under my direction, in October 2026:** all of
-  it so far: the material package, the go-ui-apk tool, the gallery and the docs. It is pending my
-  review.
-
-Commits made with AI carry a `Co-Authored-By: Claude` line.
-
-The material package embeds the Roboto typeface (SIL Open Font License, licence in `material/fonts`).
+| | |
+|---|---|
+| [Getting started](docs/getting-started.md) | The two parts, a program's first lines, and building against go-ui. |
+| [The pieces](docs/pieces.md) | Every piece by Material's catalogue, with pictures. |
+| [Colours](docs/colours.md) | The wallpaper's colours, Material's baseline, a scheme from one colour. |
+| [Feeling at home on a phone](docs/phone.md) | Gestures, the back gesture, turning the phone, notifications, services. |
+| [Screen readers](docs/screen-readers.md) | How TalkBack reads every piece. |
+| [Packaging: go-ui-apk](docs/packaging.md) | From a Go program to an `.apk` or an App Bundle. |
+| [The gallery](docs/gallery.md) | Every piece in one program, and where it was tried. |
 
 ## Licence
 
-MIT, see [LICENSE](LICENSE). Roboto is under the SIL Open Font License (`material/fonts/OFL.txt`).
+MIT, see [LICENSE](LICENSE). The material package embeds the Roboto typeface, under the SIL Open
+Font License (`material/fonts/OFL.txt`).
