@@ -18,4 +18,4 @@ New here? Start with the [project README](../README.md).
 - Keyboards for Chinese and Japanese (they compose as Android's own keyboard does, which is tried),
   right-to-left layout and Arabic letters joined, and emoji joined into one (a
   family, a skin tone): other scripts and colour emoji are drawn with the phone's own fonts.
-- Sound: films play their pictures only.
+- Sound in films: a film plays its pictures only (go-sound plays other sounds).

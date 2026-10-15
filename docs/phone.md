@@ -113,6 +113,10 @@ What a program asks of the phone goes through go-ui's window, and works in a bro
   values between runs. Android may end a program in the background without a word, so keep them
   in `Options.Hidden`, called when the program leaves the screen: the gallery keeps its screen, its
   theme and its colours there, and comes back as it was left.
+- **Sound.** The feedback screen plays a note through [go-sound](https://github.com/akrck02/go-sound),
+  which goes quiet when the gallery leaves the screen (`Options.Hidden`) and plays again when it
+  comes back (`Options.Shown`). go-ui-apk passes the NDK's C++ compiler too, for the sound output's
+  C++ (Oboe).
 - **The person's text size.** Text grows with the phone's font size setting; icons and paddings
   keep theirs, as in Android's own applications.
 

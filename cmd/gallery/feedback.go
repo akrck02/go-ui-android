@@ -71,6 +71,16 @@ func (feedback *feedbackState) draw(program *gallery, look material.Look) {
 			}
 		})
 		look.Paragraph("Notifications show in the phone's shade, even with the gallery in the background.", 14, draw2d.Regular, scheme.OnSurfaceVariant)
+		look.Heading("Sound")
+		row(context, func() {
+			if look.TonalButton("volume-2", "Play a note") {
+				program.sounds.play(&overlays.snackbar)
+			}
+		})
+		if look.Slider("volume", &program.sounds.volume, 0, 1, 0) {
+			program.sounds.setVolume()
+		}
+		look.Paragraph("A note from go-sound, through the phone's own audio output. It stops when the gallery leaves the screen.", 14, draw2d.Regular, scheme.OnSurfaceVariant)
 	})
 }
 

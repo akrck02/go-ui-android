@@ -55,6 +55,7 @@ type gallery struct {
 	feedback feedbackState
 	tabs     tabsState
 	overlays overlaysState
+	sounds   soundState
 }
 
 func main() {
@@ -62,7 +63,7 @@ func main() {
 	options.RegisterFlags(flag.CommandLine)
 	screen := flag.Int("screen", actionsScreen, "the screen to open on, from 0 (Actions) to 4 (Tabs): for captures")
 	flag.Parse()
-	program := &gallery{dark: options.Dark, themeSet: options.Dark}
+	program := &gallery{dark: options.Dark, themeSet: options.Dark, sounds: soundState{volume: 0.8}}
 	program.inputs = newInputs()
 	program.lists = newLists()
 	program.tabs = newTabs()
@@ -73,7 +74,8 @@ func main() {
 	if wasSet("dark") {
 		program.dark, program.themeSet = options.Dark, true
 	}
-	options.Hidden = program.keep // a phone may end the gallery once it is out of sight
+	options.Hidden = program.hidden
+	options.Shown = program.sounds.resume
 	material.UseRoboto()          // before the window makes its interface, which reads the fonts
 	if err := window.Run(options, program.build); err != nil {
 		log.Fatal(err)
@@ -88,6 +90,13 @@ func wasSet(name string) bool {
 }
 
 // keep keeps the screen, the theme and the colours chosen, for the next run.
+// hidden is what the gallery does on leaving the screen: its sound stops, and what it would miss
+// is kept, as a phone may end it once it is out of sight.
+func (program *gallery) hidden() {
+	program.sounds.suspend()
+	program.keep()
+}
+
 func (program *gallery) keep() {
 	theme := ""
 	if program.themeSet {

@@ -76,7 +76,8 @@ func buildLibrary(pkg, library string, processor abi, compiler string) error {
 	}
 	command := exec.Command("go", "build", "-buildmode=c-shared", "-trimpath",
 		"-ldflags=-extldflags=-Wl,-z,max-page-size=16384", "-o", library, pkg)
-	command.Env = append(os.Environ(), "CGO_ENABLED=1", "GOOS=android", "GOARCH="+processor.goArch, "CC="+compiler)
+	// C++ too, for the libraries that carry some (go-sound's audio output, through Oboe)
+	command.Env = append(os.Environ(), "CGO_ENABLED=1", "GOOS=android", "GOARCH="+processor.goArch, "CC="+compiler, "CXX="+compiler+"++")
 	if processor.goArm != "" {
 		command.Env = append(command.Env, "GOARM="+processor.goArm)
 	}
