@@ -1,6 +1,6 @@
 <div align="center">
 
-# go-ui-android
+# Go UI for Android
 
 **Android apps in Go that look like Android's own.** Material Design 3 pieces for
 [go-ui](https://github.com/akrck02/go-ui), and a tool that packages a go-ui program as an Android
