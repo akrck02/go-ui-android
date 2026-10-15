@@ -64,7 +64,7 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 
 | Piece | What it is |
 |---|---|
-| `TextField(name, &text, Field{…})` | Material's text field, outlined or `Filled`: a label, the box with a `Prefix` and a `Suffix`, a hint or an error under it and a `Counter`; `Secret` with `Reveal` for a password and its eye. The on-screen keyboard comes up while it is typed in, suggests words and underlines the one it is composing |
+| `TextField(name, &text, Field{…})` | Material's text field, outlined or `Filled`: a label, the box with a `Prefix` and a `Suffix`, a hint or an error under it and a `Counter`; `Secret` with `Reveal` for a password and its eye. The on-screen keyboard comes up while it is typed in, suggests words and underlines the one it is composing; a finger held on a word selects it, with handles to drag and a bar to cut, copy and paste (`Look.Words` in the person's language) |
 | `Dropdown(name, label, choices, &dropdown)` | Material's exposed dropdown: a box showing the choice, opening the choices under it |
 | `SearchView(name, placeholder, &search, content)` | A search pill that opens over the whole screen, ready to type in, with what the program finds under it |
 | `SearchBar(name, &text, placeholder)` | A pill to search in, with a button to empty it |

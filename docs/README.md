@@ -16,6 +16,6 @@ New here? Start with the [project README](../README.md).
 
 - TalkBack itself, on a phone (see [screen readers](screen-readers.md)).
 - Keyboards for Chinese and Japanese (they compose as Android's own keyboard does, which is tried),
-  selection handles, right-to-left layout and Arabic letters joined, and emoji joined into one (a
+  right-to-left layout and Arabic letters joined, and emoji joined into one (a
   family, a skin tone): other scripts and colour emoji are drawn with the phone's own fonts.
 - Sound: films play their pictures only.

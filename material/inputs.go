@@ -33,6 +33,8 @@ type Field struct {
 // it is typed in. It returns true when the text changed. name tells fields apart.
 func (look Look) TextField(name string, text *string, field Field) bool {
 	scheme := look.Scheme
+	words := look.words()
+	look.Context.SetEditingWords(ui.EditingWords{Cut: words.Cut, Copy: words.Copy, Paste: words.Paste, SelectAll: words.SelectAll})
 	changed := false
 	focused := look.Context.FieldFocused(name)
 	look.Context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Gap: 4}, func() {

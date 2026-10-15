@@ -22,22 +22,24 @@ func (look Look) safePadding(margin float32) ui.Padding {
 type Look struct {
 	Context *ui.Context
 	Scheme  Scheme
-	Words   Words // what a screen reader calls the icons with no label; the zero value reads EnglishWords
+	Words   Words // the pieces' own words, in the person's language; the zero value is EnglishWords
 }
 
-// Words are what a screen reader (TalkBack) calls the pieces' icons that have no label beside them:
-// the arrow that goes back, the cross that clears a field.
+// Words are what the pieces say themselves: what a screen reader (TalkBack) calls the icons that
+// have no label beside them (the arrow that goes back, the cross that clears a field), and the bar
+// over a text field's selection.
 type Words struct {
-	Back, Close, Clear         string
-	ShowPassword, HidePassword string
-	PreviousMonth, NextMonth   string
-	MoreOptions                string // a menu's button, a split button's arrow
+	Back, Close, Clear          string
+	ShowPassword, HidePassword  string
+	PreviousMonth, NextMonth    string
+	MoreOptions                 string // a menu's button, a split button's arrow
+	Cut, Copy, Paste, SelectAll string // the bar over a text field's selection
 }
 
 // EnglishWords are the words a screen reader reads by default.
 var EnglishWords = Words{Back: "Back", Close: "Close", Clear: "Clear", ShowPassword: "Show password",
 	HidePassword: "Hide password", PreviousMonth: "Previous month", NextMonth: "Next month",
-	MoreOptions: "More options"}
+	MoreOptions: "More options", Cut: "Cut", Copy: "Copy", Paste: "Paste", SelectAll: "Select all"}
 
 // words are the Look's words, or English ones.
 func (look Look) words() Words {

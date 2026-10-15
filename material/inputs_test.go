@@ -137,3 +137,17 @@ func TestASearchOpensReadyToTypeAndCloses(t *testing.T) {
 		t.Fatalf("chosen %q, active %v; want Seal Rock chosen and the search closed", chosen, search.Active)
 	}
 }
+
+func TestTheSelectionBarSpeaksTheLooksWords(t *testing.T) {
+	name := "North light"
+	words := EnglishWords
+	words.Copy = "Copiar"
+	screen := newScreen(t, func(look Look) {
+		look.Words = words
+		look.TextField("name", &name, Field{Label: "Name"})
+	})
+	screen.frame()
+	if got := screen.context.EditingWords().Copy; got != "Copiar" {
+		t.Fatalf("the field's bar has the Look's words: %q", got)
+	}
+}
