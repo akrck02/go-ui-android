@@ -35,7 +35,7 @@ func TestJavacIsFoundInJavaHome(t *testing.T) {
 }
 
 // The class compiles for real when the computer has a JDK and the Android SDK.
-func TestTheScreenReaderCompilesIntoClassesDex(t *testing.T) {
+func TestTheJavaClassesCompileIntoClassesDex(t *testing.T) {
 	if _, err := javaCompiler(); err != nil {
 		t.Skip(err)
 	}
@@ -54,7 +54,8 @@ func TestTheScreenReaderCompilesIntoClassesDex(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.HasPrefix(contents, []byte("dex\n")) || !bytes.Contains(contents, []byte("Lio/github/akrck02/gorenderer/ScreenReader;")) {
-		t.Fatal("classes.dex holds the screen reader's class")
+	if !bytes.HasPrefix(contents, []byte("dex\n")) || !bytes.Contains(contents, []byte("Lio/github/akrck02/gorenderer/ScreenReader;")) ||
+		!bytes.Contains(contents, []byte("Lio/github/akrck02/gorenderer/TextInput;")) {
+		t.Fatal("classes.dex holds the screen reader's class and the keyboard's view")
 	}
 }

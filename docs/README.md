@@ -90,7 +90,7 @@ The package's files follow the same order (`doc.go` lists them).
 
 | Piece | What it is |
 |---|---|
-| `TextField(name, &text, Field{…})` | Material's text field, outlined or `Filled`: a label, the box with a `Prefix` and a `Suffix`, a hint or an error under it and a `Counter`; `Secret` with `Reveal` for a password and its eye. The on-screen keyboard comes up while it is typed in |
+| `TextField(name, &text, Field{…})` | Material's text field, outlined or `Filled`: a label, the box with a `Prefix` and a `Suffix`, a hint or an error under it and a `Counter`; `Secret` with `Reveal` for a password and its eye. The on-screen keyboard comes up while it is typed in, suggests words and underlines the one it is composing |
 | `Dropdown(name, label, choices, &dropdown)` | Material's exposed dropdown: a box showing the choice, opening the choices under it |
 | `SearchView(name, placeholder, &search, content)` | A search pill that opens over the whole screen, ready to type in, with what the program finds under it |
 | `SearchBar(name, &text, placeholder)` | A pill to search in, with a button to empty it |
@@ -363,8 +363,8 @@ go run github.com/akrck02/go-ui-android/cmd/go-ui-apk -name Gallery -id io.examp
 It builds the program as a shared library for each processor asked for (arm64 phones by default) with the NDK's compiler (aligned to 16 KB
 pages, which Android 15 and later phones need), writes the manifest and a window theme that lets the
 program paint under the system's bars (light or dark with the phone) and beside a camera's cutout,
-compiles go-renderer's one Java class (what a screen reader reads) with `javac` and the build tools'
-`d8`, and packs, aligns and signs the package with the SDK's own `aapt2`, `zipalign` and `apksigner`. The
+compiles go-renderer's two Java classes (what a screen reader reads, and the view the on-screen
+keyboard types in) with `javac` and the build tools' `d8`, and packs, aligns and signs the package with the SDK's own `aapt2`, `zipalign` and `apksigner`. The
 window shrinks while the on-screen keyboard is up. It signs with the debug key in
 `~/.android/debug.keystore`, making it when missing, for phones and the emulator; a release is
 signed with the program's own key (below).
@@ -424,8 +424,9 @@ tests drive each piece with a fake pointer and fake fingers, with no display.
 ## Not yet
 
 - TalkBack itself, on a phone (see [screen readers](#screen-readers)).
-- The keyboard's composing text (predictions, emoji, Chinese and Japanese), selection handles,
-  fonts for other scripts and right-to-left layout.
+- Keyboards for Chinese and Japanese (they compose as Android's own keyboard does, which is tried),
+  selection handles, fonts for other scripts (an emoji typed is kept, but shows as "?") and
+  right-to-left layout.
 - Sound: films play their pictures only.
 
 ## Building

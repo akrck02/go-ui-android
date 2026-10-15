@@ -13,9 +13,10 @@ import (
 	"github.com/akrck02/go-renderer/android/java"
 )
 
-// The package carries one Java class, go-renderer's ScreenReader: what TalkBack reads of the
-// window, which Android only lets Java answer. It is compiled here from its source, against the
-// platform's android.jar, and turned into Android's classes.dex by the build tools' d8.
+// The package carries go-renderer's Java classes: ScreenReader, what TalkBack reads of the window,
+// and TextInput, the view the on-screen keyboard types in, which Android only lets Java answer. They
+// are compiled here from their source, against the platform's android.jar, and turned into
+// Android's classes.dex by the build tools' d8.
 
 // dexName is the classes' name in a package.
 const dexName = "classes.dex"
@@ -27,17 +28,14 @@ func buildDex(tools sdk, work string, minimumSDK int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	source := filepath.Join(work, "java", filepath.FromSlash(java.ScreenReaderPath))
-	if err := os.MkdirAll(filepath.Dir(source), 0o755); err != nil {
-		return "", err
-	}
-	if err := os.WriteFile(source, []byte(java.ScreenReader), 0o644); err != nil {
+	sources, err := writeSources(filepath.Join(work, "java"))
+	if err != nil {
 		return "", err
 	}
 	platform := filepath.Join(tools.platform, "android.jar")
 	classes := filepath.Join(work, "classes")
 	// Java 11's classes, which d8 reads
-	if err := run(javac, "--release", "11", "-classpath", platform, "-d", classes, source); err != nil {
+	if err := run(javac, append([]string{"--release", "11", "-classpath", platform, "-d", classes}, sources...)...); err != nil {
 		return "", err
 	}
 	compiled, err := classFiles(classes)
@@ -53,6 +51,22 @@ func buildDex(tools sdk, work string, minimumSDK int) (string, error) {
 		return "", err
 	}
 	return filepath.Join(dex, dexName), nil
+}
+
+// writeSources writes the Java go-renderer carries under a folder, for javac, and lists the files.
+func writeSources(folder string) ([]string, error) {
+	var written []string
+	for _, source := range java.Sources {
+		path := filepath.Join(folder, filepath.FromSlash(source.Path))
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			return nil, err
+		}
+		if err := os.WriteFile(path, []byte(source.Text), 0o644); err != nil {
+			return nil, err
+		}
+		written = append(written, path)
+	}
+	return written, nil
 }
 
 // javaCompiler finds javac: in JAVA_HOME, else on the path. A JDK is already needed for apksigner
