@@ -1,5 +1,7 @@
 <div align="center">
 
+<img alt="" src="docs/images/logo.svg" width="120">
+
 # Go UI for Android
 
 **Android apps in Go that look like Android's own.** Material Design 3 pieces for

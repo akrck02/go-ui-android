@@ -1,3 +1,5 @@
+<p align="center"><img alt="" src="images/logo.svg" width="120"></p>
+
 # Welcome to go-ui-android 👋
 
 **go-ui-android makes Android apps in Go that look and feel like Android's own**: Material Design pieces (bars, lists, buttons, dialogs) and a tool that turns the program into an app you install on a phone. No Java, no Android Studio.
