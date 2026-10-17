@@ -2,7 +2,7 @@
 
 Every Material piece of `material`, one by one: when to use it, concrete cases with their code,
 how it behaves under a finger and with TalkBack. Each case is a real program's code, and the
-pictures are captures of it in a phone-sized window. [The pieces](../pieces.md) shows them all at
+pictures are captures of it in a phone-sized window. [The pieces](../4-guides/1-pieces.md) shows them all at
 a glance; this is the page to read when using one.
 
 The cases assume the usual frame: `look` is the `material.Look` made in it
@@ -17,15 +17,15 @@ func padded(look material.Look, content func()) {
 
 | Page | Pieces |
 |---|---|
-| [Navigation](navigation.md) | `TopAppBar`, `NavigationBar`, `NavigationRail`, `NavigationDrawer`, `Tabs`, `Screens` |
-| [Actions](actions.md) | `FilledButton`, `TonalButton`, `OutlinedButton`, `TextButton`, `IconButton`, `NamedIconButton`, `RoundButton`, `SplitButton`, `FloatingButton`, `ExtendedFloatingButton`, `FloatingMenu`, `ButtonGroup`, `FloatingToolbar` |
-| [Selection](selection.md) | `Switch`, `Checkbox`, `RadioButton`, `SegmentedButtons`, `Slider`, `FilterChip`, `InputChip`, `AssistChip`, `Tag` |
-| [Inputs](inputs.md) | `TextField`, `Dropdown`, `SearchBar`, `SearchView` |
-| [Containment](containment.md) | `ListItem`, `ExpandableItem`, `Card`, `OutlinedCard`, `ElevatedCard`, `Avatar`, `Banner`, `SectionTitle`, `Divider` |
-| [Overlays](overlays.md) | `Dialog`, `BottomSheet`, `StandardSheet`, `SideSheet`, `Snackbar`, `Menu` |
-| [Pickers](pickers.md) | `DatePicker`, `TimePicker` |
-| [Progress](progress.md) | `LoadingIndicator`, `CircularProgress`, `WavyProgress`, `LinearProgress`, `Skeleton` |
-| [Gestures](gestures.md) | `Carousel`, `MultiBrowseCarousel`, `TabPager`, `PullToRefresh`, `SwipeToDismiss`, `LongPressed`, `Stick` |
+| [Navigation](1-navigation.md) | `TopAppBar`, `NavigationBar`, `NavigationRail`, `NavigationDrawer`, `Tabs`, `Screens` |
+| [Actions](2-actions.md) | `FilledButton`, `TonalButton`, `OutlinedButton`, `TextButton`, `IconButton`, `NamedIconButton`, `RoundButton`, `SplitButton`, `FloatingButton`, `ExtendedFloatingButton`, `FloatingMenu`, `ButtonGroup`, `FloatingToolbar` |
+| [Selection](3-selection.md) | `Switch`, `Checkbox`, `RadioButton`, `SegmentedButtons`, `Slider`, `FilterChip`, `InputChip`, `AssistChip`, `Tag` |
+| [Inputs](4-inputs.md) | `TextField`, `Dropdown`, `SearchBar`, `SearchView` |
+| [Containment](5-containment.md) | `ListItem`, `ExpandableItem`, `Card`, `OutlinedCard`, `ElevatedCard`, `Avatar`, `Banner`, `SectionTitle`, `Divider` |
+| [Overlays](6-overlays.md) | `Dialog`, `BottomSheet`, `StandardSheet`, `SideSheet`, `Snackbar`, `Menu` |
+| [Pickers](7-pickers.md) | `DatePicker`, `TimePicker` |
+| [Progress](8-progress.md) | `LoadingIndicator`, `CircularProgress`, `WavyProgress`, `LinearProgress`, `Skeleton` |
+| [Gestures](9-gestures.md) | `Carousel`, `MultiBrowseCarousel`, `TabPager`, `PullToRefresh`, `SwipeToDismiss`, `LongPressed`, `Stick` |
 
 ## Rules every piece follows
 
@@ -41,4 +41,4 @@ func padded(look material.Look, content func()) {
 
 ---
 
-[← Documentation](../README.md)
+[← Documentation](../1-overview.md)

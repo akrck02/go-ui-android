@@ -90,4 +90,4 @@ case 2: // remove
 
 ---
 
-[← Navigation](navigation.md) · [Selection →](selection.md)
+[← Navigation](1-navigation.md) · [Selection →](3-selection.md)

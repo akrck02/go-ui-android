@@ -37,4 +37,4 @@ if open && look.TimePicker("light at", &picker, &date) != material.Open {
 
 ---
 
-[← Overlays](overlays.md) · [Progress →](progress.md)
+[← Overlays](6-overlays.md) · [Progress →](8-progress.md)

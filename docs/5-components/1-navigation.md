@@ -71,7 +71,7 @@ if open && look.NavigationDrawer("drawer", "Coast guard", places, &place) {
 
 Primary tabs under the top bar, the underline sliding to the one chosen, for views of **one**
 thing (a lighthouse's overview, light and history). For tabs whose pages a finger swipes, use
-[`TabPager`](gestures.md#tabpager).
+[`TabPager`](9-gestures.md#tabpager).
 
 ```go
 look.Tabs("view", []string{"Overview", "Light", "History"}, &tab)
@@ -113,8 +113,8 @@ if look.Back() {
 }
 ```
 
-See [the tutorial's lesson 2](../tutorial/02-screens-and-back.md) for a whole app.
+See [the tutorial's lesson 2](../3-the-quest/2-screens-and-back.md) for a whole app.
 
 ---
 
-[← Components](README.md) · [Actions →](actions.md)
+[← Components](0-components.md) · [Actions →](2-actions.md)

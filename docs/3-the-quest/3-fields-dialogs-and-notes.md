@@ -20,7 +20,7 @@ Lesson 2's `details` already has the pieces:
 | `TextField(name, &text, material.Field{Label, Placeholder, Supporting, Error, MaxLength, Counter, Filled, Prefix, Suffix, Secret, Reveal})` | A string. On a phone the on-screen keyboard comes up, suggests words and underlines the one it composes; a held word is selected, with handles and a bar to cut, copy and paste |
 | `Slider(name, &value, minimum, maximum, step)` | A number |
 | `Switch(name, &on)` | A `bool` |
-| `Dropdown`, `SegmentedButtons`, `Checkbox`, `RadioButton`, `DatePicker`, `TimePicker` | See [the pieces](../pieces.md) |
+| `Dropdown`, `SegmentedButtons`, `Checkbox`, `RadioButton`, `DatePicker`, `TimePicker` | See [the pieces](../4-guides/1-pieces.md) |
 
 ## A dialog
 
@@ -97,4 +97,4 @@ look.TextField("place", &light.place, field)
 
 ---
 
-[← Lesson 2](02-screens-and-back.md) · [Lesson 4: colours and settings →](04-colours-and-settings.md)
+[← Lesson 2](2-screens-and-back.md) · [Lesson 4: colours and settings →](4-colours-and-settings.md)

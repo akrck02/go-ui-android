@@ -89,7 +89,7 @@ look.Context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, nil)
 
 ![A banner with a no-wifi icon, a message, and Dismiss and Refresh](../images/components/contain-banner.jpg)
 
-For a note that goes by itself, use a [`Snackbar`](overlays.md#snackbar).
+For a note that goes by itself, use a [`Snackbar`](6-overlays.md#snackbar).
 
 ## `SectionTitle`, `Heading`, `Divider`, `Text`, `Paragraph`
 
@@ -99,4 +99,4 @@ only piece that wraps).
 
 ---
 
-[← Inputs](inputs.md) · [Overlays →](overlays.md)
+[← Inputs](4-inputs.md) · [Overlays →](6-overlays.md)

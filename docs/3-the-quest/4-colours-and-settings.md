@@ -40,7 +40,7 @@ func (program *app) settings(look material.Look) {
 
 To keep the choice between runs, use go-ui's `window.KeepPreference` in `Options.Hidden`, which is
 called when the app leaves the screen; Android may end it afterwards without a word
-([feeling at home on a phone](../phone.md#the-phones-services)). More in [colours](../colours.md).
+([feeling at home on a phone](../4-guides/3-phone.md#the-phones-services)). More in [colours](../4-guides/2-colours.md).
 
 #### Checkpoint
 
@@ -263,4 +263,4 @@ func (program *app) remove(name string) {
 
 ---
 
-[← Lesson 3](03-fields-dialogs-and-notes.md) · [Lesson 5: on a phone →](05-on-a-phone.md)
+[← Lesson 3](3-fields-dialogs-and-notes.md) · [Lesson 5: on a phone →](5-on-a-phone.md)

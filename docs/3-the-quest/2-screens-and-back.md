@@ -23,7 +23,7 @@ var places = []material.Destination{{Icon: "lighthouse", Label: "Lighthouses"}, 
 
 `build` shows the destination chosen with a `switch`, then the bar (lesson 1's `build`). On a phone
 turned on its side, `look.Wide()` is true: draw `NavigationRail` down the left instead, with
-`look.Body(true, …)` ([feeling at home on a phone](../phone.md#turning-the-phone)).
+`look.Body(true, …)` ([feeling at home on a phone](../4-guides/3-phone.md#turning-the-phone)).
 
 ## A stack of screens
 
@@ -118,4 +118,4 @@ settings is shown, before `look.Back()`.
 
 ---
 
-[← Lesson 1](01-a-first-screen.md) · [Lesson 3: fields, dialogs and notes →](03-fields-dialogs-and-notes.md)
+[← Lesson 1](1-a-first-screen.md) · [Lesson 3: fields, dialogs and notes →](3-fields-dialogs-and-notes.md)

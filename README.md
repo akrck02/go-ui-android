@@ -91,7 +91,7 @@ go run github.com/akrck02/go-ui-android/cmd/go-ui-apk -name Lighthouses -id io.e
 adb install lighthouses.apk
 ```
 
-`go run ./cmd/gallery` shows every piece on the desktop. [More on getting started →](docs/getting-started.md)
+`go run ./cmd/gallery` shows every piece on the desktop. [More on getting started →](docs/2-getting-started.md)
 
 ## 🔍 How it works
 
@@ -101,22 +101,22 @@ adb install lighthouses.apk
 
 Your program stays an ordinary Go `main` package. On Android it is a shared library that Android's
 own `NativeActivity` loads; go-ui-apk builds it with the NDK and packs it with the SDK's own tools.
-[More on packaging →](docs/packaging.md)
+[More on packaging →](docs/4-guides/5-packaging.md)
 
 ## 📚 Documentation
 
 | | |
 |---|---|
-| [Getting started](docs/getting-started.md) | The two parts, a program's first lines, and building against go-ui. |
-| [Tutorial](docs/tutorial/README.md) | A lighthouse app in five lessons, from the first screen to a phone. |
-| [Components](docs/components/README.md) | Every piece one by one, with concrete cases. |
-| [Reference](docs/reference/README.md) | Every type and function of `material`. |
-| [The pieces](docs/pieces.md) | Every piece by Material's catalogue, with pictures. |
-| [Colours](docs/colours.md) | The wallpaper's colours, Material's baseline, a scheme from one colour. |
-| [Feeling at home on a phone](docs/phone.md) | Gestures, the back gesture, turning the phone, notifications, services. |
-| [Screen readers](docs/screen-readers.md) | How TalkBack reads every piece. |
-| [Packaging: go-ui-apk](docs/packaging.md) | From a Go program to an `.apk` or an App Bundle. |
-| [The gallery](docs/gallery.md) | Every piece in one program, and where it was tried. |
+| [Getting started](docs/2-getting-started.md) | The two parts, a program's first lines, and building against go-ui. |
+| [Tutorial](docs/3-the-quest/0-the-quest.md) | A lighthouse app in five lessons, from the first screen to a phone. |
+| [Components](docs/5-components/0-components.md) | Every piece one by one, with concrete cases. |
+| [Reference](docs/6-reference/0-reference.md) | Every type and function of `material`. |
+| [The pieces](docs/4-guides/1-pieces.md) | Every piece by Material's catalogue, with pictures. |
+| [Colours](docs/4-guides/2-colours.md) | The wallpaper's colours, Material's baseline, a scheme from one colour. |
+| [Feeling at home on a phone](docs/4-guides/3-phone.md) | Gestures, the back gesture, turning the phone, notifications, services. |
+| [Screen readers](docs/4-guides/4-screen-readers.md) | How TalkBack reads every piece. |
+| [Packaging: go-ui-apk](docs/4-guides/5-packaging.md) | From a Go program to an `.apk` or an App Bundle. |
+| [The gallery](docs/4-guides/6-gallery.md) | Every piece in one program, and where it was tried. |
 
 ## Licence
 

@@ -122,4 +122,4 @@ What a program asks of the phone goes through go-ui's window, and works in a bro
 
 ---
 
-[← All the documentation](README.md)
+[← All the documentation](../1-overview.md)

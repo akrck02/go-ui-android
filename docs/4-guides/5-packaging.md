@@ -55,4 +55,4 @@ What the program writes to its standard error (a panic, `log.Fatal`) is in Andro
 
 ---
 
-[← All the documentation](README.md)
+[← All the documentation](../1-overview.md)

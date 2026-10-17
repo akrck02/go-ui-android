@@ -90,4 +90,4 @@ walker.Steer(stick.Forward, stick.Sideways, step) // go-renderer's camera.Walk
 
 ---
 
-[← Progress](progress.md) · [Components](README.md)
+[← Progress](8-progress.md) · [Components](0-components.md)
