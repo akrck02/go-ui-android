@@ -1,0 +1,201 @@
+<h1 id="lesson-5-on-a-phone">Lesson 5: on a phone</h1>
+
+<p>The app runs on the desktop. In this lesson it becomes an Android package, installed on an
+emulator or your own phone. You need no Java code, Gradle or Android Studio: <strong>go-ui-apk</strong> builds
+the program with the NDK and packs it with the SDK&rsquo;s own tools.</p>
+
+<table>
+<thead>
+<tr>
+<th>Mission</th>
+<th>Pieces</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>The app installed</td>
+<td>the SDK, the NDK, go-ui-apk, <code>adb</code></td>
+<td>30 min</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="the-idea">The idea</h4>
+
+<p>go-ui-apk is a <strong>removal company</strong>: it packs your program (built for the phone&rsquo;s processor with the NDK), Android&rsquo;s paperwork (the manifest, the icon) and a signature into one box, the <code>.apk</code>, which the phone unpacks and installs.</p>
+
+<h2 id="1-install-the-android-tools">1. Install the Android tools</h2>
+
+<table>
+<thead>
+<tr>
+<th>You need</th>
+<th>Why</th>
+<th>How</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>The <strong>Android SDK</strong> command-line tools, with <code>platform-tools</code>, <code>build-tools</code> and a <code>platforms;android-…</code></td>
+<td><code>aapt2</code>, <code>zipalign</code>, <code>apksigner</code>, <code>d8</code> and <code>adb</code></td>
+<td><a href="https://developer.android.com/studio#command-tools" target="_blank">developer.android.com/studio#command-tools</a>, then <code>sdkmanager &quot;platform-tools&quot; &quot;build-tools;35.0.0&quot; &quot;platforms;android-35&quot;</code></td>
+</tr>
+
+<tr>
+<td>The <strong>NDK</strong></td>
+<td>Compiles the Go program (cgo) for the phone&rsquo;s processor</td>
+<td><code>sdkmanager &quot;ndk;27.2.12479018&quot;</code></td>
+</tr>
+
+<tr>
+<td>A <strong>JDK</strong> 17 or later</td>
+<td>Compiles go-renderer&rsquo;s two small Java classes (the screen reader&rsquo;s, the keyboard&rsquo;s)</td>
+<td><code>javac</code> on the <code>PATH</code>, or <code>JAVA_HOME</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"><span class="nb">export</span> <span class="nv">ANDROID_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/android-sdk
+<span class="nb">export</span> <span class="nv">ANDROID_NDK_HOME</span><span class="o">=</span><span class="nv">$ANDROID_HOME</span>/ndk/27.2.12479018
+</code></pre>
+
+<h2 id="2-build-the-package">2. Build the package</h2>
+
+<p>From the app&rsquo;s folder:</p>
+<pre><code class="language-bash">go run github.com/akrck02/go-ui-android/cmd/go-ui-apk -name Lighthouses -id io.example.lighthouses .
+</code></pre>
+
+<p><code>-name</code> is the name under the icon, <code>-id</code> the application id (a reversed domain you own). It writes
+<code>lighthouses.apk</code>, signed with the debug key (<code>~/.android/debug.keystore</code>, made when missing), for
+arm64 phones. For the emulator on a PC add <code>-abi arm64,x86_64</code>.</p>
+
+<h2 id="3-install-it">3. Install it</h2>
+
+<p>On a phone: turn on <em>Developer options</em> and <em>USB debugging</em>, plug it in, then</p>
+<pre><code class="language-bash">adb install lighthouses.apk
+</code></pre>
+
+<p>Or on an emulator: make one with <code>avdmanager</code> (an <code>x86_64</code> system image), start it with
+<code>emulator -avd &lt;name&gt;</code>, and <code>adb install</code> the same way.</p>
+
+<p>What the program writes to standard error (a panic, <code>log.Print</code>) is in Android&rsquo;s log:</p>
+<pre><code class="language-bash">adb logcat -s Go
+</code></pre>
+
+<p><code>window.LastCrash()</code> gives the program the report of its last crash, to show or send.</p>
+
+<h2 id="4-make-it-look-finished">4. Make it look finished</h2>
+
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Gives</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>-icon-foreground fg.png -icon-background '#00796b' -icon-monochrome mono.png</code></td>
+<td>An adaptive icon, cut to each launcher&rsquo;s shape, and a themed one</td>
+</tr>
+
+<tr>
+<td><code>-splash '#fef7ff' -splash-dark '#141218'</code></td>
+<td>The window&rsquo;s colour while the app starts</td>
+</tr>
+
+<tr>
+<td><code>-notifications</code></td>
+<td>The permission Android 13+ asks before <code>window.Notify</code></td>
+</tr>
+
+<tr>
+<td><code>-version-code 2 -version 1.1</code></td>
+<td>The version</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="5-a-release">5. A release</h2>
+
+<p>A store knows an app by its key: make one, keep it safe and out of the repository, and pass its
+password through the environment, never the command line:</p>
+<pre><code class="language-bash">keytool -genkeypair -keystore lighthouses.keystore -alias lighthouses -keyalg RSA -validity <span class="m">10000</span>
+<span class="nv">GO_UI_APK_STORE_PASSWORD</span><span class="o">=</span>… go run github.com/akrck02/go-ui-android/cmd/go-ui-apk <span class="se">\
+</span>    -name Lighthouses -id io.example.lighthouses <span class="se">\
+</span>    -release -keystore lighthouses.keystore -key-alias lighthouses -bundle .
+</code></pre>
+
+<p><code>-bundle</code> writes the App Bundle (<code>.aab</code>) Google Play asks for. Every flag is in
+<a href="./guides/packaging">packaging</a>.</p>
+
+<h4 id="checkpoint">Checkpoint</h4>
+
+<p><code>adb install lighthouses.apk</code> says <em>Success</em>; the app is in the phone&rsquo;s launcher, opens on the list, and <code>adb logcat -s Go</code> shows what it prints.</p>
+
+<p><img src="./images/tutorial/quest/achievement-shipper.svg" alt="Achievement unlocked: Shipper" /></p>
+
+<h2 id="what-you-learnt">What you learnt</h2>
+
+<ul>
+<li>go-ui-apk turns a Go <code>main</code> package into an <code>.apk</code> with the SDK, the NDK and a JDK.</li>
+<li><code>adb install</code> and <code>adb logcat -s Go</code> for trying and debugging.</li>
+<li>Releases are signed with your own key; <code>-bundle</code> for Google Play.</li>
+</ul>
+
+<h2 id="final-challenge-lighthouse-network">Final challenge · Lighthouse network</h2>
+
+<p>Turn the phone on its side: the app should move its destinations from the bar at the bottom to a <strong>rail</strong> down the left, as Android&rsquo;s own apps do on a wide screen.</p>
+
+<blockquote>
+<p><strong>Hint:</strong> <code>look.Wide()</code> says the screen has more width than height to spare; <code>NavigationRail</code> takes the same destinations as the bar, and <code>look.Body(true, …)</code> keeps the content beside it.</p>
+</blockquote>
+
+<p>Try it on your own first, then compare with the solution.</p>
+
+<p><img src="./images/tutorial/final.jpg" alt="The final challenge: the app on its side, the destinations on a rail down the left" /></p>
+
+<details>
+<summary>🔓 Show the solution</summary>
+
+```go
+// in build, instead of the vertical box
+if look.Wide() {
+	context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func() {
+		look.NavigationRail(places, &program.place)
+		look.Body(true, func() { program.show(look) })
+	})
+	return
+}
+context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow()}, func() {
+	look.Body(false, func() { program.show(look) })
+	look.NavigationBar(places, &program.place)
+})
+```
+
+with `show` holding the `switch` over the places that was inside `Body`. On the desktop, `-width 892 -height 412` gives the window a phone's side.
+
+</details>
+
+<p><img src="./images/tutorial/quest/achievement-final.svg" alt="Rare achievement unlocked: Lighthouse network" /></p>
+
+<h2 id="well-done">Well done</h2>
+
+<p><img src="./images/tutorial/quest/achievements-all.svg" alt="Every achievement of the quest" /></p>
+
+<h2 id="where-next">Where next</h2>
+
+<ul>
+<li><a href="./guides/pieces">The pieces</a>: every Material piece, with pictures.</li>
+<li><a href="./guides/phone">Feeling at home on a phone</a>: gestures, turning the phone, notifications, services.</li>
+<li><a href="./guides/screen-readers">Screen readers</a>: how TalkBack reads the app.</li>
+<li><a href="./guides/gallery">The gallery</a>: every piece in one program, to read its code.</li>
+<li><a href="./reference/reference">The reference</a>.</li>
+</ul>
+
+<hr>
+
+<p><a href="./the-quest/colours-and-settings">← Lesson 4</a> · <a href="./the-quest/the-quest">Tutorial</a></p>

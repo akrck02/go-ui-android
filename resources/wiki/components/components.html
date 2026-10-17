@@ -1,0 +1,88 @@
+<h1 id="components">Components</h1>
+
+<p>Every Material piece of <code>material</code>, one by one: when to use it, concrete cases with their code,
+how it behaves under a finger and with TalkBack. Each case is a real program&rsquo;s code, and the
+pictures are captures of it in a phone-sized window. <a href="./guides/pieces">The pieces</a> shows them all at
+a glance; this is the page to read when using one.</p>
+
+<p>The cases assume the usual frame: <code>look</code> is the <code>material.Look</code> made in it
+(<code>material.New(context, scheme)</code>), and variables such as <code>lit</code> or <code>place</code> belong to your program
+and live between frames. <code>padded</code> stands for a column with the screen&rsquo;s margins:</p>
+<pre><code class="language-go"><span class="kd">func</span> <span class="nf">padded</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">,</span> <span class="nx">content</span> <span class="kd">func</span><span class="p">())</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Direction</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">Vertical</span><span class="p">,</span> <span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Padding</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Pad</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="nx">Gap</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span> <span class="nx">content</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Pieces</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="./components/navigation">Navigation</a></td>
+<td><code>TopAppBar</code>, <code>NavigationBar</code>, <code>NavigationRail</code>, <code>NavigationDrawer</code>, <code>Tabs</code>, <code>Screens</code></td>
+</tr>
+
+<tr>
+<td><a href="./components/actions">Actions</a></td>
+<td><code>FilledButton</code>, <code>TonalButton</code>, <code>OutlinedButton</code>, <code>TextButton</code>, <code>IconButton</code>, <code>NamedIconButton</code>, <code>RoundButton</code>, <code>SplitButton</code>, <code>FloatingButton</code>, <code>ExtendedFloatingButton</code>, <code>FloatingMenu</code>, <code>ButtonGroup</code>, <code>FloatingToolbar</code></td>
+</tr>
+
+<tr>
+<td><a href="./components/selection">Selection</a></td>
+<td><code>Switch</code>, <code>Checkbox</code>, <code>RadioButton</code>, <code>SegmentedButtons</code>, <code>Slider</code>, <code>FilterChip</code>, <code>InputChip</code>, <code>AssistChip</code>, <code>Tag</code></td>
+</tr>
+
+<tr>
+<td><a href="./components/inputs">Inputs</a></td>
+<td><code>TextField</code>, <code>Dropdown</code>, <code>SearchBar</code>, <code>SearchView</code></td>
+</tr>
+
+<tr>
+<td><a href="./components/containment">Containment</a></td>
+<td><code>ListItem</code>, <code>ExpandableItem</code>, <code>Card</code>, <code>OutlinedCard</code>, <code>ElevatedCard</code>, <code>Avatar</code>, <code>Banner</code>, <code>SectionTitle</code>, <code>Divider</code></td>
+</tr>
+
+<tr>
+<td><a href="./components/overlays">Overlays</a></td>
+<td><code>Dialog</code>, <code>BottomSheet</code>, <code>StandardSheet</code>, <code>SideSheet</code>, <code>Snackbar</code>, <code>Menu</code></td>
+</tr>
+
+<tr>
+<td><a href="./components/pickers">Pickers</a></td>
+<td><code>DatePicker</code>, <code>TimePicker</code></td>
+</tr>
+
+<tr>
+<td><a href="./components/progress">Progress</a></td>
+<td><code>LoadingIndicator</code>, <code>CircularProgress</code>, <code>WavyProgress</code>, <code>LinearProgress</code>, <code>Skeleton</code></td>
+</tr>
+
+<tr>
+<td><a href="./components/gestures">Gestures</a></td>
+<td><code>Carousel</code>, <code>MultiBrowseCarousel</code>, <code>TabPager</code>, <code>PullToRefresh</code>, <code>SwipeToDismiss</code>, <code>LongPressed</code>, <code>Stick</code></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="rules-every-piece-follows">Rules every piece follows</h2>
+
+<ul>
+<li>Pieces that can be touched <strong>return <code>true</code> in the frame they are touched</strong>; pieces that edit a
+value take a pointer to it. Overlays that ask return a <code>material.Answer</code>.</li>
+<li>A piece is told apart by its <strong>name</strong> (its label, its icon, or a name given). Rows that repeat
+get a scope each: <code>look.Context.Push(name)</code> … <code>look.Context.Pop()</code>.</li>
+<li>Targets are at least <strong>48 pixels</strong>, as Material asks. A finger has no hover: pieces change only
+while pressed.</li>
+<li>Colours come from the <strong>scheme</strong> (<code>look.Scheme.OnSurface</code>, <code>ErrorContainer</code>…), so the dark theme
+and the wallpaper&rsquo;s colours follow.</li>
+<li>Every piece is read by <strong>TalkBack</strong>; icon buttons need a name (<code>NamedIconButton</code>).</li>
+</ul>
+
+<hr>
+
+<p><a href="./overview">← Documentation</a></p>

@@ -1,0 +1,122 @@
+<h1 id="selection">Selection</h1>
+
+<h2 id="switch-checkbox-radiobutton"><code>Switch</code>, <code>Checkbox</code>, <code>RadioButton</code></h2>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>When</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>Switch(name, &amp;on)</code></td>
+<td>A setting that takes effect at once; at the end of a row or a list item</td>
+</tr>
+
+<tr>
+<td><code>Checkbox(label, &amp;on)</code></td>
+<td>One of several facts in a form, or rows to choose</td>
+</tr>
+
+<tr>
+<td><code>RadioButton(label, chosen)</code></td>
+<td>One of a few choices, all in sight; it returns <code>true</code> when touched, and the program chooses</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-go"><span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;Lit&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Spacer</span><span class="p">()</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;lit&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">lit</span><span class="p">)</span> <span class="c1">// takes effect at once</span>
+	<span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">Checkbox</span><span class="p">(</span><span class="s">&#34;Has a foghorn&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">foghorn</span><span class="p">)</span> <span class="c1">// part of a form</span>
+	<span class="k">for</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">name</span> <span class="o">:=</span> <span class="k">range</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;White&#34;</span><span class="p">,</span> <span class="s">&#34;Red&#34;</span><span class="p">,</span> <span class="s">&#34;Green&#34;</span><span class="p">}</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">RadioButton</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">colour</span> <span class="o">==</span> <span class="nx">index</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// one of a few, all in sight</span>
+			<span class="nx">colour</span> <span class="p">=</span> <span class="nx">index</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/selection-controls.jpg" alt="Lit with a switch, an empty Has a foghorn checkbox, and White, Red and Green with White chosen" /></p>
+
+<p>TalkBack reads a switch as on or off, a checkbox as ticked, a radio button as chosen.</p>
+
+<h2 id="segmentedbuttons-and-slider"><code>SegmentedButtons</code> and <code>Slider</code></h2>
+
+<p>Two to five short choices sharing a row, one chosen (units, a view); and a value between two ends,
+in steps. Write the value beside a slider when it matters.</p>
+<pre><code class="language-go"><span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">SegmentedButtons</span><span class="p">(</span><span class="s">&#34;units&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;Miles&#34;</span><span class="p">,</span> <span class="s">&#34;Kilometres&#34;</span><span class="p">},</span> <span class="o">&amp;</span><span class="nx">units</span><span class="p">)</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">Slider</span><span class="p">(</span><span class="s">&#34;volume&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">volume</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;Foghorn volume %.0f&#34;</span><span class="p">,</span> <span class="nx">volume</span><span class="p">),</span> <span class="mi">14</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurfaceVariant</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/selection-segmented.jpg" alt="Miles chosen beside Kilometres, a slider and Foghorn volume 6" /></p>
+
+<h2 id="chips-and-tags">Chips and tags</h2>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>When</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>FilterChip(label, selected)</code></td>
+<td>A filter on or off over a list; returns <code>true</code> when touched</td>
+</tr>
+
+<tr>
+<td><code>InputChip(label)</code></td>
+<td>Something entered (a tag, a person), with a cross: returns <code>touched, removed</code></td>
+</tr>
+
+<tr>
+<td><code>AssistChip(icon, label)</code></td>
+<td>An action suggested beside the content</td>
+</tr>
+
+<tr>
+<td><code>Tag(text, ink, tint)</code></td>
+<td>A label in its own colours: a state, a count. It is not touched</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-go"><span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// filters over a list</span>
+		<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">FilterChip</span><span class="p">(</span><span class="s">&#34;Lit&#34;</span><span class="p">,</span> <span class="nx">lit</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">lit</span> <span class="p">=</span> <span class="p">!</span><span class="nx">lit</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">FilterChip</span><span class="p">(</span><span class="s">&#34;Stone&#34;</span><span class="p">,</span> <span class="nx">stone</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">stone</span> <span class="p">=</span> <span class="p">!</span><span class="nx">stone</span>
+		<span class="p">}</span>
+	<span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// what was entered, removable</span>
+		<span class="k">for</span> <span class="nx">index</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">index</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">tags</span><span class="p">);</span> <span class="nx">index</span><span class="o">++</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">removed</span> <span class="o">:=</span> <span class="nx">look</span><span class="p">.</span><span class="nf">InputChip</span><span class="p">(</span><span class="nx">tags</span><span class="p">[</span><span class="nx">index</span><span class="p">]);</span> <span class="nx">removed</span> <span class="p">{</span>
+				<span class="nx">tags</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">tags</span><span class="p">[:</span><span class="nx">index</span><span class="p">],</span> <span class="nx">tags</span><span class="p">[</span><span class="nx">index</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span><span class="o">...</span><span class="p">)</span>
+				<span class="nx">index</span><span class="o">--</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// suggested actions</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">AssistChip</span><span class="p">(</span><span class="s">&#34;map-pin&#34;</span><span class="p">,</span> <span class="s">&#34;Show on the map&#34;</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Tag</span><span class="p">(</span><span class="s">&#34;Needs repair&#34;</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnErrorContainer</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">ErrorContainer</span><span class="p">)</span>
+	<span class="p">})</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/selection-chips.jpg" alt="Lit chosen and Stone filters, Listed and Painted removable chips, Show on the map and a red Needs repair tag" /></p>
+
+<hr>
+
+<p><a href="./components/actions">← Actions</a> · <a href="./components/inputs">Inputs →</a></p>

@@ -1,0 +1,126 @@
+<h1 id="feeling-at-home-on-a-phone">📱 Feeling at home on a phone</h1>
+
+<p>What a phone does that a desktop does not: fingers that swipe and hold, the back gesture, a
+screen that turns, notifications, and the phone&rsquo;s own services. Most of it comes from go-ui and
+go-renderer; the pieces use it the way Android&rsquo;s own applications do.</p>
+
+<h2 id="gestures">Gestures</h2>
+
+<p>go-ui follows the one finger on a touch screen from where it comes down. Once it has moved a few
+pixels, the way it went first decides who takes it: the innermost list for up and down, the
+innermost of the sideways pieces (a carousel inside swiping pages) for sideways. The control it came
+down on is then not touched, and a finger that hardly moves stays a touch. So the pieces sit inside
+each other freely: the gallery has a carousel inside a list inside swiping pages, and rows swiped
+away inside a list pulled to refresh.</p>
+
+<ul>
+<li><strong>Long press.</strong> A finger held still on a piece for half a second (go-ui&rsquo;s <code>LongPressed</code>; with a
+mouse, its right button) long-presses it, and lifting it then is no touch. <code>look.LongPressed()</code>
+after a piece tells, and gives the phone&rsquo;s short buzz, as Android&rsquo;s own applications do. A list
+starts choosing with it: the row held is chosen (<code>Item.Selected</code>), touches choose more, and the
+top bar says how many, with a cross to stop (<code>TopBar.Close</code>) and actions for what is chosen.</li>
+</ul>
+<pre><code class="language-go">  <span class="nx">touched</span> <span class="o">:=</span> <span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;row&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Headline</span><span class="p">:</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">Selected</span><span class="p">:</span> <span class="nx">light</span><span class="p">.</span><span class="nx">chosen</span><span class="p">})</span>
+  <span class="k">switch</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="nx">look</span><span class="p">.</span><span class="nf">LongPressed</span><span class="p">():</span>
+  	<span class="nx">light</span><span class="p">.</span><span class="nx">chosen</span> <span class="p">=</span> <span class="kc">true</span>
+  <span class="k">case</span> <span class="nx">touched</span> <span class="o">&amp;&amp;</span> <span class="nx">choosing</span><span class="p">:</span>
+  	<span class="nx">light</span><span class="p">.</span><span class="nx">chosen</span> <span class="p">=</span> <span class="p">!</span><span class="nx">light</span><span class="p">.</span><span class="nx">chosen</span>
+  <span class="p">}</span>
+</code></pre>
+
+<ul>
+<li><strong>Pull to refresh.</strong> The indicator follows the pull (go-ui&rsquo;s <code>ScrollPull</code>); let go past 64 pixels,
+<code>PullToRefresh</code> returns true, and the program refreshes, keeping <code>refreshing</code> set until done.</li>
+<li><strong>Swiping pages.</strong> A page let go past a third of the way, or flicked, turns to the next; the tab
+underline moves with the pages, between two tabs while a page is half way.</li>
+<li><strong>Rows swiped away.</strong> Past two fifths of their width, or flicked, they go; short of that they slide
+back.</li>
+<li><strong>Carousels.</strong> Let go, they glide on with the finger&rsquo;s speed and settle at a tile&rsquo;s edge.</li>
+<li><strong>The stick.</strong> The finger that comes down on it holds it; <code>Forward</code> and <code>Sideways</code> go from -1 to 1.
+Other fingers stay free, so a program can turn a view with them (<code>context.Touches()</code>, leaving out
+<code>stick.Touching(touch)</code>). It can sit anywhere, in a <code>Push</code> scope, a list or swiping pages: the
+finger steering it is its own, so the pages and the list stay still under it.</li>
+</ul>
+
+<h2 id="back-and-motion">Back and motion</h2>
+
+<p>A phone&rsquo;s back gesture reaches the program. Dialogs, sheets, the drawer and the floating menu answer
+it first and close; then <code>look.Back()</code> tells the screen, which stops choosing rows or goes back (to
+the first destination, to the list a detail came from). A back nobody answers sends the program to
+the background, as Android&rsquo;s own applications do at their first screen. Ask for it after drawing what goes over the
+screen, so that gets it first:</p>
+<pre><code class="language-go"><span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">screen</span> <span class="o">!=</span> <span class="nx">firstScreen</span> <span class="o">&amp;&amp;</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Back</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">screen</span> <span class="p">=</span> <span class="nx">firstScreen</span>
+	<span class="p">}</span>
+<span class="p">}()</span>
+</code></pre>
+
+<p>Pieces move as Material&rsquo;s do, and only while they move does the window draw: the switch&rsquo;s handle
+slides and grows, the navigation bar&rsquo;s pill widens under the chosen icon, the tabs&rsquo; underline slides,
+dialogs rise in as the screen darkens, sheets and the drawer slide in, the snackbar slides up, the
+floating menu&rsquo;s actions rise one after another, and <code>look.Enter(key, …)</code> lets a screen rise into
+place when it is first shown.</p>
+
+<p>They leave with motion too, though a program simply stops drawing them: a dialog answered fades
+out, a sheet slides back down, the drawer slides back off the side, the snackbar fades when its time
+is up, a side sheet slides back off its side, a floating menu&rsquo;s actions sink and fade as it
+closes, and a row&rsquo;s more folds back under it. go-ui keeps what such a layer
+painted last (<code>LayerOptions.Leave</code>) and lets that picture go; nothing in it can be touched on its
+way out.</p>
+
+<h2 id="turning-the-phone">Turning the phone</h2>
+
+<p>A phone on its side has more width than height to spare, and its camera&rsquo;s cutout at a side. Material
+moves the destinations from a bar at the bottom to a rail down the left:</p>
+<pre><code class="language-go"><span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Wide</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">NavigationRail</span><span class="p">(</span><span class="nx">places</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">screen</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Body</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nf">drawScreen</span><span class="p">(</span><span class="nx">look</span><span class="p">)</span> <span class="p">})</span>
+	<span class="p">})</span>
+	<span class="k">return</span>
+<span class="p">}</span>
+<span class="nx">context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Direction</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">Vertical</span><span class="p">,</span> <span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">Body</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nf">drawScreen</span><span class="p">(</span><span class="nx">look</span><span class="p">)</span> <span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">NavigationBar</span><span class="p">(</span><span class="nx">places</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">screen</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><code>Body</code> keeps the content clear of the cutout; go-ui-apk&rsquo;s window theme paints beside it
+(<code>shortEdges</code>), so no black strip is left there.</p>
+
+<h2 id="notifications">Notifications</h2>
+
+<p>A program&rsquo;s notifications go through go-ui&rsquo;s window: <code>window.Notify(id, title, text)</code> shows one in
+the phone&rsquo;s shade, even while the program is in the background, and touching it opens the program.
+Android 13 and later show them only once the person allows it: check <code>window.NotificationsAllowed()</code>
+and ask with <code>window.AskForNotifications()</code> when they do something that needs them. Build the
+package with <code>go-ui-apk -notifications</code>, which names the permission. In a browser they are the
+page&rsquo;s notifications; on the desktop they are not shown yet.</p>
+
+<h2 id="the-phone-s-services">The phone&rsquo;s services</h2>
+
+<p>What a program asks of the phone goes through go-ui&rsquo;s window, and works in a browser too:</p>
+
+<ul>
+<li><strong>Links and sharing.</strong> <code>window.OpenLink(link)</code> opens a web page in the browser, <code>mailto:</code> in the
+mail, <code>tel:</code> in the phone; <code>window.Share(title, text)</code> offers a text through the system&rsquo;s sheet.
+The gallery shares the lighthouses chosen in its list, and opens its project page from the menu.</li>
+<li><strong>The clipboard.</strong> <code>look.Context.Copy(text)</code> puts a text on the phone&rsquo;s clipboard, and text fields
+copy and paste through it.</li>
+<li><strong>Preferences.</strong> <code>window.Preference(name)</code> and <code>window.KeepPreference(name, value)</code> keep small
+values between runs. Android may end a program in the background without a word, so keep them
+in <code>Options.Hidden</code>, called when the program leaves the screen: the gallery keeps its screen, its
+theme and its colours there, and comes back as it was left.</li>
+<li><strong>Sound.</strong> The feedback screen plays a note through <a href="https://github.com/akrck02/go-sound" target="_blank">go-sound</a>,
+which goes quiet when the gallery leaves the screen (<code>Options.Hidden</code>) and plays again when it
+comes back (<code>Options.Shown</code>). go-ui-apk passes the NDK&rsquo;s C++ compiler too, for the sound output&rsquo;s
+C++ (Oboe).</li>
+<li><strong>The person&rsquo;s text size.</strong> Text grows with the phone&rsquo;s font size setting; icons and paddings
+keep theirs, as in Android&rsquo;s own applications.</li>
+</ul>
+
+<hr>
+
+<p><a href="./overview">← All the documentation</a></p>

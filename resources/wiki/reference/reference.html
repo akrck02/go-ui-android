@@ -1,0 +1,127 @@
+<h1 id="reference">Reference</h1>
+
+<table>
+<thead>
+<tr>
+<th>Package or tool</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><a href="./reference/material"><code>material</code></a></td>
+<td>Material Design 3 pieces for go-ui: <code>Look</code>, its pieces, <code>Scheme</code> and the state structs some pieces keep. Generated from the doc comments (<code>python3 docs/6-reference/generate.py</code>)</td>
+</tr>
+
+<tr>
+<td><a href="./guides/pieces">The pieces</a></td>
+<td>The same pieces by Material&rsquo;s catalogue, with pictures: the place to choose one</td>
+</tr>
+
+<tr>
+<td><a href="./guides/packaging"><code>cmd/go-ui-apk</code></a></td>
+<td>Every flag of the packaging tool</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="the-shape-of-every-piece">The shape of every piece</h2>
+
+<table>
+<thead>
+<tr>
+<th>Kind of piece</th>
+<th>Signature</th>
+<th>Example</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Touched</td>
+<td>returns <code>true</code> in the frame it is touched</td>
+<td><code>FilledButton(icon, label) bool</code>, <code>ListItem(name, item) bool</code></td>
+</tr>
+
+<tr>
+<td>Edits a value</td>
+<td>takes a pointer, returns <code>true</code> when it changed</td>
+<td><code>Switch(name, &amp;on)</code>, <code>Slider(name, &amp;value, minimum, maximum, step)</code>, <code>NavigationBar(destinations, &amp;selected)</code></td>
+</tr>
+
+<tr>
+<td>Chooses one of a few</td>
+<td>returns the index, or -1</td>
+<td><code>Menu(icon, choices) int</code>, <code>FloatingToolbar(…) int</code>, <code>Banner(icon, text, actions...) int</code></td>
+</tr>
+
+<tr>
+<td>Asks</td>
+<td>returns a <code>material.Answer</code>: <code>Open</code>, <code>Confirmed</code> or <code>Dismissed</code></td>
+<td><code>Dialog</code>, <code>DatePicker</code>, <code>TimePicker</code></td>
+</tr>
+
+<tr>
+<td>Closes</td>
+<td>returns <code>true</code> when the person closes it</td>
+<td><code>BottomSheet</code>, <code>SideSheet</code>, <code>NavigationDrawer</code></td>
+</tr>
+
+<tr>
+<td>Keeps state between frames</td>
+<td>takes a struct the program keeps</td>
+<td><code>Snackbar</code>, <code>Navigation</code>, <code>Pager</code>, <code>Carousel</code>, <code>Dropdown</code>, <code>Search</code>, <code>Sheet</code>, <code>Stick</code>, <code>FloatingMenu</code>, <code>DatePicker</code></td>
+</tr>
+
+<tr>
+<td>Holds content</td>
+<td>takes a <code>func()</code></td>
+<td><code>Card(content)</code>, <code>Body(besideRail, content)</code>, <code>Screens(name, &amp;navigation, screen)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Names: each piece takes the name go-ui tells it apart by (its label, its icon, or a name given);
+repeated pieces get a scope each with <code>look.Context.Push</code>.</p>
+
+<h2 id="constants-and-helpers">Constants and helpers</h2>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>material.NavigationBarHeight</code></td>
+<td>80: what to lift floating things by over the navigation bar</td>
+</tr>
+
+<tr>
+<td><code>material.Indeterminate</code></td>
+<td>-1: a progress indicator with no known fraction</td>
+</tr>
+
+<tr>
+<td><code>material.UseRoboto()</code></td>
+<td>Draws every text in Roboto; before the window opens</td>
+</tr>
+
+<tr>
+<td><code>material.EnglishWords</code>, <code>EnglishDates</code>, <code>EnglishTimes</code></td>
+<td>The pieces&rsquo; own words; replace them with <code>Look.Words</code>, <code>DateNames</code>, <code>TimeNames</code> in another language</td>
+</tr>
+
+<tr>
+<td><code>material.PalettesFromColour(colour)</code></td>
+<td>Tonal palettes from one colour</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<p><a href="./overview">← Documentation</a></p>

@@ -1,0 +1,83 @@
+<h1 id="gestures">Gestures</h1>
+
+<p>A finger is followed from where it comes down; the way it goes first decides who takes it (a list
+for up and down, the innermost sideways piece for sideways), so these pieces nest freely.</p>
+
+<h2 id="carousel-and-multibrowsecarousel"><code>Carousel</code> and <code>MultiBrowseCarousel</code></h2>
+
+<p>A row of tiles slid sideways, gliding on and settling at a tile. The program keeps a
+<code>material.Carousel</code>. <code>CarouselItem(height, tint, icon, title)</code> and <code>CarouselPicture(picture,
+height, title)</code> are ready tiles. <code>MultiBrowseCarousel</code> shows large tiles, then a medium and a
+small one, growing as they come in.</p>
+<pre><code class="language-go"><span class="nx">places</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;Cliffs&#34;</span><span class="p">,</span> <span class="s">&#34;Harbour&#34;</span><span class="p">,</span> <span class="s">&#34;Reef&#34;</span><span class="p">,</span> <span class="s">&#34;Dunes&#34;</span><span class="p">,</span> <span class="s">&#34;Island&#34;</span><span class="p">}</span>
+<span class="nx">tints</span> <span class="o">:=</span> <span class="p">[]</span><span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span><span class="p">{</span><span class="nx">draw2d</span><span class="p">.</span><span class="nf">Hex</span><span class="p">(</span><span class="s">&#34;#b3d4e0&#34;</span><span class="p">),</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nf">Hex</span><span class="p">(</span><span class="s">&#34;#c9e0b3&#34;</span><span class="p">),</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nf">Hex</span><span class="p">(</span><span class="s">&#34;#e0cdb3&#34;</span><span class="p">),</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nf">Hex</span><span class="p">(</span><span class="s">&#34;#e0b3c4&#34;</span><span class="p">),</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nf">Hex</span><span class="p">(</span><span class="s">&#34;#c4b3e0&#34;</span><span class="p">)}</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">SectionTitle</span><span class="p">(</span><span class="s">&#34;Places&#34;</span><span class="p">)</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">Carousel</span><span class="p">(</span><span class="s">&#34;places&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">carousel</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">places</span><span class="p">),</span> <span class="mi">140</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">index</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">CarouselItem</span><span class="p">(</span><span class="mi">160</span><span class="p">,</span> <span class="nx">tints</span><span class="p">[</span><span class="nx">index</span><span class="p">],</span> <span class="s">&#34;map-pin&#34;</span><span class="p">,</span> <span class="nx">places</span><span class="p">[</span><span class="nx">index</span><span class="p">])</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/gestures-carousel.jpg" alt="Places, and tiles Cliffs, Harbour and Reef in a row" /></p>
+
+<h2 id="tabpager"><code>TabPager</code></h2>
+
+<p>Tabs over pages a finger swipes from side to side, the underline following them. The program
+keeps a <code>material.Pager</code>; <code>pager.Selected</code> is the page on show.</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">TabPager</span><span class="p">(</span><span class="s">&#34;pages&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;Today&#34;</span><span class="p">,</span> <span class="s">&#34;Tomorrow&#34;</span><span class="p">,</span> <span class="s">&#34;Week&#34;</span><span class="p">},</span> <span class="o">&amp;</span><span class="nx">pager</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">index</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprint</span><span class="p">(</span><span class="s">&#34;Forecast for page &#34;</span><span class="p">,</span> <span class="nx">index</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="mi">16</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+	<span class="p">})</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/gestures-pager.jpg" alt="Today, Tomorrow and Week tabs, Today chosen, and its page" /></p>
+
+<h2 id="pulltorefresh-and-swipetodismiss"><code>PullToRefresh</code> and <code>SwipeToDismiss</code></h2>
+
+<p>A list that refreshes when pulled past its top and let go (it returns <code>true</code> then; keep
+<code>refreshing</code> true until done), and rows a finger slides away (true when gone).</p>
+<pre><code class="language-go"><span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">PullToRefresh</span><span class="p">(</span><span class="s">&#34;lights&#34;</span><span class="p">,</span> <span class="nx">refreshing</span><span class="p">,</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">index</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">index</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">names</span><span class="p">);</span> <span class="nx">index</span><span class="o">++</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">names</span><span class="p">[</span><span class="nx">index</span><span class="p">])</span>
+		<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">SwipeToDismiss</span><span class="p">(</span><span class="s">&#34;swipe&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;row&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;lighthouse&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="nx">names</span><span class="p">[</span><span class="nx">index</span><span class="p">]})</span>
+		<span class="p">})</span> <span class="p">{</span>
+			<span class="nx">names</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">names</span><span class="p">[:</span><span class="nx">index</span><span class="p">],</span> <span class="nx">names</span><span class="p">[</span><span class="nx">index</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span><span class="o">...</span><span class="p">)</span> <span class="c1">// swiped away</span>
+			<span class="nx">index</span><span class="o">--</span>
+		<span class="p">}</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Pop</span><span class="p">()</span>
+	<span class="p">}</span>
+<span class="p">})</span> <span class="p">{</span>
+	<span class="nx">refreshing</span> <span class="p">=</span> <span class="kc">true</span> <span class="c1">// pulled down and let go: refresh, then set it back to false</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/components/gestures-swipe.jpg" alt="Three lighthouse rows in a list that can be pulled and swiped" /></p>
+
+<h2 id="longpressed"><code>LongPressed</code></h2>
+
+<p>Whether the piece drawn just before was held for half a second: the phone buzzes. A list starts
+choosing rows with it.</p>
+<pre><code class="language-go"><span class="nx">touched</span> <span class="o">:=</span> <span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;row&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Headline</span><span class="p">:</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">Selected</span><span class="p">:</span> <span class="nx">light</span><span class="p">.</span><span class="nx">chosen</span><span class="p">})</span>
+<span class="k">switch</span> <span class="p">{</span>
+<span class="k">case</span> <span class="nx">look</span><span class="p">.</span><span class="nf">LongPressed</span><span class="p">():</span>
+	<span class="nx">light</span><span class="p">.</span><span class="nx">chosen</span> <span class="p">=</span> <span class="kc">true</span> <span class="c1">// start choosing</span>
+<span class="k">case</span> <span class="nx">touched</span> <span class="o">&amp;&amp;</span> <span class="nx">choosing</span><span class="p">:</span>
+	<span class="nx">light</span><span class="p">.</span><span class="nx">chosen</span> <span class="p">=</span> <span class="p">!</span><span class="nx">light</span><span class="p">.</span><span class="nx">chosen</span>
+<span class="k">case</span> <span class="nx">touched</span><span class="p">:</span>
+	<span class="nx">navigation</span><span class="p">.</span><span class="nf">Go</span><span class="p">(</span><span class="nx">light</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<h2 id="stick"><code>Stick</code></h2>
+
+<p>An on-screen stick for walking or driving with a thumb. The finger that comes down on it holds it;
+<code>stick.Forward</code> and <code>stick.Sideways</code> go from -1 to 1. Other fingers stay free, to turn a view
+(<code>look.Context.Touches()</code>, leaving out <code>stick.Touching(touch)</code>).</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">Stick</span><span class="p">(</span><span class="s">&#34;walk&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">stick</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+<span class="nx">walker</span><span class="p">.</span><span class="nf">Steer</span><span class="p">(</span><span class="nx">stick</span><span class="p">.</span><span class="nx">Forward</span><span class="p">,</span> <span class="nx">stick</span><span class="p">.</span><span class="nx">Sideways</span><span class="p">,</span> <span class="nx">step</span><span class="p">)</span> <span class="c1">// go-renderer&#39;s camera.Walk</span>
+</code></pre>
+
+<hr>
+
+<p><a href="./components/progress">← Progress</a> · <a href="./components/components">Components</a></p>

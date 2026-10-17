@@ -1,0 +1,874 @@
+<h1 id="material">material</h1>
+<pre><code class="language-go"><span class="kn">import</span> <span class="s">&#34;github.com/akrck02/go-ui-android/material&#34;</span>
+</code></pre>
+
+<p>Package material draws go-ui interfaces the way Android&rsquo;s own applications look
+(Material Design 3, with Material 3 Expressive&rsquo;s newer pieces). The pieces are
+made of go-ui boxes, texts and clickables, as any program can make controls
+of its own, so they draw the same on a phone, on a desktop and in a browser.
+A program makes a Look for each frame and calls its pieces:</p>
+<pre><code>scheme := material.System(dark) // the wallpaper&#39;s colours on Android 12 and later
+context.Theme = scheme.Theme(dark)
+look := material.New(context, scheme)
+look.TopAppBar(material.TopBar{Title: &#34;Inbox&#34;})
+if look.FilledButton(&#34;plus&#34;, &#34;New message&#34;) { … }
+</code></pre>
+
+<p>The files follow Material&rsquo;s catalogue:</p>
+<pre><code>look.go         the Look, text and paragraphs
+scheme.go       colour schemes: Material&#39;s baseline, a brand&#39;s colour
+dynamic.go      the phone&#39;s wallpaper colours (Material You)
+theme.go        go-ui&#39;s own controls in the scheme, and Roboto
+navigation.go   top bars, the navigation bar, rail and drawer, tabs and swiping pages, the back
+actions.go      buttons, floating buttons and their menu, split buttons, button groups, toolbars
+selection.go    switches, check boxes, radio buttons, segmented buttons, sliders
+chips.go        filter, assist and input chips, and tags
+inputs.go       text fields and the search bar
+containment.go  cards, list items, avatars, banners, section titles, dividers
+overlays.go     dialogs, bottom sheets, snackbars, menus
+pickers.go      date and time pickers
+progress.go     loading indicators, circular, linear and wavy progress, skeletons
+gestures.go     pull to refresh, rows swiped away, carousels
+stick.go        an on-screen stick
+</code></pre>
+
+<h3 id="functions">Functions</h3>
+
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>func PalettesFromColour(seed draw2d.Color) window.Palettes</code></td>
+<td>PalettesFromColour makes the five palettes Android makes from a wallpaper, from one colour: the main one of its hue, a quieter one for the containers, a third of the hue turned a sixth of the way round, and two near-greys of its hue for the surfaces.</td>
+</tr>
+
+<tr>
+<td><code>func UseRoboto()</code></td>
+<td>UseRoboto draws every text in Roboto, Android&rsquo;s own typeface (SIL Open Font License, in fonts/).</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="constants-and-variables">Constants and variables</h3>
+<pre><code class="language-go"><span class="kd">const</span> <span class="nx">Indeterminate</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span>
+</code></pre>
+
+<p>Progress is how an indicator of known length shows its work: a fraction from 0 to 1, or Indeterminate for work of unknown length.</p>
+<pre><code class="language-go"><span class="kd">const</span> <span class="nx">NavigationBarHeight</span> <span class="p">=</span> <span class="mi">80</span>
+</code></pre>
+
+<p>NavigationBarHeight is a navigation bar&rsquo;s height without the gesture bar under it, for a snackbar or a floating button to keep above.</p>
+<pre><code class="language-go"><span class="kd">var</span> <span class="nx">EnglishDates</span> <span class="p">=</span> <span class="nx">DateNames</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Select date&#34;</span><span class="p">,</span>
+</code></pre>
+<pre><code class="language-go"><span class="kd">var</span> <span class="nx">EnglishTimes</span> <span class="p">=</span> <span class="nx">TimeNames</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Select time&#34;</span><span class="p">,</span> <span class="nx">Confirm</span><span class="p">:</span> <span class="s">&#34;OK&#34;</span><span class="p">,</span> <span class="nx">Dismiss</span><span class="p">:</span> <span class="s">&#34;Cancel&#34;</span><span class="p">}</span>
+</code></pre>
+
+<p>EnglishTimes are the words a time picker shows by default.</p>
+<pre><code class="language-go"><span class="kd">var</span> <span class="nx">EnglishWords</span> <span class="p">=</span> <span class="nx">Words</span><span class="p">{</span><span class="nx">Back</span><span class="p">:</span> <span class="s">&#34;Back&#34;</span><span class="p">,</span> <span class="nx">Close</span><span class="p">:</span> <span class="s">&#34;Close&#34;</span><span class="p">,</span> <span class="nx">Clear</span><span class="p">:</span> <span class="s">&#34;Clear&#34;</span><span class="p">,</span> <span class="nx">ShowPassword</span><span class="p">:</span> <span class="s">&#34;Show password&#34;</span><span class="p">,</span>
+</code></pre>
+
+<h3 id="answer">Answer</h3>
+
+<p>Answer is what the person did with a dialog in a frame.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Answer</span> <span class="kt">int</span>
+</code></pre>
+<pre><code class="language-go"><span class="kd">const</span> <span class="p">(</span>
+	<span class="nx">Open</span>      <span class="nx">Answer</span> <span class="p">=</span> <span class="kc">iota</span> <span class="c1">// nothing yet: keep showing it</span>
+	<span class="nx">Confirmed</span>               <span class="c1">// the main action</span>
+	<span class="nx">Dismissed</span>               <span class="c1">// the other action, a touch outside, Escape</span>
+<span class="p">)</span>
+</code></pre>
+
+<h3 id="carousel">Carousel</h3>
+
+<p>Carousel is what a carousel remembers: where it rests, as the index of the first item shown.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Carousel</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="datenames">DateNames</h3>
+
+<p>DateNames are the words a date picker shows, for a program in another language than English.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">DateNames</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Title</span>    <span class="kt">string</span>     <span class="c1">// over the date chosen</span>
+	<span class="nx">Months</span>   <span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="kt">string</span> <span class="c1">// January first</span>
+	<span class="nx">Weekdays</span> <span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="kt">string</span>  <span class="c1">// one or two letters each, Monday first</span>
+	<span class="nx">Confirm</span>  <span class="kt">string</span>     <span class="c1">// the action that keeps the date</span>
+	<span class="nx">Dismiss</span>  <span class="kt">string</span>     <span class="c1">// the one that leaves it</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="datepicker">DatePicker</h3>
+
+<p>DatePicker is what a date picker remembers while shown: the month on show and the day chosen.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">DatePicker</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Names</span> <span class="nx">DateNames</span> <span class="c1">// the zero value shows EnglishDates</span>
+
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="destination">Destination</h3>
+
+<p>Destination is a place the navigation bar leads to: an icon and a short label.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Destination</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Icon</span><span class="p">,</span> <span class="nx">Label</span> <span class="kt">string</span>
+	<span class="c1">// Badge marks the icon: a count (&#34;3&#34;), or a dot with &#34;•&#34;; none when empty.</span>
+	<span class="nx">Badge</span> <span class="kt">string</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="dialog">Dialog</h3>
+
+<p>Dialog is what a dialog says and offers.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Dialog</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Icon</span>    <span class="kt">string</span> <span class="c1">// over the title, centred; none when empty</span>
+	<span class="nx">Title</span>   <span class="kt">string</span>
+	<span class="nx">Text</span>    <span class="kt">string</span> <span class="c1">// under the title, broken into lines</span>
+	<span class="nx">Content</span> <span class="kd">func</span><span class="p">()</span> <span class="c1">// more under the text (fields, choices); none when nil</span>
+	<span class="nx">Confirm</span> <span class="kt">string</span> <span class="c1">// the main action, at the end</span>
+	<span class="nx">Dismiss</span> <span class="kt">string</span> <span class="c1">// the other action, before it; none when empty</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="dropdown">Dropdown</h3>
+
+<p>Dropdown is what an exposed dropdown keeps: the choice, and whether its choices show.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Dropdown</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Selected</span> <span class="kt">int</span>
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="field">Field</h3>
+
+<p>Field is what a text field says around what is typed.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Field</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Label</span>       <span class="kt">string</span> <span class="c1">// above the box</span>
+	<span class="nx">Placeholder</span> <span class="kt">string</span> <span class="c1">// in the box, quiet, while it is empty</span>
+	<span class="nx">Supporting</span>  <span class="kt">string</span> <span class="c1">// under the box: a hint</span>
+	<span class="nx">Error</span>       <span class="kt">string</span> <span class="c1">// under the box instead of the hint, in red, with the box red too</span>
+	<span class="nx">MaxLength</span>   <span class="kt">int</span>    <span class="c1">// the most characters it takes; 0 = no limit</span>
+	<span class="c1">// Counter shows how many characters there are of MaxLength, under the box at its end.</span>
+	<span class="nx">Counter</span> <span class="kt">bool</span>
+	<span class="c1">// Filled draws Material&#39;s filled field, a tinted box with a line under it, rather than the</span>
+	<span class="c1">// outlined one: for a form on a plain screen, where boxes drawn by their border look empty.</span>
+	<span class="nx">Filled</span> <span class="kt">bool</span>
+	<span class="c1">// Prefix and Suffix are written in the box before and after what is typed: a currency, a unit.</span>
+	<span class="nx">Prefix</span><span class="p">,</span> <span class="nx">Suffix</span> <span class="kt">string</span>
+	<span class="c1">// Secret shows a dot for each character (a password). With Reveal, an eye at the box&#39;s end</span>
+	<span class="c1">// shows the characters while *Reveal is true, and touching it turns *Reveal over.</span>
+	<span class="nx">Secret</span> <span class="kt">bool</span>
+	<span class="nx">Reveal</span> <span class="o">*</span><span class="kt">bool</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="floatingmenu">FloatingMenu</h3>
+
+<p>FloatingMenu is a floating action button that opens into a few related actions stacked above it, its icon turning into a cross. A program keeps one, and draws it with Look.FloatingMenu.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">FloatingMenu</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Icon</span>    <span class="kt">string</span>        <span class="c1">// the button&#39;s icon while closed</span>
+	<span class="nx">Label</span>   <span class="kt">string</span>        <span class="c1">// what a screen reader reads for the button while closed (&#34;Create&#34;)</span>
+	<span class="nx">Actions</span> <span class="p">[]</span><span class="nx">Destination</span> <span class="c1">// what it opens into: an icon and a label each</span>
+	<span class="c1">// Above is how far over the bottom of the window it sits: a navigation bar&#39;s height</span>
+	<span class="c1">// (NavigationBarHeight) when there is one.</span>
+	<span class="nx">Above</span> <span class="kt">float32</span>
+	<span class="nx">Open</span>  <span class="kt">bool</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="item">Item</h3>
+
+<p>Item is what a list item shows.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Item</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Icon</span> <span class="kt">string</span>       <span class="c1">// in a round avatar at the start; none when empty</span>
+	<span class="nx">Mark</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span> <span class="c1">// the avatar&#39;s colour; the primary container when zero</span>
+	<span class="c1">// Picture is a photo in the round avatar instead of the icon (a person, a place).</span>
+	<span class="nx">Picture</span>    <span class="o">*</span><span class="nx">draw2d</span><span class="p">.</span><span class="nx">Image</span>
+	<span class="nx">Headline</span>   <span class="kt">string</span>
+	<span class="nx">Supporting</span> <span class="kt">string</span> <span class="c1">// the line under the headline; none when empty</span>
+	<span class="c1">// Trailing draws what goes at the end (a Switch, an IconButton, a Tag); none when nil.</span>
+	<span class="nx">Trailing</span> <span class="kd">func</span><span class="p">()</span>
+	<span class="c1">// Selected marks the row chosen, in a list whose rows are chosen with a long press: it is tinted,</span>
+	<span class="c1">// and a tick takes the avatar&#39;s place.</span>
+	<span class="nx">Selected</span> <span class="kt">bool</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="look">Look</h3>
+
+<p>Look draws the pieces in one frame, with one scheme. It is small: make one in every frame. Pieces that can be touched return true in the frame they are touched. Each takes the name go-ui tells it apart by: its label or icon, or a name given. Two pieces with the same name in one scope are one to go-ui: give repeated ones a scope each (ui.Context.Push).</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Look</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Context</span> <span class="o">*</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Context</span>
+	<span class="nx">Scheme</span>  <span class="nx">Scheme</span>
+	<span class="nx">Words</span>   <span class="nx">Words</span> <span class="c1">// the pieces&#39; own words, in the person&#39;s language; the zero value is EnglishWords</span>
+<span class="p">}</span>
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>Function or method</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>func New(context *ui.Context, scheme Scheme) Look</code></td>
+<td>New makes the frame&rsquo;s Look.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) AssistChip(icon, label string) bool</code></td>
+<td>AssistChip suggests an action related to what is on screen (add to the calendar, share), with an icon before its label.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Avatar(name, icon string, tint draw2d.Color, size float32)</code></td>
+<td>Avatar is a person or a thing shown in a circle: their initials (up to two letters of name) on a colour, or an icon when name is empty.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Back() bool</code></td>
+<td>Back answers the system&rsquo;s back (a phone&rsquo;s back gesture) for the screen: true when there was one, and the program then goes back (to the first destination, to the list a detail came from).</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Banner(icon, text string, actions ...string) int</code></td>
+<td>Banner is a message across the top of the content that stays until acted on (no connection, an update to install), with an icon and one or two actions under its text.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Body(besideRail bool, content func())</code></td>
+<td>Body holds a screen&rsquo;s content between the bars: it grows to fill them and keeps its content clear of what the system draws at the sides (a camera&rsquo;s cutout, a navigation bar on the side).</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) BottomSheet(name string, content func()) (dismissed bool)</code></td>
+<td>BottomSheet shows content in a sheet rising from the bottom of the screen, which is dimmed meanwhile: choices for what was touched, a short form.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) ButtonGroup(name string, labels []string, selected *int) bool</code></td>
+<td>ButtonGroup is a few choices joined side by side, the chosen one filled and fully rounded, the others squarer: Material 3 Expressive&rsquo;s connected group (a view, a size, an alignment).</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Card(content func())</code></td>
+<td>Card is a filled container for one subject: a few lines, a picture, its actions.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Carousel(name string, carousel *Carousel, count int, itemWidth float32, item func(index int))</code></td>
+<td>Carousel is a row of items wider than the screen, slid sideways with a finger: let go, it glides on with the finger&rsquo;s speed and settles at an item&rsquo;s edge.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) CarouselItem(height float32, tint draw2d.Color, icon, title string)</code></td>
+<td>CarouselItem is a carousel&rsquo;s usual item: a rounded tile in a colour, with a title over its foot.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) CarouselPicture(picture *draw2d.Image, height float32, title string)</code></td>
+<td>CarouselPicture is a carousel item made of a photo, with a title over its foot on a dark veil that keeps the title readable on any photo; an empty title leaves the photo alone (a narrow item).</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Checkbox(label string, on *bool) bool</code></td>
+<td>Checkbox is a square that is ticked or not, with a label after it; touching either flips it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) CircularProgress(fraction float32, size float32, wavy bool)</code></td>
+<td>CircularProgress is a ring that fills as work gets done (fraction from 0 to 1), or, with Indeterminate, an arc chasing round.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) ContainedLoadingIndicator(size float32)</code></td>
+<td>ContainedLoadingIndicator is the indicator on a round container, to stand out over content (at the top of a list being refreshed).</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) DatePicker(name string, picker *DatePicker, date *time.Time) Answer</code></td>
+<td>DatePicker asks for a day in a dialog: a month at a time, with arrows to the months around it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Dialog(name string, dialog Dialog) Answer</code></td>
+<td>Dialog asks something over the screen, which is dimmed and does not react meanwhile: a card in the middle with a title, a text and one or two actions.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Divider()</code></td>
+<td>Divider is a thin line across, between groups.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Dropdown(name, label string, choices []string, dropdown *Dropdown) bool</code></td>
+<td>Dropdown is Material&rsquo;s exposed dropdown menu: a box like a text field&rsquo;s showing the choice, which opens the choices under it when touched.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) ElevatedCard(content func())</code></td>
+<td>ElevatedCard is a card raised over what is beneath it: over a map or a scene.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Enter(key string, content func())</code></td>
+<td>Enter shows a screen rising gently into place when it is first shown, as Material&rsquo;s screens arrive: give each screen its own key.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) ExpandableItem(name string, item Item, open *bool, more func()) bool</code></td>
+<td>ExpandableItem is a list row that opens to show more under it (an answer under its question, the details of an order), its chevron turning.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) ExtendedFloatingButton(icon, label string) bool</code></td>
+<td>ExtendedFloatingButton is the floating action button with its action written beside the icon: clearer where the icon alone would not say it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) FilledButton(icon, label string) bool</code></td>
+<td>FilledButton is the screen&rsquo;s main action, in the primary colour.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) FilterChip(label string, selected bool) bool</code></td>
+<td>FilterChip is a choice that is on or off, among others in a row: outlined, or filled with a tick when selected.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) FloatingButton(icon string) bool</code></td>
+<td>FloatingButton is the floating action button: 56 pixels, rounded square corners, raised over what scrolls beneath it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) FloatingMenu(name string, menu *FloatingMenu) int</code></td>
+<td>FloatingMenu draws the button at the bottom end of the screen, over everything, and its actions while open.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) FloatingToolbar(name string, tools []Destination, above float32) int</code></td>
+<td>FloatingToolbar is a row of actions in a pill floating over the content at the bottom of the screen, for what is done to the content on show (edit, share, delete): each tool shows its icon, and a screen reader reads its label.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) GoBack(navigation *Navigation) bool</code></td>
+<td>GoBack answers the system&rsquo;s back by going back a screen, while there is one to go back to.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Heading(text string)</code></td>
+<td>Heading is a section&rsquo;s small title in the primary colour, as SectionTitle, for content that keeps its own margins (a page of cards and buttons) rather than a list across the screen.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) IconButton(icon string) bool</code></td>
+<td>IconButton is a round 48-pixel target with a 24-pixel icon, in the bars and beside list items.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) InputChip(label string) (touched, removed bool)</code></td>
+<td>InputChip is something the person entered or chose (a recipient, a tag), with a cross to take it out.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) LinearProgress(fraction float32)</code></td>
+<td>LinearProgress is a bar across that fills as work gets done: fraction from 0 to 1.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) ListItem(name string, item Item) bool</code></td>
+<td>ListItem is a row of a list, 72 pixels tall with a supporting line and 56 without.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) LoadingIndicator(size float32)</code></td>
+<td>LoadingIndicator is Material&rsquo;s indicator for a short wait of unknown length: a filled shape in the primary colour, turning and morphing from one form to the next.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) LongPressed() bool</code></td>
+<td>LongPressed tells whether the piece drawn just before it was long-pressed in this frame: a finger held still on it for half a second, or the mouse&rsquo;s right button.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Menu(icon string, choices []string) int</code></td>
+<td>Menu is a button with an icon (three dots, usually) that opens a list of choices under it; a screen reader reads the button as &ldquo;More options&rdquo;.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) MultiBrowseCarousel(name string, carousel *Carousel, count int, largeWidth, height float32, item func(index int, width float32))</code></td>
+<td>MultiBrowseCarousel is Material&rsquo;s carousel for browsing many items at once: large items, then a medium one and a small one at the edge where the row runs off.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) NamedIconButton(icon, name string) bool</code></td>
+<td>NamedIconButton is an IconButton a screen reader (TalkBack) reads by a name, what it does (&ldquo;Share&rdquo;), rather than by its icon&rsquo;s.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) NavigationBar(destinations []Destination, selected *int) bool</code></td>
+<td>NavigationBar is the bar at the bottom, painted down under the gesture bar: three to five destinations, the selected one with its icon on a pill.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) NavigationDrawer(name, title string, destinations []Destination, selected *int) (closed bool)</code></td>
+<td>NavigationDrawer slides in from the left over the dimmed screen, with a title and the program&rsquo;s destinations, for more places than a navigation bar holds.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) NavigationRail(destinations []Destination, selected *int) bool</code></td>
+<td>NavigationRail is the navigation bar&rsquo;s form on a wide screen (a phone on its side, a tablet): the destinations down the left edge, painted under the status bar and beside a camera&rsquo;s cutout.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) OutlinedButton(icon, label string) bool</code></td>
+<td>OutlinedButton is a second action beside the main one.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) OutlinedCard(content func())</code></td>
+<td>OutlinedCard is a card drawn by its border, among others on the surface.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Paragraph(text string, size float32, weight draw2d.Weight, colour draw2d.Color)</code></td>
+<td>Paragraph writes text that breaks into lines at the width it has, word by word: a card&rsquo;s body, a description.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) PictureAvatar(picture *draw2d.Image, size float32)</code></td>
+<td>PictureAvatar is a person or a place shown by a photo in a circle.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) PullToRefresh(name string, refreshing bool, layout ui.Layout, content func()) (refresh bool)</code></td>
+<td>PullToRefresh is a scrolling list that refreshes when pulled down past its top and let go: a loading indicator follows the pull, and stays over the list while refreshing is true.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) RadioButton(label string, chosen bool) bool</code></td>
+<td>RadioButton is one of a few choices of which one is chosen, with a label after it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) RoundButton(icon string, size float32, primary bool) bool</code></td>
+<td>RoundButton is a round floating button of any size, over a map or a scene (zoom in, zoom out, change the view).</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Screens(name string, navigation *Navigation, screen func(key string))</code></td>
+<td>Screens draws the screen on top of a navigation: one gone to slides in from the end over the one it was gone to from, and slides back out when the program goes back.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) SearchBar(name string, text *string, placeholder string) bool</code></td>
+<td>SearchBar is a pill to search in, at the top of a screen.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) SearchView(name, placeholder string, search *Search, content func()) bool</code></td>
+<td>SearchView is Material&rsquo;s search: a pill at the top of a screen which, touched, opens over the whole screen ready to type in, with a way back and a cross to empty it; content shows under it what the program finds (the last searches, suggestions, results), and closes the search by setting search.Active to false when one is chosen.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) SectionTitle(text string)</code></td>
+<td>SectionTitle is a small heading over a group of rows, in the primary colour.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) SegmentedButtons(name string, options []string, selected *int) bool</code></td>
+<td>SegmentedButtons are two to five choices side by side sharing the row&rsquo;s width, one of them chosen (a view, a speed, a period).</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) SideSheet(name, title string, content func()) (closed bool)</code></td>
+<td>SideSheet slides in from the end of the screen over the dimmed screen, headed by a title and a cross: filters for a list, the details of what is chosen, room for a form on a wide screen.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Skeleton(width, height ui.Sizing, radius float32)</code></td>
+<td>Skeleton stands in for content still coming (a picture, a line of text): a quiet block with a light passing across it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Slider(name string, value *float32, minimum, maximum, step float32) bool</code></td>
+<td>Slider chooses a value between two ends by dragging, in steps (0 for any value): go-ui&rsquo;s slider in the scheme&rsquo;s colours and a finger&rsquo;s size.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Snackbar(snackbar *Snackbar) (actionTouched bool)</code></td>
+<td>Snackbar draws the note while it is up, over everything, and asks for a frame when it is due to go.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) SplitButton(icon, label string) (action, more bool)</code></td>
+<td>SplitButton is a main action joined to a small button that opens its other choices (send, and schedule): it tells which half was touched.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) StandardSheet(name string, sheet *Sheet, peek float32, content func())</code></td>
+<td>StandardSheet is a bottom sheet that stays over the screen without dimming it, which goes on working above it (a map under a list of its places): it rests showing peek pixels, or expanded to most of the screen, and a finger drags it by its handle between the two; let go, it settles where it was heading.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) StatusBarScrim()</code></td>
+<td>StatusBarScrim paints the strip under the status bar alone, for a screen whose top is a scene rather than a bar: the system&rsquo;s icons stay readable over it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Stick(name string, stick *Stick, size float32)</code></td>
+<td>Stick draws the stick, its knob where the finger points it, and follows the fingers of this frame (ui.Context.Touches).</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) SwipeToDismiss(name string, content func()) (dismissed bool)</code></td>
+<td>SwipeToDismiss is a row a finger slides sideways to take it away, a bin showing in the gap it leaves: pushed past two fifths of its width, or flicked, it goes, and SwipeToDismiss returns true for the program to remove it; let go short of that, it slides back.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Switch(name string, on *bool) bool</code></td>
+<td>Switch is Material&rsquo;s switch: a 52 × 32 track whose handle grows and moves to the end when on.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) TabPager(name string, labels []string, pager *Pager, page func(index int))</code></td>
+<td>TabPager is tabs over pages a finger swipes from side to side: the underline follows the pages as they move, a page let go past a third of the way (or flicked) turns to the next, and touching a tab slides to its page.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Tabs(name string, labels []string, selected *int) bool</code></td>
+<td>Tabs are the primary tabs under a top bar: labels sharing the width, an underline under the chosen one that slides to the next one chosen.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Tag(text string, ink, tint draw2d.Color)</code></td>
+<td>Tag is a label that cannot be touched, in a pill of its own colours: a state (&ldquo;3 running&rdquo;), a count, a kind.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Text(text string, size float32, weight draw2d.Weight, colour draw2d.Color)</code></td>
+<td>Text writes a line in a size, a weight and a colour.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) TextButton(icon, label string) bool</code></td>
+<td>TextButton is the quietest action: a dialog&rsquo;s &ldquo;Cancel&rdquo;, a card&rsquo;s &ldquo;More&rdquo;.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) TextField(name string, text *string, field Field) bool</code></td>
+<td>TextField is Material&rsquo;s text field: a label, the box typed in (outlined, or filled), and a hint or an error and a count of characters under it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) TimePicker(name string, picker *TimePicker, date *time.Time) Answer</code></td>
+<td>TimePicker asks for a time of day in a dialog, on Material&rsquo;s dial: the hour first, on a ring of 1 to 12 with 13 to 00 inside it, then the minute, by touching or dragging round the dial.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) TonalButton(icon, label string) bool</code></td>
+<td>TonalButton is a main action that should not stand out as much, on the secondary container.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) TopAppBar(bar TopBar) (back bool)</code></td>
+<td>TopAppBar is the bar at the top, painted up under the status bar, so the screen reaches the top edge as Android&rsquo;s own apps do.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) VideoPlayer(name string, video *window.Video, height float32)</code></td>
+<td>VideoPlayer shows a film (go-ui&rsquo;s window.Video) in a rounded box: whole, over black where their shapes differ, with a round play button over it while it is paused and a thin line at its foot of how far it has played.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) WavyProgress(fraction float32)</code></td>
+<td>WavyProgress is a line that fills as work gets done (fraction from 0 to 1), the filled part a travelling wave and the rest a flat track ending in a stop dot, as Material 3 Expressive draws it; with Indeterminate, a wave runs along it.</td>
+</tr>
+
+<tr>
+<td><code>func (look Look) Wide() bool</code></td>
+<td>Wide tells whether the screen is wide enough for a navigation rail instead of a bar: wider than tall, or 600 pixels across (Material&rsquo;s medium width, a small tablet).</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="navigation">Navigation</h3>
+
+<p>Navigation is a program&rsquo;s screens, one gone to from another: a list, then one of its rows&rsquo; details, then a form about it. The program keeps one and names its screens as it likes; Screens draws the one on top. The zero value starts at &ldquo;&rdquo;.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Navigation</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>Function or method</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>func (navigation *Navigation) Back() bool</code></td>
+<td>Back goes back to the screen before, and tells whether there was one.</td>
+</tr>
+
+<tr>
+<td><code>func (navigation *Navigation) Current() string</code></td>
+<td>Current is the screen on top.</td>
+</tr>
+
+<tr>
+<td><code>func (navigation *Navigation) Depth() int</code></td>
+<td>Depth is how many screens there are, the first one included.</td>
+</tr>
+
+<tr>
+<td><code>func (navigation *Navigation) Go(screen string)</code></td>
+<td>Go goes to a screen, over the one shown.</td>
+</tr>
+
+<tr>
+<td><code>func (navigation *Navigation) Reset(screen string)</code></td>
+<td>Reset starts again at one screen, with nothing to go back to: a destination of the navigation bar.</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="pager">Pager</h3>
+
+<p>Pager is what tabs with swiping pages remember: the page chosen, and where the pages were shown in the last frame (between two while one is dragged).</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Pager</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Selected</span> <span class="kt">int</span>
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="scheme">Scheme</h3>
+
+<p>Scheme holds the colour roles of Material Design 3: what each piece is painted with. Baseline gives Material&rsquo;s own; a program with colours of its own changes the roles it needs (WithPrimary for a brand&rsquo;s main colour).</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Scheme</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Primary</span><span class="p">,</span> <span class="nx">OnPrimary</span><span class="p">,</span> <span class="nx">PrimaryContainer</span><span class="p">,</span> <span class="nx">OnPrimaryContainer</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span>
+	<span class="nx">SecondaryContainer</span><span class="p">,</span> <span class="nx">OnSecondaryContainer</span>                 <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span>
+	<span class="nx">Error</span><span class="p">,</span> <span class="nx">OnError</span><span class="p">,</span> <span class="nx">ErrorContainer</span><span class="p">,</span> <span class="nx">OnErrorContainer</span>         <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span>
+	<span class="c1">// Surface is the screen&#39;s background; the containers are the surfaces raised over it, from the</span>
+	<span class="c1">// lowest to the highest (a card, a navigation bar, a switch&#39;s track).</span>
+	<span class="nx">Surface</span><span class="p">,</span> <span class="nx">OnSurface</span><span class="p">,</span> <span class="nx">OnSurfaceVariant</span>                                                 <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span>
+	<span class="nx">SurfaceContainerLow</span><span class="p">,</span> <span class="nx">SurfaceContainer</span><span class="p">,</span> <span class="nx">SurfaceContainerHigh</span><span class="p">,</span> <span class="nx">SurfaceContainerHighest</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span>
+	<span class="nx">Outline</span><span class="p">,</span> <span class="nx">OutlineVariant</span>                                                              <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span>
+	<span class="c1">// The inverse roles paint what stands out against the screen: a snackbar.</span>
+	<span class="nx">InverseSurface</span><span class="p">,</span> <span class="nx">InverseOnSurface</span><span class="p">,</span> <span class="nx">InversePrimary</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span>
+	<span class="c1">// Scrim is the surface&#39;s colour, see-through: under a bar painted over a scene.</span>
+	<span class="nx">Scrim</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span>
+<span class="p">}</span>
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>Function or method</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>func Baseline(dark bool) Scheme</code></td>
+<td>Baseline is Material Design 3&rsquo;s baseline scheme, light or dark.</td>
+</tr>
+
+<tr>
+<td><code>func FromColour(seed draw2d.Color, dark bool) Scheme</code></td>
+<td>FromColour makes a whole scheme from one colour (a brand&rsquo;s, a place&rsquo;s), as Material&rsquo;s own tools do: palettes of its hue at every tone, the way Android 12 and later make them from a wallpaper (FromPalettes), then the roles from them.</td>
+</tr>
+
+<tr>
+<td><code>func FromPalettes(palettes window.Palettes, dark bool) Scheme</code></td>
+<td>FromPalettes builds the scheme from a phone&rsquo;s palettes, as Android&rsquo;s own dynamic colours do: the main colour from the first accent palette, the containers from the second, the surfaces from the neutral ones.</td>
+</tr>
+
+<tr>
+<td><code>func System(dark bool) Scheme</code></td>
+<td>System is the phone&rsquo;s own scheme: on Android 12 and later, the colours it made from the wallpaper (Material You), so the program matches the system&rsquo;s applications and changes with the wallpaper; elsewhere, Material&rsquo;s baseline.</td>
+</tr>
+
+<tr>
+<td><code>func (scheme Scheme) Theme(dark bool) ui.Theme</code></td>
+<td>Theme gives go-ui&rsquo;s own controls (its slider, text fields, menus) the scheme&rsquo;s colours and a size for fingers: controls 48 pixels tall, 16-pixel text, pill-shaped corners.</td>
+</tr>
+
+<tr>
+<td><code>func (scheme Scheme) WithPrimary(primary, onPrimary, container, onContainer draw2d.Color) Scheme</code></td>
+<td>WithPrimary returns the scheme with a main colour of the program&rsquo;s own: the colour, the text on it, a soft container of it and the text on that container.</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="search">Search</h3>
+
+<p>Search is what a search view keeps: what is typed, and whether it is open over the screen.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Search</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Query</span>  <span class="kt">string</span>
+	<span class="nx">Active</span> <span class="kt">bool</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="sheet">Sheet</h3>
+
+<p>Sheet is what a standard bottom sheet keeps: whether it is expanded, and how far a finger has dragged it from where it rests.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Sheet</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Expanded</span> <span class="kt">bool</span>
+	<span class="c1">// Above is how far over the bottom of the window it sits: a navigation bar&#39;s height</span>
+	<span class="c1">// (NavigationBarHeight) when there is one.</span>
+	<span class="nx">Above</span> <span class="kt">float32</span>
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="snackbar">Snackbar</h3>
+
+<p>Snackbar is a short note at the bottom of the screen for a few seconds, with an action that undoes or follows what was just done. A program keeps one, calls Show when something happens and draws it with Look.Snackbar in every frame.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Snackbar</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Text</span>   <span class="kt">string</span>
+	<span class="nx">Action</span> <span class="kt">string</span> <span class="c1">// a button at its end; none when empty</span>
+	<span class="c1">// Above is how far over the bottom of the window it sits: a navigation bar&#39;s height</span>
+	<span class="c1">// (NavigationBarHeight) when there is one.</span>
+	<span class="nx">Above</span> <span class="kt">float32</span>
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>Function or method</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>func (snackbar *Snackbar) Hide()</code></td>
+<td>Hide takes the note away before its time.</td>
+</tr>
+
+<tr>
+<td><code>func (snackbar *Snackbar) Show(text, action string, duration time.Duration)</code></td>
+<td>Show puts a note up for a while (Material&rsquo;s are 4 to 10 seconds).</td>
+</tr>
+
+<tr>
+<td><code>func (snackbar *Snackbar) Shown() bool</code></td>
+<td>Shown tells whether the note is up.</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="stick">Stick</h3>
+
+<p>Stick is an on-screen stick, for walking or driving something with a thumb: the finger that comes down on it holds it, and where that finger is from its middle says where to go. Other fingers stay free (to look around, to press buttons). A program keeps one Stick and reads it in every step.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Stick</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Forward</span>  <span class="kt">float32</span> <span class="c1">// from -1 (back) to 1 (ahead): the finger above the middle is ahead</span>
+	<span class="nx">Sideways</span> <span class="kt">float32</span> <span class="c1">// from -1 (left) to 1 (right)</span>
+	<span class="nx">Held</span>     <span class="kt">bool</span>
+	<span class="nx">Finger</span>   <span class="kt">int64</span> <span class="c1">// the finger holding it, while Held</span>
+
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>Function or method</th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>func (stick *Stick) Follow(touches []input.Touch)</code></td>
+<td>Follow gives the stick to the finger that came down on it, and points it at that finger; a finger lifted lets it go back to the middle.</td>
+</tr>
+
+<tr>
+<td><code>func (stick *Stick) Place(area draw2d.Rect, size float32)</code></td>
+<td>Place says where a stick of a program&rsquo;s own drawing is, and its side, for Follow.</td>
+</tr>
+
+<tr>
+<td><code>func (stick *Stick) Touching(touch input.Touch) bool</code></td>
+<td>Touching tells whether a finger is the one holding the stick: a program that turns a view with the other fingers leaves this one out.</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="timenames">TimeNames</h3>
+
+<p>TimeNames are the words a time picker shows, for a program in another language than English.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">TimeNames</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Title</span>   <span class="kt">string</span>
+	<span class="nx">Confirm</span> <span class="kt">string</span>
+	<span class="nx">Dismiss</span> <span class="kt">string</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="timepicker">TimePicker</h3>
+
+<p>TimePicker is what a time picker remembers while shown: the time chosen, not yet kept, and whether the dial chooses the hour or the minute.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">TimePicker</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Names</span> <span class="nx">TimeNames</span> <span class="c1">// the zero value shows EnglishTimes</span>
+
+	<span class="c1">// Has unexported fields.</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="topbar">TopBar</h3>
+
+<p>TopBar is what the top app bar shows.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">TopBar</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Title</span>    <span class="kt">string</span>
+	<span class="nx">Subtitle</span> <span class="kt">string</span> <span class="c1">// under the title, smaller; none when empty</span>
+	<span class="nx">Back</span>     <span class="kt">bool</span>   <span class="c1">// an arrow before the title, to go back</span>
+	<span class="c1">// Close makes that arrow a cross, for leaving a mode (rows chosen) rather than a screen.</span>
+	<span class="nx">Close</span> <span class="kt">bool</span>
+	<span class="c1">// Actions draws what goes at the bar&#39;s end, usually IconButtons; none when nil.</span>
+	<span class="nx">Actions</span> <span class="kd">func</span><span class="p">()</span>
+	<span class="c1">// OverScene paints the bar see-through (the scheme&#39;s scrim), over a scene behind the interface.</span>
+	<span class="nx">OverScene</span> <span class="kt">bool</span>
+	<span class="c1">// Large writes the title big under the arrow and the actions, for a screen&#39;s first level.</span>
+	<span class="nx">Large</span> <span class="kt">bool</span>
+	<span class="c1">// Scrolled is how far the content under the bar has scrolled up (ui.Context.ScrollOffset): a</span>
+	<span class="c1">// large bar shrinks into a small one as it goes, and any bar takes a container&#39;s colour once</span>
+	<span class="c1">// content is under it.</span>
+	<span class="nx">Scrolled</span> <span class="kt">float32</span>
+<span class="p">}</span>
+</code></pre>
+
+<h3 id="words">Words</h3>
+
+<p>Words are what the pieces say themselves: what a screen reader (TalkBack) calls the icons that have no label beside them (the arrow that goes back, the cross that clears a field), and the bar over a text field&rsquo;s selection.</p>
+<pre><code class="language-go"><span class="kd">type</span> <span class="nx">Words</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Back</span><span class="p">,</span> <span class="nx">Close</span><span class="p">,</span> <span class="nx">Clear</span>          <span class="kt">string</span>
+	<span class="nx">ShowPassword</span><span class="p">,</span> <span class="nx">HidePassword</span>  <span class="kt">string</span>
+	<span class="nx">PreviousMonth</span><span class="p">,</span> <span class="nx">NextMonth</span>    <span class="kt">string</span>
+	<span class="nx">MoreOptions</span>                 <span class="kt">string</span> <span class="c1">// a menu&#39;s button, a split button&#39;s arrow</span>
+	<span class="nx">Cut</span><span class="p">,</span> <span class="nx">Copy</span><span class="p">,</span> <span class="nx">Paste</span><span class="p">,</span> <span class="nx">SelectAll</span> <span class="kt">string</span> <span class="c1">// the bar over a text field&#39;s selection</span>
+<span class="p">}</span>
+</code></pre>
+
+<hr>
+
+<p><a href="./reference/reference">← Reference</a> · generated from the doc comments by <code>generate.py</code></p>

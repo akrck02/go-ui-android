@@ -1,0 +1,94 @@
+<h1 id="containment">Containment</h1>
+
+<h2 id="listitem"><code>ListItem</code></h2>
+
+<p>A list row: an icon in a round avatar (or a photo, <code>Picture</code>), a headline, a supporting line, and
+<code>Trailing</code> for what goes at its end (a switch, an icon button, a tag). It returns <code>true</code> when
+touched. <code>Selected</code> tints it and puts a tick in the avatar&rsquo;s place, for rows chosen with a long
+press.</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">SectionTitle</span><span class="p">(</span><span class="s">&#34;On the coast&#34;</span><span class="p">)</span>
+<span class="nx">names</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;North Point&#34;</span><span class="p">,</span> <span class="s">&#34;Harbour Mole&#34;</span><span class="p">,</span> <span class="s">&#34;South Reef&#34;</span><span class="p">}</span>
+<span class="nx">places</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;On the northern cliffs&#34;</span><span class="p">,</span> <span class="s">&#34;At the harbour&#39;s mouth&#34;</span><span class="p">,</span> <span class="s">&#34;On a rock off the reef&#34;</span><span class="p">}</span>
+<span class="k">for</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">name</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">names</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="c1">// rows repeat: a scope each</span>
+	<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;row&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;lighthouse&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">Supporting</span><span class="p">:</span> <span class="nx">places</span><span class="p">[</span><span class="nx">index</span><span class="p">],</span>
+		<span class="nx">Trailing</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;lit&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">lit</span><span class="p">[</span><span class="nx">index</span><span class="p">])</span> <span class="p">}})</span> <span class="p">{</span>
+		<span class="c1">// open its screen</span>
+	<span class="p">}</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Pop</span><span class="p">()</span>
+<span class="p">}</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">Divider</span><span class="p">()</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;chosen&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;lighthouse&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;East Cape&#34;</span><span class="p">,</span> <span class="nx">Selected</span><span class="p">:</span> <span class="kc">true</span><span class="p">})</span> <span class="c1">// chosen with a long press</span>
+</code></pre>
+
+<p><img src="./images/components/contain-list.jpg" alt="On the coast, three lighthouses with switches, a line, and East Cape chosen with a tick" /></p>
+
+<p>Touching the switch at its end does not touch the row. For photos, decode a <code>draw2d.Image</code> once and
+pass it as <code>Picture</code>.</p>
+
+<h2 id="expandableitem"><code>ExpandableItem</code></h2>
+
+<p>A row that unfolds to show more under it, its chevron turning: questions and answers, details.</p>
+<pre><code class="language-go"><span class="nx">questions</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;When is the lamp lit?&#34;</span><span class="p">,</span> <span class="s">&#34;Can it be visited?&#34;</span><span class="p">}</span>
+<span class="nx">answers</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;From sunset to sunrise, and in fog.&#34;</span><span class="p">,</span> <span class="s">&#34;On summer weekends.&#34;</span><span class="p">}</span>
+<span class="k">for</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">question</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">questions</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ExpandableItem</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprint</span><span class="p">(</span><span class="s">&#34;question &#34;</span><span class="p">,</span> <span class="nx">index</span><span class="p">),</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Headline</span><span class="p">:</span> <span class="nx">question</span><span class="p">},</span> <span class="o">&amp;</span><span class="nx">open</span><span class="p">[</span><span class="nx">index</span><span class="p">],</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Paragraph</span><span class="p">(</span><span class="nx">answers</span><span class="p">[</span><span class="nx">index</span><span class="p">],</span> <span class="mi">14</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurfaceVariant</span><span class="p">)</span>
+	<span class="p">})</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/components/contain-expandable.jpg" alt="When is the lamp lit? open with its answer, Can it be visited? closed" /></p>
+
+<h2 id="card-outlinedcard-elevatedcard-avatar"><code>Card</code>, <code>OutlinedCard</code>, <code>ElevatedCard</code>, <code>Avatar</code></h2>
+
+<p>Containers for one subject. Filled on a plain screen, outlined beside other cards, elevated over a
+map or a scene. <code>Avatar(name, icon, tint, size)</code> draws a person&rsquo;s initials (or an icon) in a
+circle; <code>PictureAvatar(picture, size)</code> a photo.</p>
+<pre><code class="language-go"><span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">Card</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// filled: on a plain screen</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;North Point&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Medium</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;Lit, 18 nautical miles&#34;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurfaceVariant</span><span class="p">)</span>
+	<span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">OutlinedCard</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// drawn by its border: beside other cards</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nf">Avatar</span><span class="p">(</span><span class="s">&#34;Ana Keeper&#34;</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Color</span><span class="p">{},</span> <span class="mi">40</span><span class="p">)</span> <span class="c1">// initials in a circle</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;Ana Keeper is on duty&#34;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+		<span class="p">})</span>
+	<span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ElevatedCard</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// raised: over a map or a scene</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;Fog warning tonight&#34;</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Medium</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+	<span class="p">})</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/contain-cards.jpg" alt="A filled card, an outlined card with AK initials, and a raised card" /></p>
+
+<h2 id="banner"><code>Banner</code></h2>
+
+<p>A message across the top that stays until acted on: no connection, an update. It returns the index
+of the action touched, or -1.</p>
+<pre><code class="language-go"><span class="k">if</span> <span class="nx">shown</span> <span class="p">{</span>
+	<span class="k">switch</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Banner</span><span class="p">(</span><span class="s">&#34;wifi-off&#34;</span><span class="p">,</span> <span class="s">&#34;The positions were last brought up to date a week ago.&#34;</span><span class="p">,</span> <span class="s">&#34;Dismiss&#34;</span><span class="p">,</span> <span class="s">&#34;Refresh&#34;</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="nx">shown</span> <span class="p">=</span> <span class="kc">false</span>
+	<span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="nx">shown</span> <span class="p">=</span> <span class="kc">false</span> <span class="c1">// and refresh</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kc">nil</span><span class="p">)</span>
+</code></pre>
+
+<p><img src="./images/components/contain-banner.jpg" alt="A banner with a no-wifi icon, a message, and Dismiss and Refresh" /></p>
+
+<p>For a note that goes by itself, use a <a href="./components/overlays"><code>Snackbar</code></a>.</p>
+
+<h2 id="sectiontitle-heading-divider-text-paragraph"><code>SectionTitle</code>, <code>Heading</code>, <code>Divider</code>, <code>Text</code>, <code>Paragraph</code></h2>
+
+<p>A small heading over a list&rsquo;s rows; a heading for content with its own margins; a line between
+groups; one line of text; and text that breaks into lines at the width it has (<code>Paragraph</code>, the
+only piece that wraps).</p>
+
+<hr>
+
+<p><a href="./components/inputs">← Inputs</a> · <a href="./components/overlays">Overlays →</a></p>

@@ -1,0 +1,36 @@
+<h1 id="pickers">Pickers</h1>
+
+<p>Both are dialogs: show them while choosing, and they answer <code>Open</code>, <code>Confirmed</code> or <code>Dismissed</code>.
+They edit a <code>time.Time</code> only when confirmed. The program keeps a picker struct while it is shown.</p>
+
+<h2 id="datepicker"><code>DatePicker</code></h2>
+
+<p>A day chosen a month at a time, with arrows to the months before and after.</p>
+<pre><code class="language-go"><span class="k">if</span> <span class="nx">open</span> <span class="p">{</span>
+	<span class="k">switch</span> <span class="nx">look</span><span class="p">.</span><span class="nf">DatePicker</span><span class="p">(</span><span class="s">&#34;inspection&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">picker</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">date</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Confirmed</span><span class="p">:</span> <span class="c1">// date holds the day chosen</span>
+		<span class="nx">open</span> <span class="p">=</span> <span class="kc">false</span>
+	<span class="k">case</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Dismissed</span><span class="p">:</span>
+		<span class="nx">open</span> <span class="p">=</span> <span class="kc">false</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/components/pickers-date.jpg" alt="Select date, 21 June 2026, a month with the 21st chosen" /></p>
+
+<p><code>picker.Names</code> (a <code>material.DateNames</code>) gives the month and day names in another language.</p>
+
+<h2 id="timepicker"><code>TimePicker</code></h2>
+
+<p>Material&rsquo;s dial: the hours 1 to 12 round it and 13 to 00 inside, then the minutes; touched or
+dragged round.</p>
+<pre><code class="language-go"><span class="k">if</span> <span class="nx">open</span> <span class="o">&amp;&amp;</span> <span class="nx">look</span><span class="p">.</span><span class="nf">TimePicker</span><span class="p">(</span><span class="s">&#34;light at&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">picker</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">date</span><span class="p">)</span> <span class="o">!=</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Open</span> <span class="p">{</span>
+	<span class="nx">open</span> <span class="p">=</span> <span class="kc">false</span> <span class="c1">// Confirmed: date has the time chosen</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/components/pickers-time.jpg" alt="Select time 21:30 on a dial with 21 chosen" /></p>
+
+<hr>
+
+<p><a href="./components/overlays">← Overlays</a> · <a href="./components/progress">Progress →</a></p>

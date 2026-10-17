@@ -1,0 +1,55 @@
+<h1 id="progress">Progress</h1>
+<pre><code class="language-go"><span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">LoadingIndicator</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span>          <span class="c1">// a short wait, nothing to measure</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">ContainedLoadingIndicator</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span> <span class="c1">// the same on a round container</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">CircularProgress</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">CircularProgress</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">Indeterminate</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+	<span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">WavyProgress</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span> <span class="c1">// work being done, with a fraction</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">LinearProgress</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">Skeleton</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Fixed</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span> <span class="c1">// content still coming</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">Skeleton</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nf">Percent</span><span class="p">(</span><span class="mf">0.6</span><span class="p">),</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Fixed</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/progress-all.jpg" alt="Two morphing loading shapes, a ring at 70 %, an arc, a wavy line, a straight line and two skeleton blocks" /></p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>When</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>LoadingIndicator(size)</code>, <code>ContainedLoadingIndicator(size)</code></td>
+<td>A short wait with nothing to measure: Expressive&rsquo;s shape that turns and morphs</td>
+</tr>
+
+<tr>
+<td><code>CircularProgress(fraction, size, wavy)</code></td>
+<td>Work with a fraction, in a small place; <code>material.Indeterminate</code> for an arc chasing round</td>
+</tr>
+
+<tr>
+<td><code>WavyProgress(fraction)</code>, <code>LinearProgress(fraction)</code></td>
+<td>Work with a fraction across the screen</td>
+</tr>
+
+<tr>
+<td><code>Skeleton(width, height, radius)</code></td>
+<td>Blocks standing in for content still coming, with a light crossing them</td>
+</tr>
+</tbody>
+</table>
+<p>Indicators ask for frames only while on screen; a screen without one sleeps.</p>
+
+<p><code>VideoPlayer(name, video, height)</code> plays a film (<code>window.OpenVideo</code>) in a rounded box, touched to
+play or pause: see <a href="./guides/pieces">the pieces</a>.</p>
+
+<hr>
+
+<p><a href="./components/pickers">← Pickers</a> · <a href="./components/gestures">Gestures →</a></p>

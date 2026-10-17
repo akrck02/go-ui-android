@@ -1,0 +1,136 @@
+<h1 id="lesson-3-fields-dialogs-and-notes">Lesson 3: fields, dialogs and notes</h1>
+
+<p>In this lesson a lighthouse&rsquo;s screen edits it, a dialog asks before removing it, and a note at the
+bottom offers to undo.</p>
+
+<table>
+<thead>
+<tr>
+<th>Mission</th>
+<th>Pieces</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Editing, removing and undoing</td>
+<td><code>TextField</code>, <code>Slider</code>, <code>Dialog</code>, <code>Snackbar</code></td>
+<td>15 min</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="the-idea">The idea</h4>
+
+<p>A dialog is a <strong>question that needs an answer</strong> before anything else happens; a snackbar is a <strong>sticky note</strong> on the fridge: it says what just happened and offers to take it back, and falls off by itself after a few seconds.</p>
+
+<h2 id="editing">Editing</h2>
+
+<p>Lesson 2&rsquo;s <code>details</code> already has the pieces:</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Edits</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>TextField(name, &amp;text, material.Field{Label, Placeholder, Supporting, Error, MaxLength, Counter, Filled, Prefix, Suffix, Secret, Reveal})</code></td>
+<td>A string. On a phone the on-screen keyboard comes up, suggests words and underlines the one it composes; a held word is selected, with handles and a bar to cut, copy and paste</td>
+</tr>
+
+<tr>
+<td><code>Slider(name, &amp;value, minimum, maximum, step)</code></td>
+<td>A number</td>
+</tr>
+
+<tr>
+<td><code>Switch(name, &amp;on)</code></td>
+<td>A <code>bool</code></td>
+</tr>
+
+<tr>
+<td><code>Dropdown</code>, <code>SegmentedButtons</code>, <code>Checkbox</code>, <code>RadioButton</code>, <code>DatePicker</code>, <code>TimePicker</code></td>
+<td>See <a href="./guides/pieces">the pieces</a></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="a-dialog">A dialog</h2>
+
+<p><code>Dialog(name, material.Dialog{…})</code> is a question over the dimmed screen. Show it while your program
+wants (here, while <code>removing</code> names a lighthouse); it returns <code>material.Open</code> while it waits, then
+<code>Confirmed</code> or <code>Dismissed</code> (the other button, a touch outside, or the back gesture) once.</p>
+
+<h2 id="a-note-with-undo">A note with Undo</h2>
+
+<p>A <code>material.Snackbar</code> is kept by the program: <code>Show(text, action, duration)</code> when something
+happens, and <code>look.Snackbar(&amp;snackbar)</code> at every frame, which returns <code>true</code> when its action is
+touched. <code>Above</code> lifts it over the navigation bar.</p>
+<pre><code class="language-go"><span class="c1">// overlays draws what goes over the screens: the dialog that asks before removing, and the note.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">overlays</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">program</span><span class="p">.</span><span class="nx">removing</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+		<span class="nx">answer</span> <span class="o">:=</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Dialog</span><span class="p">(</span><span class="s">&#34;remove&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Dialog</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;trash-2&#34;</span><span class="p">,</span> <span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Remove &#34;</span> <span class="o">+</span> <span class="nx">program</span><span class="p">.</span><span class="nx">removing</span> <span class="o">+</span> <span class="s">&#34;?&#34;</span><span class="p">,</span>
+			<span class="nx">Text</span><span class="p">:</span> <span class="s">&#34;It leaves the list.&#34;</span><span class="p">,</span> <span class="nx">Confirm</span><span class="p">:</span> <span class="s">&#34;Remove&#34;</span><span class="p">,</span> <span class="nx">Dismiss</span><span class="p">:</span> <span class="s">&#34;Cancel&#34;</span><span class="p">})</span>
+		<span class="k">if</span> <span class="nx">answer</span> <span class="o">==</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Confirmed</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nf">remove</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">removing</span><span class="p">)</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">.</span><span class="nf">Back</span><span class="p">()</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">notes</span><span class="p">.</span><span class="nf">Show</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">removed</span><span class="p">.</span><span class="nx">name</span><span class="o">+</span><span class="s">&#34; removed&#34;</span><span class="p">,</span> <span class="s">&#34;Undo&#34;</span><span class="p">,</span> <span class="mi">5</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">answer</span> <span class="o">!=</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Open</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">removing</span> <span class="p">=</span> <span class="s">&#34;&#34;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">program</span><span class="p">.</span><span class="nx">notes</span><span class="p">.</span><span class="nx">Above</span> <span class="p">=</span> <span class="nx">material</span><span class="p">.</span><span class="nx">NavigationBarHeight</span>
+	<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Snackbar</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">notes</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">program</span><span class="p">.</span><span class="nx">removed</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">,</span> <span class="o">*</span><span class="nx">program</span><span class="p">.</span><span class="nx">removed</span><span class="p">)</span> <span class="c1">// Undo</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nx">removed</span> <span class="p">=</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">remove</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">light</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span> <span class="o">==</span> <span class="nx">name</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">removed</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">light</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">[:</span><span class="nx">index</span><span class="p">],</span> <span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">[</span><span class="nx">index</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span><span class="o">...</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/tutorial/phone-dialog.jpg" alt="The dialog before East Cape is removed" /></p>
+
+<p><code>overlays</code> is deferred in <code>build</code>, so it is drawn over the screens and answers the back before
+them.</p>
+
+<h4 id="checkpoint">Checkpoint</h4>
+
+<p>The bin on a lighthouse&rsquo;s screen asks <em>Remove East Cape?</em>; <em>Remove</em> takes it out, goes back to the list and shows <em>East Cape removed</em> with <em>Undo</em>, which puts it back.</p>
+
+<p><img src="./images/tutorial/quest/achievement-lamplighter.svg" alt="Achievement unlocked: Lamplighter" /></p>
+
+<h2 id="bonus-optional">Bonus (optional)</h2>
+
+<p>Give the field an error, &ldquo;A place is needed&rdquo;, while it is empty.</p>
+
+<details>
+<summary>🔓 Show the solution</summary>
+
+```go
+field := material.Field{Label: "Where it stands", MaxLength: 60, Counter: true}
+if light.place == "" {
+	field.Error = "A place is needed"
+}
+look.TextField("place", &light.place, field)
+```
+
+</details>
+
+<hr>
+
+<p><a href="./the-quest/screens-and-back">← Lesson 2</a> · <a href="./the-quest/colours-and-settings">Lesson 4: colours and settings →</a></p>

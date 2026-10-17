@@ -1,0 +1,126 @@
+<h1 id="lesson-2-screens-and-the-back-gesture">Lesson 2: screens and the back gesture</h1>
+
+<p>A phone app moves between screens: destinations at the bottom, and inside one a stack of screens,
+each sliding in over the one before. In this lesson the app gets both, and answers the system&rsquo;s
+<strong>back gesture</strong> as Android&rsquo;s own apps do.</p>
+
+<table>
+<thead>
+<tr>
+<th>Mission</th>
+<th>Pieces</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>A screen for each lighthouse</td>
+<td><code>NavigationBar</code>, <code>Navigation</code>, <code>Screens</code>, <code>GoBack</code></td>
+<td>20 min</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="the-idea">The idea</h4>
+
+<p>Screens stack like <strong>plates</strong>: opening a lighthouse puts its screen on top, and the back gesture takes the top plate off. The navigation bar picks which <strong>pile</strong> you look at.</p>
+
+<h2 id="destinations">Destinations</h2>
+
+<p><code>NavigationBar(destinations, &amp;selected)</code> draws three to five destinations at the bottom, under the
+gesture bar; it changes <code>selected</code> when one is touched:</p>
+<pre><code class="language-go"><span class="kd">var</span> <span class="nx">places</span> <span class="p">=</span> <span class="p">[]</span><span class="nx">material</span><span class="p">.</span><span class="nx">Destination</span><span class="p">{{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;lighthouse&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Lighthouses&#34;</span><span class="p">},</span> <span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;settings&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Settings&#34;</span><span class="p">}}</span>
+</code></pre>
+
+<p><code>build</code> shows the destination chosen with a <code>switch</code>, then the bar (lesson 1&rsquo;s <code>build</code>). On a phone
+turned on its side, <code>look.Wide()</code> is true: draw <code>NavigationRail</code> down the left instead, with
+<code>look.Body(true, …)</code> (<a href="./guides/phone">feeling at home on a phone</a>).</p>
+
+<h2 id="a-stack-of-screens">A stack of screens</h2>
+
+<p>A <code>material.Navigation</code> is a stack of screen names, kept by the program. <code>Go(name)</code> opens one,
+sliding in from the right; <code>Back()</code> returns. <code>look.Screens</code> draws the one on top, by its name:
+<code>&quot;&quot;</code> is the first.</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">Screens</span><span class="p">(</span><span class="s">&#34;lighthouses&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">key</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nf">list</span><span class="p">(</span><span class="nx">look</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">program</span><span class="p">.</span><span class="nf">details</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre>
+
+<p>The list&rsquo;s rows call <code>program.navigation.Go(light.name)</code>. A lighthouse&rsquo;s screen has a top bar with
+a back arrow; <code>TopAppBar</code> returns <code>true</code> when it is touched:</p>
+<pre><code class="language-go"><span class="c1">// details is a lighthouse&#39;s own screen.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">details</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">,</span> <span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">light</span> <span class="o">:=</span> <span class="nx">program</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">light</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span> <span class="c1">// removed while its screen was still sliding away</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">Back</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">Actions</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">NamedIconButton</span><span class="p">(</span><span class="s">&#34;trash-2&#34;</span><span class="p">,</span> <span class="s">&#34;Remove&#34;</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">removing</span> <span class="p">=</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span>
+		<span class="p">}</span>
+	<span class="p">}})</span> <span class="p">{</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">.</span><span class="nf">Back</span><span class="p">()</span>
+	<span class="p">}</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Direction</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">Vertical</span><span class="p">,</span> <span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Padding</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Pad</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="nx">Gap</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">TextField</span><span class="p">(</span><span class="s">&#34;place&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">light</span><span class="p">.</span><span class="nx">place</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Field</span><span class="p">{</span><span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Where it stands&#34;</span><span class="p">,</span> <span class="nx">MaxLength</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="nx">Counter</span><span class="p">:</span> <span class="kc">true</span><span class="p">})</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Slider</span><span class="p">(</span><span class="s">&#34;range&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">light</span><span class="p">.</span><span class="nx">rangeNM</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;Seen from %.0f nautical miles&#34;</span><span class="p">,</span> <span class="nx">light</span><span class="p">.</span><span class="nx">rangeNM</span><span class="p">),</span> <span class="mi">14</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurfaceVariant</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;Lit&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Spacer</span><span class="p">()</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;lit&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">light</span><span class="p">.</span><span class="nx">lit</span><span class="p">)</span>
+		<span class="p">})</span>
+	<span class="p">})</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/tutorial/phone-details.jpg" alt="A lighthouse&rsquo;s screen" /></p>
+
+<h2 id="the-back-gesture">The back gesture</h2>
+
+<p>Android&rsquo;s back gesture reaches the program. Dialogs, sheets and drawers answer it first and close.
+Then the screen: <code>look.GoBack(&amp;navigation)</code> goes back a screen when there is one, and
+<code>look.Back()</code> takes the back for anything else. A back nobody takes sends the app to the
+background, as at a phone app&rsquo;s first screen.</p>
+
+<p>Ask <strong>last</strong> in the frame, after what goes over the screens, so that gets it first. <code>build</code>
+does it with <code>defer</code>:</p>
+<pre><code class="language-go"><span class="c1">// goBack answers the system&#39;s back: from a lighthouse to the list, from settings to the list;</span>
+<span class="c1">// from the list nobody answers, and the app goes to the background.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">goBack</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">program</span><span class="p">.</span><span class="nx">place</span> <span class="o">==</span> <span class="nx">lighthousesPlace</span> <span class="o">&amp;&amp;</span> <span class="nx">look</span><span class="p">.</span><span class="nf">GoBack</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">program</span><span class="p">.</span><span class="nx">place</span> <span class="o">!=</span> <span class="nx">lighthousesPlace</span> <span class="o">&amp;&amp;</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Back</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nx">place</span> <span class="p">=</span> <span class="nx">lighthousesPlace</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<h4 id="checkpoint">Checkpoint</h4>
+
+<p>Touching <em>North Point</em> slides its screen in from the right; the arrow, or the phone&rsquo;s back gesture, slides it away; <em>Settings</em> in the bar opens the other destination.</p>
+
+<p><img src="./images/tutorial/quest/achievement-pathfinder.svg" alt="Achievement unlocked: Pathfinder" /></p>
+
+<h2 id="bonus-optional">Bonus (optional)</h2>
+
+<p>Make the settings destination a stack too, with an &ldquo;About&rdquo; row that opens an &ldquo;About&rdquo; screen.</p>
+
+<details>
+<summary>🔓 Show the solution</summary>
+
+Keep a second `material.Navigation` for settings, draw it with `look.Screens("settings", …)`,
+`Go("about")` from the row, and in `goBack` try `look.GoBack(&program.settingsNavigation)` while
+settings is shown, before `look.Back()`.
+
+</details>
+
+<hr>
+
+<p><a href="./the-quest/a-first-screen">← Lesson 1</a> · <a href="./the-quest/fields-dialogs-and-notes">Lesson 3: fields, dialogs and notes →</a></p>

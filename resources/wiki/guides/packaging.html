@@ -1,0 +1,117 @@
+<h1 id="packaging-go-ui-apk">📦 Packaging: go-ui-apk</h1>
+<pre><code class="language-bash"><span class="nb">export</span> <span class="nv">ANDROID_HOME</span><span class="o">=</span>…/android-sdk      <span class="c1"># with build-tools and a platform</span>
+<span class="nb">export</span> <span class="nv">ANDROID_NDK_HOME</span><span class="o">=</span>…/ndk/&lt;version&gt;
+<span class="c1"># and a JDK, 17 or later: javac on the path or in JAVA_HOME</span>
+go run github.com/akrck02/go-ui-android/cmd/go-ui-apk -name Gallery -id io.example.gallery ./cmd/gallery
+</code></pre>
+
+<p>It builds the program as a shared library for each processor asked for (arm64 phones by default) with the NDK&rsquo;s compiler (aligned to 16 KB
+pages, which Android 15 and later phones need), writes the manifest and a window theme that lets the
+program paint under the system&rsquo;s bars (light or dark with the phone) and beside a camera&rsquo;s cutout,
+compiles go-renderer&rsquo;s two Java classes (what a screen reader reads, and the view the on-screen
+keyboard types in) with <code>javac</code> and the build tools&rsquo; <code>d8</code>, and packs, aligns and signs the package with the SDK&rsquo;s own <code>aapt2</code>, <code>zipalign</code> and <code>apksigner</code>. The
+window shrinks while the on-screen keyboard is up. It signs with the debug key in
+<code>~/.android/debug.keystore</code>, making it when missing, for phones and the emulator; a release is
+signed with the program&rsquo;s own key (below).</p>
+
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>What it sets</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>-name</code></td>
+<td>The name under the icon (required)</td>
+</tr>
+
+<tr>
+<td><code>-id</code></td>
+<td>The application id, like <code>io.example.app</code> (required)</td>
+</tr>
+
+<tr>
+<td><code>-o</code></td>
+<td>The package to write; the program&rsquo;s folder name <code>.apk</code> by default</td>
+</tr>
+
+<tr>
+<td><code>-version-code</code>, <code>-version</code></td>
+<td>The version&rsquo;s number and the version people read</td>
+</tr>
+
+<tr>
+<td><code>-min-sdk</code>, <code>-target-sdk</code></td>
+<td>The oldest Android it runs on (26, Android 8, at least) and the one it is made for</td>
+</tr>
+
+<tr>
+<td><code>-icon</code></td>
+<td>A square PNG for the launcher</td>
+</tr>
+
+<tr>
+<td><code>-icon-foreground</code>, <code>-icon-background</code>, <code>-icon-monochrome</code></td>
+<td>An adaptive icon, which each launcher cuts to its own shape: a PNG of 108 dp whose middle 66 dp always shows, a colour (<code>#rrggbb</code>) or a PNG behind it, and a one-colour PNG for themed icons (Android 13+)</td>
+</tr>
+
+<tr>
+<td><code>-splash</code>, <code>-splash-dark</code></td>
+<td>The colour (<code>#rrggbb</code>) the window shows while the program starts, in the light and the dark theme; Android 12 and later draw the icon over it</td>
+</tr>
+
+<tr>
+<td><code>-debuggable</code></td>
+<td>Lets <code>adb</code> read its folder and debug it; on by default</td>
+</tr>
+
+<tr>
+<td><code>-notifications</code></td>
+<td>Names the permission Android 13 and later ask before showing notifications</td>
+</tr>
+
+<tr>
+<td><code>-internet</code></td>
+<td>Lets the program use the network: on by default, granted when the package is installed with no question; <code>-internet=false</code> leaves it out</td>
+</tr>
+
+<tr>
+<td><code>-abi</code></td>
+<td>The processors to carry a library for: <code>arm64</code> (phones, the default), <code>x86_64</code> (the emulator on a PC), <code>arm</code> (old 32-bit phones); <code>-abi arm64,x86_64</code> for several</td>
+</tr>
+
+<tr>
+<td><code>-release</code>, <code>-keystore</code>, <code>-key-alias</code></td>
+<td>Signs with the program&rsquo;s own key instead of the debug key, and leaves the package not debuggable: for a store</td>
+</tr>
+
+<tr>
+<td><code>-bundle</code></td>
+<td>With <code>-release</code>, writes an App Bundle (<code>.aab</code>), which Google Play asks for and makes each phone&rsquo;s packages from</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A release</strong> is signed with a key of the program&rsquo;s own, which a store knows it by from then on:
+keep the key store safe and out of the repository. The store&rsquo;s password is read from
+<code>GO_UI_APK_STORE_PASSWORD</code> (and the key&rsquo;s, when different, from <code>GO_UI_APK_KEY_PASSWORD</code>), never
+from the command line, which other users of the computer can see:</p>
+<pre><code class="language-bash">keytool -genkeypair -keystore lighthouses.keystore -alias lighthouses -keyalg RSA -validity <span class="m">10000</span>
+<span class="nv">GO_UI_APK_STORE_PASSWORD</span><span class="o">=</span>… go run ./cmd/go-ui-apk -name Lighthouses -id io.example.lighthouses <span class="se">\
+</span>    -release -keystore lighthouses.keystore -key-alias lighthouses -version-code <span class="m">2</span> -version 1.1 ./cmd/lighthouses
+</code></pre>
+
+<p><strong>An App Bundle</strong> (<code>-bundle</code>) is what Google Play asks for: the same program, its resources in
+protocol buffers and its libraries in one <code>base</code> module, signed with the upload key; Play makes
+each phone&rsquo;s packages from it. Google&rsquo;s <code>bundletool</code> validates it and makes those packages to try
+on a phone (<code>bundletool build-apks --connected-device</code>, then <code>install-apks</code>); the gallery&rsquo;s bundle
+was tried that way on the emulator.</p>
+
+<p>What the program writes to its standard error (a panic, <code>log.Fatal</code>) is in Android&rsquo;s log:
+<code>adb logcat -s Go</code>.</p>
+
+<hr>
+
+<p><a href="./overview">← All the documentation</a></p>

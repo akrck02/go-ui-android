@@ -1,0 +1,72 @@
+<h1 id="screen-readers">🗣️ Screen readers</h1>
+
+<p>Every piece reads under TalkBack as Android&rsquo;s own do: a finger moved over the screen reads what is
+under it (&ldquo;Lamp, switch, on&rdquo;), a swipe goes to the next thing, a double tap presses it, and the
+thing read is ringed. go-ui works the list out from the boxes (<a href="https://github.com/akrck02/go-ui/blob/main/docs/4-guide.md#screen-readers" target="_blank">its docs</a>):
+a control is read by the texts inside it, texts side by side are read together, a list holds its
+rows, and what is behind a dialog or a sheet is left out. The pieces add what the boxes cannot
+tell:</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Read as</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>Switch</code>, <code>Checkbox</code>, <code>RadioButton</code></td>
+<td>A switch, a checkbox, a radio button, and whether it is on</td>
+</tr>
+
+<tr>
+<td><code>SegmentedButtons</code>, <code>ButtonGroup</code>, a dropdown&rsquo;s choices, the date picker&rsquo;s days</td>
+<td>The chosen one selected</td>
+</tr>
+
+<tr>
+<td><code>NavigationBar</code>, <code>NavigationRail</code>, <code>Tabs</code></td>
+<td>Tabs, the one shown selected; a badge after the label</td>
+</tr>
+
+<tr>
+<td><code>TopAppBar</code>, <code>Dialog</code></td>
+<td>The title as a heading; the arrow as &ldquo;Back&rdquo; (or &ldquo;Close&rdquo;)</td>
+</tr>
+
+<tr>
+<td><code>TextField</code></td>
+<td>The label over the box names the field, read with what is typed (not a secret one&rsquo;s); the screen reader&rsquo;s own typing, pasting and dictation fill it</td>
+</tr>
+
+<tr>
+<td><code>Slider</code></td>
+<td>Its range; the volume keys or a swipe up or down move it a step</td>
+</tr>
+
+<tr>
+<td><code>FloatingMenu</code>, <code>FloatingToolbar</code></td>
+<td>The menu&rsquo;s <code>Label</code> (&ldquo;Create&rdquo;), &ldquo;Close&rdquo; while open; each tool&rsquo;s label</td>
+</tr>
+
+<tr>
+<td>Icons with no label (a field&rsquo;s cross, the month&rsquo;s arrows, a <code>Menu</code>&rsquo;s button, the split button&rsquo;s arrow)</td>
+<td>What they do (&ldquo;More options&rdquo;): <code>Look.Words</code>, English by default (<code>EnglishWords</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>An icon button of the program&rsquo;s own reads its icon&rsquo;s name (&ldquo;share 2&rdquo;) unless it has one:
+<code>NamedIconButton(&quot;share-2&quot;, &quot;Share&quot;)</code>, or <code>Describe</code> after any piece. The gallery&rsquo;s test goes to
+every screen with double taps alone, and checks that every control has a name.</p>
+
+<p>The package carries one small Java class for it (<code>go-ui-apk</code> compiles it in, see <a href="./guides/packaging">packaging</a>). It was tried
+on the Android 14 emulator with an accessibility service acting as TalkBack does: the gallery&rsquo;s
+tree reaches the system with every name, role and state, and a click goes to another destination,
+the focus rings a checkbox, a second click ticks it, a scroll moves the list on and text set on a
+field (&ldquo;North light 🌊&rdquo;) lands in it whole. TalkBack itself, on a phone, is not tried yet.</p>
+
+<hr>
+
+<p><a href="./overview">← All the documentation</a></p>

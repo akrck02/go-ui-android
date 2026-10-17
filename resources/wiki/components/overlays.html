@@ -1,0 +1,95 @@
+<h1 id="overlays">Overlays</h1>
+
+<p>Draw overlays <strong>after</strong> the screen in the frame (a <code>defer</code> at the start of the frame does it), so
+they are on top and answer the back gesture first.</p>
+
+<h2 id="dialog"><code>Dialog</code></h2>
+
+<p>A question over the dimmed screen. Show it while your program asks; it returns <code>material.Open</code>
+while waiting, then <code>Confirmed</code> or <code>Dismissed</code> (the other action, a touch outside, the back
+gesture) once.</p>
+<pre><code class="language-go"><span class="k">if</span> <span class="nx">asking</span> <span class="p">{</span>
+	<span class="nx">answer</span> <span class="o">:=</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Dialog</span><span class="p">(</span><span class="s">&#34;switch off&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Dialog</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;lightbulb-off&#34;</span><span class="p">,</span> <span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Switch every light off?&#34;</span><span class="p">,</span>
+		<span class="nx">Text</span><span class="p">:</span> <span class="s">&#34;Ships will not see the coast until they are lit again.&#34;</span><span class="p">,</span> <span class="nx">Confirm</span><span class="p">:</span> <span class="s">&#34;Switch off&#34;</span><span class="p">,</span> <span class="nx">Dismiss</span><span class="p">:</span> <span class="s">&#34;Cancel&#34;</span><span class="p">})</span>
+	<span class="k">if</span> <span class="nx">answer</span> <span class="o">==</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Confirmed</span> <span class="p">{</span>
+		<span class="c1">// switch them off</span>
+	<span class="p">}</span>
+	<span class="nx">asking</span> <span class="p">=</span> <span class="nx">answer</span> <span class="o">==</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Open</span> <span class="c1">// Confirmed or Dismissed: it closes</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/components/over-dialog.jpg" alt="Switch every light off? with an icon, a line, Cancel and Switch off" /></p>
+
+<p><code>Content</code> adds more under the text (a field, choices).</p>
+
+<h2 id="bottomsheet-standardsheet-sidesheet"><code>BottomSheet</code>, <code>StandardSheet</code>, <code>SideSheet</code></h2>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>When</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>BottomSheet(name, content)</code></td>
+<td>Choices or a short form rising from the bottom, the screen dimmed. Returns <code>true</code> when dragged down or dismissed</td>
+</tr>
+
+<tr>
+<td><code>StandardSheet(name, &amp;sheet, peek, content)</code></td>
+<td>A sheet over the screen that does not dim it (a map&rsquo;s places): it rests low or expanded, dragged by its handle</td>
+</tr>
+
+<tr>
+<td><code>SideSheet(name, title, content)</code></td>
+<td>Filters or details sliding in from the end, with a title and a cross</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-go"><span class="k">if</span> <span class="nx">open</span> <span class="o">&amp;&amp;</span> <span class="nx">look</span><span class="p">.</span><span class="nf">BottomSheet</span><span class="p">(</span><span class="s">&#34;actions&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;share&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;share-2&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;Share the chart&#34;</span><span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;copy&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;copy&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;Copy the position&#34;</span><span class="p">})</span>
+	<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;close&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;x&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;Close&#34;</span><span class="p">})</span> <span class="p">{</span>
+		<span class="nx">open</span> <span class="p">=</span> <span class="kc">false</span>
+	<span class="p">}</span>
+<span class="p">})</span> <span class="p">{</span>
+	<span class="nx">open</span> <span class="p">=</span> <span class="kc">false</span> <span class="c1">// dragged down, the scrim touched, or the back gesture</span>
+<span class="p">}</span>
+</code></pre>
+
+<h2 id="snackbar"><code>Snackbar</code></h2>
+
+<p>A short note at the bottom for a few seconds, with an action that undoes or follows what was just
+done. Keep one <code>material.Snackbar</code>, call <code>Show(text, action, duration)</code> when something happens,
+and draw it in <strong>every</strong> frame; it returns <code>true</code> when its action is touched. Set <code>Above</code> to
+<code>material.NavigationBarHeight</code> over a navigation bar.</p>
+<pre><code class="language-go"><span class="k">if</span> <span class="nx">first</span> <span class="p">{</span> <span class="c1">// when something happens: here, at once</span>
+	<span class="nx">notes</span><span class="p">.</span><span class="nf">Show</span><span class="p">(</span><span class="s">&#34;North Point removed&#34;</span><span class="p">,</span> <span class="s">&#34;Undo&#34;</span><span class="p">,</span> <span class="mi">5</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Snackbar</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">notes</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// every frame</span>
+	<span class="c1">// put it back</span>
+<span class="p">}</span>
+</code></pre>
+
+<h2 id="menu"><code>Menu</code></h2>
+
+<p>A button (three dots, usually) that opens a list of choices under it; it returns the one chosen, or
+-1. TalkBack reads the button as &ldquo;More options&rdquo;.</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;North Point&#34;</span><span class="p">,</span> <span class="nx">Actions</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">switch</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Menu</span><span class="p">(</span><span class="s">&#34;ellipsis-vertical&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;Rename&#34;</span><span class="p">,</span> <span class="s">&#34;Duplicate&#34;</span><span class="p">,</span> <span class="s">&#34;Remove&#34;</span><span class="p">})</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="mi">0</span><span class="p">:</span> <span class="c1">// rename</span>
+	<span class="k">case</span> <span class="mi">1</span><span class="p">:</span> <span class="c1">// duplicate</span>
+	<span class="k">case</span> <span class="mi">2</span><span class="p">:</span> <span class="c1">// remove</span>
+	<span class="p">}</span>
+<span class="p">}})</span>
+</code></pre>
+
+<p><img src="./images/components/over-menu.jpg" alt="A top bar with North Point and a three-dots menu" /></p>
+
+<hr>
+
+<p><a href="./components/containment">← Containment</a> · <a href="./components/pickers">Pickers →</a></p>

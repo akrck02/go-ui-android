@@ -1,0 +1,34 @@
+<h1 id="colours">🎨 Colours</h1>
+
+<table>
+<tr><th>Light</th><th>Dark</th></tr>
+<tr>
+<td><img alt="The actions screen in the light theme" src="../images/actions-light.png" width="240"></td>
+<td><img alt="The actions screen in the dark theme" src="../images/actions-dark.png" width="240"></td>
+</tr>
+</table>
+
+<p>A <code>Scheme</code> holds Material&rsquo;s colour roles: the primary colour and the text on it, its container, the
+surface and the raised containers over it, the outlines, the error colours and the inverse ones.</p>
+
+<ul>
+<li><strong><code>material.System(dark)</code></strong> takes the colours the phone made from its <strong>wallpaper</strong> (Android 12
+and later, Material You), as the system&rsquo;s own applications do, and Material&rsquo;s baseline elsewhere
+(an older phone, the desktop, a browser). Call it in every frame: the colours change with the
+wallpaper. The roles are taken from Android&rsquo;s palettes as its own dynamic colours take them: the
+primary from the first accent palette, the containers from the second, the surfaces from the
+neutral ones; the error colours stay Material&rsquo;s.</li>
+<li><strong><code>material.Baseline(dark)</code></strong> is Material&rsquo;s own purple scheme, always the same.</li>
+<li><strong><code>material.FromColour(colour, dark)</code></strong> makes a whole scheme from one colour (a brand&rsquo;s, a
+place&rsquo;s), as Material&rsquo;s own tools do: palettes of its hue at every tone, as Android makes them
+from a wallpaper, then the roles from them. Each tone is the colour&rsquo;s CIELAB lightness, as in
+Material, so text keeps its contrast whatever the colour; the hues are worked in OKLCH, where
+they stay even. <code>PalettesFromColour</code> gives the palettes themselves.</li>
+<li><strong><code>scheme.WithPrimary(…)</code></strong> puts a brand&rsquo;s colour in the primary roles only.</li>
+<li><strong><code>scheme.Theme(dark)</code></strong> gives go-ui&rsquo;s own controls (its slider, text fields, menus) the scheme and
+sizes for fingers; set it as the context&rsquo;s theme before the pieces.</li>
+</ul>
+
+<hr>
+
+<p><a href="./overview">← All the documentation</a></p>

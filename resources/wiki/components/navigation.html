@@ -1,0 +1,133 @@
+<h1 id="navigation">Navigation</h1>
+
+<h2 id="topappbar"><code>TopAppBar</code></h2>
+
+<p>The bar at the top of a screen, painted up under the status bar. It returns <code>true</code> when its back
+arrow is touched.</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Lighthouses&#34;</span><span class="p">,</span> <span class="nx">Large</span><span class="p">:</span> <span class="kc">true</span><span class="p">})</span> <span class="c1">// a screen&#39;s first level</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;North Point&#34;</span><span class="p">,</span> <span class="nx">Subtitle</span><span class="p">:</span> <span class="s">&#34;On the northern cliffs&#34;</span><span class="p">,</span> <span class="nx">Back</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+	<span class="nx">Actions</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">NamedIconButton</span><span class="p">(</span><span class="s">&#34;share-2&#34;</span><span class="p">,</span> <span class="s">&#34;Share&#34;</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">NamedIconButton</span><span class="p">(</span><span class="s">&#34;pencil&#34;</span><span class="p">,</span> <span class="s">&#34;Edit&#34;</span><span class="p">)</span>
+	<span class="p">}})</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;2 chosen&#34;</span><span class="p">,</span> <span class="nx">Back</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">Close</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// a mode, left with the cross</span>
+	<span class="nx">Actions</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nx">look</span><span class="p">.</span><span class="nf">NamedIconButton</span><span class="p">(</span><span class="s">&#34;trash-2&#34;</span><span class="p">,</span> <span class="s">&#34;Remove&#34;</span><span class="p">)</span> <span class="p">}})</span>
+</code></pre>
+
+<p><img src="./images/components/nav-topbar.jpg" alt="Three bars: a large Lighthouses title, North Point with a back arrow, a subtitle and two actions, and 2 chosen with a cross and a bin" /></p>
+
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Use</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>A destination&rsquo;s first screen</td>
+<td><code>Large: true</code>: the title big under the bar. With <code>Scrolled: look.Context.ScrollOffset(&quot;list&quot;)</code> it shrinks into a small bar as the list goes up</td>
+</tr>
+
+<tr>
+<td>A screen gone to from another</td>
+<td><code>Back: true</code>, and <code>navigation.Back()</code> when it returns <code>true</code></td>
+</tr>
+
+<tr>
+<td>A mode, such as rows chosen</td>
+<td><code>Back: true, Close: true</code>: a cross, and the count as the title</td>
+</tr>
+
+<tr>
+<td>Over a map or a 3D scene</td>
+<td><code>OverScene: true</code>: see-through</td>
+</tr>
+</tbody>
+</table>
+<p>Actions go in <code>Actions</code>, usually <code>NamedIconButton</code>s; more than two or three go in a <code>Menu</code>.</p>
+
+<h2 id="navigationbar-and-navigationrail"><code>NavigationBar</code> and <code>NavigationRail</code></h2>
+
+<p>Three to five destinations at the bottom, painted under the gesture bar. It edits the index of the
+destination chosen; show the screen with a <code>switch</code>. A <code>Badge</code> marks a destination with a count
+or, with <code>&quot;•&quot;</code>, a dot.</p>
+<pre><code class="language-go"><span class="nx">places</span> <span class="o">:=</span> <span class="p">[]</span><span class="nx">material</span><span class="p">.</span><span class="nx">Destination</span><span class="p">{</span>
+	<span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;lighthouse&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Lights&#34;</span><span class="p">},</span>
+	<span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;map&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Map&#34;</span><span class="p">},</span>
+	<span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;bell&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Alerts&#34;</span><span class="p">,</span> <span class="nx">Badge</span><span class="p">:</span> <span class="s">&#34;3&#34;</span><span class="p">},</span> <span class="c1">// a count</span>
+	<span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;user&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Me&#34;</span><span class="p">,</span> <span class="nx">Badge</span><span class="p">:</span> <span class="s">&#34;•&#34;</span><span class="p">},</span>     <span class="c1">// a dot</span>
+<span class="p">}</span>
+<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kc">nil</span><span class="p">)</span> <span class="c1">// the screen above it</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">NavigationBar</span><span class="p">(</span><span class="nx">places</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">place</span><span class="p">)</span>
+</code></pre>
+
+<p><img src="./images/components/nav-bar.jpg" alt="A navigation bar with Lights chosen, Map, Alerts with a 3 and Me with a dot" /></p>
+
+<p>On a phone on its side (<code>look.Wide()</code>), draw <code>NavigationRail(places, &amp;place)</code> down the left
+instead, with <code>look.Body(true, …)</code>. Lift floating things over the bar by
+<code>material.NavigationBarHeight</code>.</p>
+
+<h2 id="navigationdrawer"><code>NavigationDrawer</code></h2>
+
+<p>Every destination in a drawer sliding in from the left: for more than five destinations, or ones
+seldom used. It returns <code>true</code> when it closes (a destination touched, the scrim, the back
+gesture). Open it from a menu icon in the top bar.</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Lighthouses&#34;</span><span class="p">})</span>
+<span class="nx">places</span> <span class="o">:=</span> <span class="p">[]</span><span class="nx">material</span><span class="p">.</span><span class="nx">Destination</span><span class="p">{{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;lighthouse&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Lights&#34;</span><span class="p">},</span> <span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;map&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Map&#34;</span><span class="p">},</span>
+	<span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;bell&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Alerts&#34;</span><span class="p">},</span> <span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;settings&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Settings&#34;</span><span class="p">}}</span>
+<span class="k">if</span> <span class="nx">open</span> <span class="o">&amp;&amp;</span> <span class="nx">look</span><span class="p">.</span><span class="nf">NavigationDrawer</span><span class="p">(</span><span class="s">&#34;drawer&#34;</span><span class="p">,</span> <span class="s">&#34;Coast guard&#34;</span><span class="p">,</span> <span class="nx">places</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">place</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">open</span> <span class="p">=</span> <span class="kc">false</span> <span class="c1">// a destination touched, the scrim touched, or the back gesture</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/drawer-light.png" alt="The drawer open over a screen" /></p>
+
+<h2 id="tabs"><code>Tabs</code></h2>
+
+<p>Primary tabs under the top bar, the underline sliding to the one chosen, for views of <strong>one</strong>
+thing (a lighthouse&rsquo;s overview, light and history). For tabs whose pages a finger swipes, use
+<a href="./components/gestures"><code>TabPager</code></a>.</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">Tabs</span><span class="p">(</span><span class="s">&#34;view&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;Overview&#34;</span><span class="p">,</span> <span class="s">&#34;Light&#34;</span><span class="p">,</span> <span class="s">&#34;History&#34;</span><span class="p">},</span> <span class="o">&amp;</span><span class="nx">tab</span><span class="p">)</span>
+<span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">switch</span> <span class="nx">tab</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;North Point, on the northern cliffs&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+	<span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;White, every five seconds&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+	<span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;Lit for the first time long ago&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/nav-tabs.jpg" alt="Tabs Overview, Light and History, Light chosen, and its text" /></p>
+
+<h2 id="screens-navigation-goback"><code>Screens</code>, <code>Navigation</code>, <code>GoBack</code></h2>
+
+<p>A stack of screens inside one destination: a list, then one row&rsquo;s screen, then a form. The program
+keeps a <code>material.Navigation</code>; <code>Go(name)</code> opens a screen sliding in from the right, <code>Back()</code> returns,
+and <code>look.Screens</code> draws the one on top by its name (<code>&quot;&quot;</code> is the first).</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nf">Screens</span><span class="p">(</span><span class="s">&#34;lighthouses&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">navigation</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">key</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+		<span class="nf">drawList</span><span class="p">(</span><span class="nx">look</span><span class="p">)</span> <span class="c1">// its rows call navigation.Go(light.name)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nf">drawLighthouse</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="c1">// last in the frame, after dialogs and sheets:</span>
+<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">GoBack</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">navigation</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="c1">// the back gesture went back a screen</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Back</span><span class="p">()</span> <span class="p">{</span>
+	<span class="err">…</span> <span class="c1">// anything else the back should do; nobody answering sends the app to the background</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>See <a href="./the-quest/screens-and-back">the tutorial&rsquo;s lesson 2</a> for a whole app.</p>
+
+<hr>
+
+<p><a href="./components/components">← Components</a> · <a href="./components/actions">Actions →</a></p>

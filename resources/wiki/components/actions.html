@@ -1,0 +1,85 @@
+<h1 id="actions">Actions</h1>
+
+<h2 id="filledbutton-tonalbutton-outlinedbutton-textbutton"><code>FilledButton</code>, <code>TonalButton</code>, <code>OutlinedButton</code>, <code>TextButton</code></h2>
+
+<p>Four levels of emphasis, from the screen&rsquo;s main action to the least important. Each takes an icon
+(or <code>&quot;&quot;</code>) and a label, and returns <code>true</code> when touched.</p>
+<pre><code class="language-go"><span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">FilledButton</span><span class="p">(</span><span class="s">&#34;check&#34;</span><span class="p">,</span> <span class="s">&#34;Save&#34;</span><span class="p">)</span>        <span class="c1">// the main action of the screen</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">TonalButton</span><span class="p">(</span><span class="s">&#34;lightbulb&#34;</span><span class="p">,</span> <span class="s">&#34;Light it&#34;</span><span class="p">)</span> <span class="c1">// important, but not the main one</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">OutlinedButton</span><span class="p">(</span><span class="s">&#34;share-2&#34;</span><span class="p">,</span> <span class="s">&#34;Share&#34;</span><span class="p">)</span>   <span class="c1">// secondary</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">TextButton</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span> <span class="s">&#34;Not now&#34;</span><span class="p">)</span>            <span class="c1">// the least important: in dialogs, beside others</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/actions-buttons.jpg" alt="Save filled, Light it tonal, Share outlined, Not now as text" /></p>
+
+<p>One filled button per screen at most. Dialogs use text buttons (the <code>Dialog</code> piece does it for you).</p>
+
+<h2 id="namediconbutton-iconbutton-roundbutton-splitbutton"><code>NamedIconButton</code>, <code>IconButton</code>, <code>RoundButton</code>, <code>SplitButton</code></h2>
+
+<p>A round 48-pixel target with an icon. <code>NamedIconButton(icon, name)</code> gives TalkBack a name for it:
+use it always, unless the icon&rsquo;s meaning is in words beside it (<code>IconButton(icon)</code>).
+<code>RoundButton(icon, size, primary)</code> floats over a map or a scene. <code>SplitButton</code> joins a main
+action to an arrow opening its other choices, and tells which half was touched.</p>
+<pre><code class="language-go"><span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">NamedIconButton</span><span class="p">(</span><span class="s">&#34;heart&#34;</span><span class="p">,</span> <span class="s">&#34;Favourite&#34;</span><span class="p">)</span> <span class="c1">// a name for TalkBack</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">NamedIconButton</span><span class="p">(</span><span class="s">&#34;share-2&#34;</span><span class="p">,</span> <span class="s">&#34;Share&#34;</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Spacer</span><span class="p">()</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">RoundButton</span><span class="p">(</span><span class="s">&#34;locate&#34;</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="c1">// over a map: centre on me</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">RoundButton</span><span class="p">(</span><span class="s">&#34;plus&#34;</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+	<span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">more</span> <span class="o">:=</span> <span class="nx">look</span><span class="p">.</span><span class="nf">SplitButton</span><span class="p">(</span><span class="s">&#34;send&#34;</span><span class="p">,</span> <span class="s">&#34;Send&#34;</span><span class="p">);</span> <span class="nx">action</span> <span class="p">{</span>
+			<span class="c1">// send now</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">more</span> <span class="p">{</span>
+			<span class="c1">// open the other ways of sending</span>
+		<span class="p">}</span>
+	<span class="p">})</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/actions-icons.jpg" alt="A heart and share icons, two round buttons, and Send split from its arrow" /></p>
+
+<h2 id="floatingbutton-and-extendedfloatingbutton"><code>FloatingButton</code> and <code>ExtendedFloatingButton</code></h2>
+
+<p>The floating action button: the screen&rsquo;s one main action (write, add), at the bottom end, over
+the content. The extended one says its action in words: use it while the screen is at rest, as on
+a list&rsquo;s first screen.</p>
+<pre><code class="language-go"><span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kc">nil</span><span class="p">)</span> <span class="c1">// the list</span>
+<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Padding</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Pad</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="nx">Gap</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="nx">AlignX</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">End</span><span class="p">},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">FloatingButton</span><span class="p">(</span><span class="s">&#34;pencil&#34;</span><span class="p">)</span>                         <span class="c1">// the screen&#39;s one main action</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ExtendedFloatingButton</span><span class="p">(</span><span class="s">&#34;plus&#34;</span><span class="p">,</span> <span class="s">&#34;New lighthouse&#34;</span><span class="p">)</span> <span class="c1">// the same, with its words</span>
+<span class="p">})</span>
+</code></pre>
+
+<p><img src="./images/components/actions-fab.jpg" alt="A pencil floating button and an extended New lighthouse button" /></p>
+
+<p><code>FloatingMenu(name, &amp;menu)</code> opens into a few related actions stacked above it, its icon turning
+into a cross; it returns the action touched, or -1. <code>menu.Label</code> names it for TalkBack.</p>
+
+<h2 id="buttongroup-and-floatingtoolbar"><code>ButtonGroup</code> and <code>FloatingToolbar</code></h2>
+
+<p><code>ButtonGroup</code> (Material 3 Expressive&rsquo;s connected buttons) chooses one of a few, the chosen one
+filled and rounded out. <code>FloatingToolbar</code> is a pill of actions floating at the bottom, for what is
+done to the content on show; it returns the index of the tool touched, or -1, and TalkBack reads
+each tool&rsquo;s label.</p>
+<pre><code class="language-go"><span class="nf">padded</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ButtonGroup</span><span class="p">(</span><span class="s">&#34;view&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;Day&#34;</span><span class="p">,</span> <span class="s">&#34;Week&#34;</span><span class="p">,</span> <span class="s">&#34;Month&#34;</span><span class="p">},</span> <span class="o">&amp;</span><span class="nx">view</span><span class="p">)</span>
+<span class="p">})</span>
+<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="k">switch</span> <span class="nx">look</span><span class="p">.</span><span class="nf">FloatingToolbar</span><span class="p">(</span><span class="s">&#34;tools&#34;</span><span class="p">,</span> <span class="p">[]</span><span class="nx">material</span><span class="p">.</span><span class="nx">Destination</span><span class="p">{</span>
+	<span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;pencil&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Edit&#34;</span><span class="p">},</span> <span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;share-2&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Share&#34;</span><span class="p">},</span> <span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;trash-2&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Remove&#34;</span><span class="p">},</span>
+<span class="p">},</span> <span class="mi">16</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">case</span> <span class="mi">0</span><span class="p">:</span> <span class="c1">// edit</span>
+<span class="k">case</span> <span class="mi">1</span><span class="p">:</span> <span class="c1">// share</span>
+<span class="k">case</span> <span class="mi">2</span><span class="p">:</span> <span class="c1">// remove</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/components/actions-group.jpg" alt="Day, Week and Month with Week chosen, and a floating toolbar with edit, share and remove" /></p>
+
+<hr>
+
+<p><a href="./components/navigation">← Navigation</a> · <a href="./components/selection">Selection →</a></p>

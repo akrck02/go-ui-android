@@ -1,0 +1,303 @@
+<h1 id="lesson-4-colours-and-settings">Lesson 4: colours and settings</h1>
+
+<p>Android 12 and later colour apps from the wallpaper (Material You). In this lesson the app does
+too, and a settings screen switches the dark theme and a colour of the app&rsquo;s own.</p>
+
+<table>
+<thead>
+<tr>
+<th>Mission</th>
+<th>Pieces</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>A settings screen</td>
+<td><code>System</code>, <code>FromColour</code>, dark theme</td>
+<td>10 min</td>
+</tr>
+</tbody>
+</table>
+
+<h4 id="the-idea">The idea</h4>
+
+<p>On Android 12 and later, the phone <strong>paints every app with its wallpaper&rsquo;s colours</strong>, like a house where every room matches the hall. <code>material.System</code> asks for those colours; <code>FromColour</code> mixes a whole matching set from one colour of your own.</p>
+
+<h2 id="schemes">Schemes</h2>
+
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Gives</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>material.System(dark)</code></td>
+<td>The wallpaper&rsquo;s colours on Android 12+, Material&rsquo;s baseline elsewhere. Call it every frame: they change with the wallpaper</td>
+</tr>
+
+<tr>
+<td><code>material.Baseline(dark)</code></td>
+<td>Material&rsquo;s own purple</td>
+</tr>
+
+<tr>
+<td><code>material.FromColour(colour, dark)</code></td>
+<td>A whole scheme from one colour, as Material&rsquo;s tools make it</td>
+</tr>
+
+<tr>
+<td><code>scheme.WithPrimary(…)</code></td>
+<td>A brand&rsquo;s colour in the primary roles only</td>
+</tr>
+
+<tr>
+<td><code>scheme.Theme(dark)</code></td>
+<td>go-ui&rsquo;s theme from the scheme, for go-ui&rsquo;s own controls</td>
+</tr>
+</tbody>
+</table>
+<p><code>window.SystemPrefersDark()</code> says whether the phone (or the desktop, or the browser) is in its dark
+theme. Lesson 1&rsquo;s <code>build</code> already picks the scheme from <code>program.dark</code> and <code>program.ownColour</code>.</p>
+
+<h2 id="the-settings-screen">The settings screen</h2>
+<pre><code class="language-go"><span class="c1">// settings chooses the theme and the colours.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">settings</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Settings&#34;</span><span class="p">,</span> <span class="nx">Large</span><span class="p">:</span> <span class="kc">true</span><span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;dark&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;moon&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;Dark theme&#34;</span><span class="p">,</span> <span class="nx">Trailing</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;dark&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">dark</span><span class="p">)</span> <span class="p">}})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;colour&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;palette&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;The app&#39;s own colour&#34;</span><span class="p">,</span>
+		<span class="nx">Supporting</span><span class="p">:</span> <span class="s">&#34;Instead of the wallpaper&#39;s&#34;</span><span class="p">,</span> <span class="nx">Trailing</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;colour&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">ownColour</span><span class="p">)</span> <span class="p">}})</span>
+<span class="p">}</span>
+</code></pre>
+
+<p><img src="./images/tutorial/phone-settings.jpg" alt="Settings in the dark theme, with the app&rsquo;s own teal" /></p>
+
+<p>To keep the choice between runs, use go-ui&rsquo;s <code>window.KeepPreference</code> in <code>Options.Hidden</code>, which is
+called when the app leaves the screen; Android may end it afterwards without a word
+(<a href="./guides/phone">feeling at home on a phone</a>). More in <a href="./guides/colours">colours</a>.</p>
+
+<h4 id="checkpoint">Checkpoint</h4>
+
+<p>On <em>Settings</em>, <em>Dark theme</em> darkens the app, and <em>The app&rsquo;s own colour</em> turns it teal; on a phone with Material You, the wallpaper&rsquo;s colours come back when it is off.</p>
+
+<p><img src="./images/tutorial/quest/achievement-painter.svg" alt="Achievement unlocked: Painter" /></p>
+
+<h2 id="the-whole-program">The whole program</h2>
+<pre><code class="language-go"><span class="c1">// Command lighthouses is the go-ui-android tutorial&#39;s program: a phone app with a list of</span>
+<span class="c1">// lighthouses, a screen for each, a dialog before removing one, a note to undo it, and settings</span>
+<span class="c1">// for the theme and the colours. The same code runs on the desktop, in a web page and on Android.</span>
+<span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;flag&#34;</span>
+	<span class="s">&#34;fmt&#34;</span>
+	<span class="s">&#34;log&#34;</span>
+	<span class="s">&#34;time&#34;</span>
+
+	<span class="s">&#34;github.com/akrck02/go-renderer/draw2d&#34;</span>
+	<span class="nx">ui</span> <span class="s">&#34;github.com/akrck02/go-ui&#34;</span>
+	<span class="s">&#34;github.com/akrck02/go-ui-android/material&#34;</span>
+	<span class="s">&#34;github.com/akrck02/go-ui/window&#34;</span>
+<span class="p">)</span>
+
+<span class="c1">// lighthouse is the program&#39;s own data.</span>
+<span class="kd">type</span> <span class="nx">lighthouse</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">name</span><span class="p">,</span> <span class="nx">place</span> <span class="kt">string</span>
+	<span class="nx">lit</span>         <span class="kt">bool</span>
+	<span class="nx">rangeNM</span>     <span class="kt">float32</span>
+<span class="p">}</span>
+
+<span class="c1">// app is everything the program remembers between frames.</span>
+<span class="kd">type</span> <span class="nx">app</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">lighthouses</span> <span class="p">[]</span><span class="nx">lighthouse</span>
+	<span class="nx">place</span>       <span class="kt">int</span>                 <span class="c1">// the destination chosen in the navigation bar</span>
+	<span class="nx">navigation</span>  <span class="nx">material</span><span class="p">.</span><span class="nx">Navigation</span> <span class="c1">// the lighthouses&#39; screens: &#34;&#34; is the list, a name its details</span>
+	<span class="nx">removing</span>    <span class="kt">string</span>              <span class="c1">// the lighthouse the dialog asks about; &#34;&#34; when it is closed</span>
+	<span class="nx">removed</span>     <span class="o">*</span><span class="nx">lighthouse</span>         <span class="c1">// the last one removed, for the note&#39;s Undo</span>
+	<span class="nx">notes</span>       <span class="nx">material</span><span class="p">.</span><span class="nx">Snackbar</span>
+	<span class="nx">dark</span>        <span class="kt">bool</span>
+	<span class="nx">ownColour</span>   <span class="kt">bool</span> <span class="c1">// a teal of the app&#39;s own instead of the wallpaper&#39;s colours</span>
+	<span class="nx">added</span>       <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="c1">// The destinations, in the navigation bar&#39;s order.</span>
+<span class="kd">const</span> <span class="p">(</span>
+	<span class="nx">lighthousesPlace</span> <span class="p">=</span> <span class="kc">iota</span>
+	<span class="nx">settingsPlace</span>
+<span class="p">)</span>
+
+<span class="kd">var</span> <span class="nx">places</span> <span class="p">=</span> <span class="p">[]</span><span class="nx">material</span><span class="p">.</span><span class="nx">Destination</span><span class="p">{{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;lighthouse&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Lighthouses&#34;</span><span class="p">},</span> <span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;settings&#34;</span><span class="p">,</span> <span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Settings&#34;</span><span class="p">}}</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">options</span> <span class="o">:=</span> <span class="nx">window</span><span class="p">.</span><span class="nx">Options</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Lighthouses&#34;</span><span class="p">}</span>
+	<span class="nx">options</span><span class="p">.</span><span class="nf">RegisterFlags</span><span class="p">(</span><span class="nx">flag</span><span class="p">.</span><span class="nx">CommandLine</span><span class="p">)</span>
+	<span class="nx">flag</span><span class="p">.</span><span class="nf">Parse</span><span class="p">()</span>
+
+	<span class="nx">program</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">app</span><span class="p">{</span>
+		<span class="nx">lighthouses</span><span class="p">:</span> <span class="p">[]</span><span class="nx">lighthouse</span><span class="p">{</span>
+			<span class="p">{</span><span class="nx">name</span><span class="p">:</span> <span class="s">&#34;North Point&#34;</span><span class="p">,</span> <span class="nx">place</span><span class="p">:</span> <span class="s">&#34;On the northern cliffs&#34;</span><span class="p">,</span> <span class="nx">lit</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">rangeNM</span><span class="p">:</span> <span class="mi">18</span><span class="p">},</span>
+			<span class="p">{</span><span class="nx">name</span><span class="p">:</span> <span class="s">&#34;East Cape&#34;</span><span class="p">,</span> <span class="nx">place</span><span class="p">:</span> <span class="s">&#34;At the end of the cape&#34;</span><span class="p">,</span> <span class="nx">lit</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">rangeNM</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span>
+			<span class="p">{</span><span class="nx">name</span><span class="p">:</span> <span class="s">&#34;Harbour Mole&#34;</span><span class="p">,</span> <span class="nx">place</span><span class="p">:</span> <span class="s">&#34;At the harbour&#39;s mouth&#34;</span><span class="p">,</span> <span class="nx">rangeNM</span><span class="p">:</span> <span class="mi">6</span><span class="p">},</span>
+			<span class="p">{</span><span class="nx">name</span><span class="p">:</span> <span class="s">&#34;South Reef&#34;</span><span class="p">,</span> <span class="nx">place</span><span class="p">:</span> <span class="s">&#34;On a rock off the reef&#34;</span><span class="p">,</span> <span class="nx">lit</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">rangeNM</span><span class="p">:</span> <span class="mi">15</span><span class="p">},</span>
+		<span class="p">},</span>
+		<span class="nx">dark</span><span class="p">:</span> <span class="nx">options</span><span class="p">.</span><span class="nx">Dark</span> <span class="o">||</span> <span class="nx">window</span><span class="p">.</span><span class="nf">SystemPrefersDark</span><span class="p">(),</span>
+	<span class="p">}</span>
+	<span class="nx">material</span><span class="p">.</span><span class="nf">UseRoboto</span><span class="p">()</span> <span class="c1">// Android&#39;s typeface, before the window reads the fonts</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">window</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">program</span><span class="p">.</span><span class="nx">build</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// build describes the app for this frame.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">build</span><span class="p">(</span><span class="nx">context</span> <span class="o">*</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">scheme</span> <span class="o">:=</span> <span class="nx">material</span><span class="p">.</span><span class="nf">System</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">dark</span><span class="p">)</span> <span class="c1">// the wallpaper&#39;s colours on Android 12 and later</span>
+	<span class="k">if</span> <span class="nx">program</span><span class="p">.</span><span class="nx">ownColour</span> <span class="p">{</span>
+		<span class="nx">scheme</span> <span class="p">=</span> <span class="nx">material</span><span class="p">.</span><span class="nf">FromColour</span><span class="p">(</span><span class="nx">draw2d</span><span class="p">.</span><span class="nf">Hex</span><span class="p">(</span><span class="s">&#34;#00796b&#34;</span><span class="p">),</span> <span class="nx">program</span><span class="p">.</span><span class="nx">dark</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="nx">context</span><span class="p">.</span><span class="nx">Theme</span> <span class="p">=</span> <span class="nx">scheme</span><span class="p">.</span><span class="nf">Theme</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">dark</span><span class="p">)</span>
+	<span class="nx">look</span> <span class="o">:=</span> <span class="nx">material</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">scheme</span><span class="p">)</span>
+
+	<span class="k">defer</span> <span class="nx">program</span><span class="p">.</span><span class="nf">goBack</span><span class="p">(</span><span class="nx">look</span><span class="p">)</span> <span class="c1">// last: what is over the screen answers the back first</span>
+	<span class="k">defer</span> <span class="nx">program</span><span class="p">.</span><span class="nf">overlays</span><span class="p">(</span><span class="nx">look</span><span class="p">)</span>
+
+	<span class="nx">context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Direction</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">Vertical</span><span class="p">,</span> <span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Body</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="k">switch</span> <span class="nx">program</span><span class="p">.</span><span class="nx">place</span> <span class="p">{</span>
+			<span class="k">case</span> <span class="nx">lighthousesPlace</span><span class="p">:</span>
+				<span class="nx">look</span><span class="p">.</span><span class="nf">Screens</span><span class="p">(</span><span class="s">&#34;lighthouses&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+					<span class="k">if</span> <span class="nx">key</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+						<span class="nx">program</span><span class="p">.</span><span class="nf">list</span><span class="p">(</span><span class="nx">look</span><span class="p">)</span>
+						<span class="k">return</span>
+					<span class="p">}</span>
+					<span class="nx">program</span><span class="p">.</span><span class="nf">details</span><span class="p">(</span><span class="nx">look</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span>
+				<span class="p">})</span>
+			<span class="k">case</span> <span class="nx">settingsPlace</span><span class="p">:</span>
+				<span class="nx">program</span><span class="p">.</span><span class="nf">settings</span><span class="p">(</span><span class="nx">look</span><span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">})</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">NavigationBar</span><span class="p">(</span><span class="nx">places</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">place</span><span class="p">)</span>
+	<span class="p">})</span>
+<span class="p">}</span>
+
+<span class="c1">// list shows every lighthouse; touching one opens its screen.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">list</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">context</span> <span class="o">:=</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Context</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Lighthouses&#34;</span><span class="p">,</span> <span class="nx">Large</span><span class="p">:</span> <span class="kc">true</span><span class="p">})</span>
+	<span class="nx">context</span><span class="p">.</span><span class="nf">ScrollArea</span><span class="p">(</span><span class="s">&#34;list&#34;</span><span class="p">,</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Direction</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">Vertical</span><span class="p">,</span> <span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Height</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">()},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">for</span> <span class="nx">index</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">{</span>
+			<span class="nx">light</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span>
+			<span class="nx">context</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">light</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span>
+			<span class="nx">icon</span> <span class="o">:=</span> <span class="s">&#34;lightbulb-off&#34;</span>
+			<span class="k">if</span> <span class="nx">light</span><span class="p">.</span><span class="nx">lit</span> <span class="p">{</span>
+				<span class="nx">icon</span> <span class="p">=</span> <span class="s">&#34;lightbulb&#34;</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;row&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="nx">icon</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">Supporting</span><span class="p">:</span> <span class="nx">light</span><span class="p">.</span><span class="nx">place</span><span class="p">,</span>
+				<span class="nx">Trailing</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;lit&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">light</span><span class="p">.</span><span class="nx">lit</span><span class="p">)</span> <span class="p">}})</span> <span class="p">{</span>
+				<span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">.</span><span class="nf">Go</span><span class="p">(</span><span class="nx">light</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="nx">context</span><span class="p">.</span><span class="nf">Pop</span><span class="p">()</span>
+		<span class="p">}</span>
+	<span class="p">})</span>
+	<span class="nx">context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Padding</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Pad</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="nx">AlignX</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">End</span><span class="p">},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">ExtendedFloatingButton</span><span class="p">(</span><span class="s">&#34;plus&#34;</span><span class="p">,</span> <span class="s">&#34;New lighthouse&#34;</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">added</span><span class="o">++</span>
+			<span class="nx">name</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprint</span><span class="p">(</span><span class="s">&#34;New lighthouse &#34;</span><span class="p">,</span> <span class="nx">program</span><span class="p">.</span><span class="nx">added</span><span class="p">)</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">,</span> <span class="nx">lighthouse</span><span class="p">{</span><span class="nx">name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">place</span><span class="p">:</span> <span class="s">&#34;Not placed yet&#34;</span><span class="p">,</span> <span class="nx">rangeNM</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">.</span><span class="nf">Go</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">})</span>
+<span class="p">}</span>
+
+<span class="c1">// details is a lighthouse&#39;s own screen.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">details</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">,</span> <span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">light</span> <span class="o">:=</span> <span class="nx">program</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">light</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span> <span class="c1">// removed while its screen was still sliding away</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">Back</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">Actions</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">NamedIconButton</span><span class="p">(</span><span class="s">&#34;trash-2&#34;</span><span class="p">,</span> <span class="s">&#34;Remove&#34;</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">removing</span> <span class="p">=</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span>
+		<span class="p">}</span>
+	<span class="p">}})</span> <span class="p">{</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">.</span><span class="nf">Back</span><span class="p">()</span>
+	<span class="p">}</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Box</span><span class="p">(</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Layout</span><span class="p">{</span><span class="nx">Direction</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">Vertical</span><span class="p">,</span> <span class="nx">Width</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Grow</span><span class="p">(),</span> <span class="nx">Padding</span><span class="p">:</span> <span class="nx">ui</span><span class="p">.</span><span class="nf">Pad</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="nx">Gap</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">TextField</span><span class="p">(</span><span class="s">&#34;place&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">light</span><span class="p">.</span><span class="nx">place</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Field</span><span class="p">{</span><span class="nx">Label</span><span class="p">:</span> <span class="s">&#34;Where it stands&#34;</span><span class="p">,</span> <span class="nx">MaxLength</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="nx">Counter</span><span class="p">:</span> <span class="kc">true</span><span class="p">})</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Slider</span><span class="p">(</span><span class="s">&#34;range&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">light</span><span class="p">.</span><span class="nx">rangeNM</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;Seen from %.0f nautical miles&#34;</span><span class="p">,</span> <span class="nx">light</span><span class="p">.</span><span class="nx">rangeNM</span><span class="p">),</span> <span class="mi">14</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurfaceVariant</span><span class="p">)</span>
+		<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Row</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nf">Text</span><span class="p">(</span><span class="s">&#34;Lit&#34;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nx">Regular</span><span class="p">,</span> <span class="nx">look</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">.</span><span class="nx">OnSurface</span><span class="p">)</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nx">Context</span><span class="p">.</span><span class="nf">Spacer</span><span class="p">()</span>
+			<span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;lit&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">light</span><span class="p">.</span><span class="nx">lit</span><span class="p">)</span>
+		<span class="p">})</span>
+	<span class="p">})</span>
+<span class="p">}</span>
+
+<span class="c1">// settings chooses the theme and the colours.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">settings</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">TopAppBar</span><span class="p">(</span><span class="nx">material</span><span class="p">.</span><span class="nx">TopBar</span><span class="p">{</span><span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Settings&#34;</span><span class="p">,</span> <span class="nx">Large</span><span class="p">:</span> <span class="kc">true</span><span class="p">})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;dark&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;moon&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;Dark theme&#34;</span><span class="p">,</span> <span class="nx">Trailing</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;dark&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">dark</span><span class="p">)</span> <span class="p">}})</span>
+	<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;colour&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;palette&#34;</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;The app&#39;s own colour&#34;</span><span class="p">,</span>
+		<span class="nx">Supporting</span><span class="p">:</span> <span class="s">&#34;Instead of the wallpaper&#39;s&#34;</span><span class="p">,</span> <span class="nx">Trailing</span><span class="p">:</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Switch</span><span class="p">(</span><span class="s">&#34;colour&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">ownColour</span><span class="p">)</span> <span class="p">}})</span>
+<span class="p">}</span>
+
+<span class="c1">// overlays draws what goes over the screens: the dialog that asks before removing, and the note.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">overlays</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">program</span><span class="p">.</span><span class="nx">removing</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+		<span class="nx">answer</span> <span class="o">:=</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Dialog</span><span class="p">(</span><span class="s">&#34;remove&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Dialog</span><span class="p">{</span><span class="nx">Icon</span><span class="p">:</span> <span class="s">&#34;trash-2&#34;</span><span class="p">,</span> <span class="nx">Title</span><span class="p">:</span> <span class="s">&#34;Remove &#34;</span> <span class="o">+</span> <span class="nx">program</span><span class="p">.</span><span class="nx">removing</span> <span class="o">+</span> <span class="s">&#34;?&#34;</span><span class="p">,</span>
+			<span class="nx">Text</span><span class="p">:</span> <span class="s">&#34;It leaves the list.&#34;</span><span class="p">,</span> <span class="nx">Confirm</span><span class="p">:</span> <span class="s">&#34;Remove&#34;</span><span class="p">,</span> <span class="nx">Dismiss</span><span class="p">:</span> <span class="s">&#34;Cancel&#34;</span><span class="p">})</span>
+		<span class="k">if</span> <span class="nx">answer</span> <span class="o">==</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Confirmed</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nf">remove</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">removing</span><span class="p">)</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">.</span><span class="nf">Back</span><span class="p">()</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">notes</span><span class="p">.</span><span class="nf">Show</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">removed</span><span class="p">.</span><span class="nx">name</span><span class="o">+</span><span class="s">&#34; removed&#34;</span><span class="p">,</span> <span class="s">&#34;Undo&#34;</span><span class="p">,</span> <span class="mi">5</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">answer</span> <span class="o">!=</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Open</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">removing</span> <span class="p">=</span> <span class="s">&#34;&#34;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">program</span><span class="p">.</span><span class="nx">notes</span><span class="p">.</span><span class="nx">Above</span> <span class="p">=</span> <span class="nx">material</span><span class="p">.</span><span class="nx">NavigationBarHeight</span>
+	<span class="k">if</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Snackbar</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">notes</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">program</span><span class="p">.</span><span class="nx">removed</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">,</span> <span class="o">*</span><span class="nx">program</span><span class="p">.</span><span class="nx">removed</span><span class="p">)</span> <span class="c1">// Undo</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nx">removed</span> <span class="p">=</span> <span class="kc">nil</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// goBack answers the system&#39;s back: from a lighthouse to the list, from settings to the list;</span>
+<span class="c1">// from the list nobody answers, and the app goes to the background.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">goBack</span><span class="p">(</span><span class="nx">look</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Look</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">program</span><span class="p">.</span><span class="nx">place</span> <span class="o">==</span> <span class="nx">lighthousesPlace</span> <span class="o">&amp;&amp;</span> <span class="nx">look</span><span class="p">.</span><span class="nf">GoBack</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">navigation</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">program</span><span class="p">.</span><span class="nx">place</span> <span class="o">!=</span> <span class="nx">lighthousesPlace</span> <span class="o">&amp;&amp;</span> <span class="nx">look</span><span class="p">.</span><span class="nf">Back</span><span class="p">()</span> <span class="p">{</span>
+		<span class="nx">program</span><span class="p">.</span><span class="nx">place</span> <span class="p">=</span> <span class="nx">lighthousesPlace</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">find</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="o">*</span><span class="nx">lighthouse</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">index</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">[</span><span class="nx">index</span><span class="p">].</span><span class="nx">name</span> <span class="o">==</span> <span class="nx">name</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="o">&amp;</span><span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">remove</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">light</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">light</span><span class="p">.</span><span class="nx">name</span> <span class="o">==</span> <span class="nx">name</span> <span class="p">{</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">removed</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">light</span>
+			<span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">[:</span><span class="nx">index</span><span class="p">],</span> <span class="nx">program</span><span class="p">.</span><span class="nx">lighthouses</span><span class="p">[</span><span class="nx">index</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span><span class="o">...</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<hr>
+
+<p><a href="./the-quest/fields-dialogs-and-notes">← Lesson 3</a> · <a href="./the-quest/on-a-phone">Lesson 5: on a phone →</a></p>

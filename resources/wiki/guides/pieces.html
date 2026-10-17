@@ -1,0 +1,470 @@
+<h1 id="the-pieces">🧩 The pieces</h1>
+
+<p>Every piece, by Material&rsquo;s catalogue: navigation, actions, selection, inputs, containment,
+overlays, pickers, progress and gestures. The package&rsquo;s files follow the same order (<code>doc.go</code> lists them).</p>
+
+<h2 id="navigation-navigation-go">Navigation — <code>navigation.go</code></h2>
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/drawer-dark.png">
+  <img alt="The navigation drawer open over the inputs screen, with its five destinations" src="../images/drawer-light.png" width="240">
+</picture>
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>TopAppBar(TopBar{…})</code></td>
+<td>The bar at the top, painted up under the status bar: a back arrow (a cross with <code>Close</code>, to leave a mode), a title and a subtitle, actions at its end; <code>Large</code> writes the title big under it, and with <code>Scrolled</code> (go-ui&rsquo;s <code>ScrollOffset</code> of the page under it) it shrinks into a small bar as the page goes up</td>
+</tr>
+
+<tr>
+<td><code>NavigationBar(destinations, &amp;selected)</code></td>
+<td>Three to five destinations at the bottom, painted down under the gesture bar; <code>Destination.Badge</code> marks one with a count or a dot</td>
+</tr>
+
+<tr>
+<td><code>NavigationRail(destinations, &amp;selected)</code></td>
+<td>The same down the left edge, on a wide screen (<code>Wide()</code>)</td>
+</tr>
+
+<tr>
+<td><code>NavigationDrawer(name, title, destinations, &amp;selected)</code></td>
+<td>Every destination in a drawer sliding in from the left</td>
+</tr>
+
+<tr>
+<td><code>Tabs(name, labels, &amp;selected)</code></td>
+<td>Primary tabs, the underline sliding to the one chosen</td>
+</tr>
+
+<tr>
+<td><code>TabPager(name, labels, &amp;pager, page)</code></td>
+<td>Tabs over pages a finger swipes from side to side, the underline following them</td>
+</tr>
+
+<tr>
+<td><code>Body(besideRail, content)</code>, <code>Enter(key, content)</code></td>
+<td>A screen&rsquo;s content kept clear of the cutout and the gesture bar; a screen rising into place</td>
+</tr>
+
+<tr>
+<td><code>Navigation</code>, <code>Screens(name, &amp;navigation, screen)</code>, <code>GoBack(&amp;navigation)</code></td>
+<td>A stack of screens inside one place: <code>Go(key)</code> opens one sliding in from the right, <code>GoBack</code> from the system&rsquo;s back slides it away; the place&rsquo;s first screen is the key <code>&quot;&quot;</code></td>
+</tr>
+
+<tr>
+<td><code>Back()</code>, <code>StatusBarScrim()</code></td>
+<td>The system&rsquo;s back for the screen (see <a href="./guides/phone">Back and motion</a>); the strip under the status bar alone</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="actions-actions-go">Actions — <code>actions.go</code></h2>
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/actions-dark.png">
+  <img alt="Buttons, a split button, a button group, assist chips, a floating toolbar and a floating button" src="../images/actions-light.png" width="240">
+</picture>
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>FilledButton</code>, <code>TonalButton</code>, <code>OutlinedButton</code>, <code>TextButton</code></td>
+<td>Actions, from the most to the least important; an icon before the label when given</td>
+</tr>
+
+<tr>
+<td><code>IconButton(icon)</code>, <code>RoundButton(icon, size, primary)</code></td>
+<td>A round 48-pixel target with an icon; a round button floating over a map or a scene</td>
+</tr>
+
+<tr>
+<td><code>FloatingButton(icon)</code>, <code>ExtendedFloatingButton(icon, label)</code></td>
+<td>The floating action button, alone or with its action written</td>
+</tr>
+
+<tr>
+<td><code>FloatingMenu(name, &amp;menu)</code></td>
+<td>The floating action button opening into a few actions stacked above it; <code>menu.Label</code> names it for a screen reader</td>
+</tr>
+
+<tr>
+<td><code>SplitButton(icon, label)</code></td>
+<td>A main action joined to a button opening its other choices; tells which half was touched</td>
+</tr>
+
+<tr>
+<td><code>ButtonGroup(name, labels, &amp;selected)</code></td>
+<td>Expressive&rsquo;s connected buttons: the chosen one fills and rounds out</td>
+</tr>
+
+<tr>
+<td><code>FloatingToolbar(name, tools, above)</code></td>
+<td>A pill of actions floating over the content at the bottom: an icon each, its label read by a screen reader</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="selection-selection-go-and-chips-go">Selection — <code>selection.go</code> and <code>chips.go</code></h2>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>Switch(name, &amp;on)</code>, <code>Checkbox(label, &amp;on)</code>, <code>RadioButton(label, chosen)</code></td>
+<td>On or off; ticked or not; one of a few</td>
+</tr>
+
+<tr>
+<td><code>SegmentedButtons(name, options, &amp;selected)</code></td>
+<td>Two to five choices sharing a row, one chosen</td>
+</tr>
+
+<tr>
+<td><code>Slider(name, &amp;value, minimum, maximum, step)</code></td>
+<td>A value between two ends, dragged</td>
+</tr>
+
+<tr>
+<td><code>FilterChip(label, selected)</code>, <code>AssistChip(icon, label)</code>, <code>InputChip(label)</code></td>
+<td>A choice on or off in a row; an action suggested beside the content; something entered, with a cross to take it out</td>
+</tr>
+
+<tr>
+<td><code>Tag(text, ink, tint)</code></td>
+<td>A label in a pill of its own colours: a state, a count</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="inputs-inputs-go">Inputs — <code>inputs.go</code></h2>
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/inputs-dark.png">
+  <img alt="A search bar, text fields with a counter and a suffix, a dropdown and a password field" src="../images/inputs-light.png" width="240">
+</picture>
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>TextField(name, &amp;text, Field{…})</code></td>
+<td>Material&rsquo;s text field, outlined or <code>Filled</code>: a label, the box with a <code>Prefix</code> and a <code>Suffix</code>, a hint or an error under it and a <code>Counter</code>; <code>Secret</code> with <code>Reveal</code> for a password and its eye. The on-screen keyboard comes up while it is typed in, suggests words and underlines the one it is composing; a finger held on a word selects it, with handles to drag and a bar to cut, copy and paste (<code>Look.Words</code> in the person&rsquo;s language)</td>
+</tr>
+
+<tr>
+<td><code>Dropdown(name, label, choices, &amp;dropdown)</code></td>
+<td>Material&rsquo;s exposed dropdown: a box showing the choice, opening the choices under it</td>
+</tr>
+
+<tr>
+<td><code>SearchView(name, placeholder, &amp;search, content)</code></td>
+<td>A search pill that opens over the whole screen, ready to type in, with what the program finds under it</td>
+</tr>
+
+<tr>
+<td><code>SearchBar(name, &amp;text, placeholder)</code></td>
+<td>A pill to search in, with a button to empty it</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="containment-containment-go">Containment — <code>containment.go</code></h2>
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/lists-dark.png">
+  <img alt="A banner over a list of lighthouses with photos and switches, and an extended floating button" src="../images/lists-light.png" width="240">
+</picture>
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>ListItem(name, Item{…})</code></td>
+<td>A list row: an icon in a round avatar (or a photo, <code>Picture</code>), a headline, a supporting line, something at its end; <code>Selected</code> tints it and puts a tick in the avatar&rsquo;s place</td>
+</tr>
+
+<tr>
+<td><code>ExpandableItem(name, item, &amp;open, more)</code></td>
+<td>A row that unfolds to show more under it and folds back, its chevron turning</td>
+</tr>
+
+<tr>
+<td><code>Card</code>, <code>ElevatedCard</code>, <code>OutlinedCard</code></td>
+<td>Containers for one subject: filled, raised over a scene, drawn by their border</td>
+</tr>
+
+<tr>
+<td><code>Avatar(name, icon, tint, size)</code>, <code>PictureAvatar(picture, size)</code></td>
+<td>A person&rsquo;s initials or a thing&rsquo;s icon in a circle; a photo in one</td>
+</tr>
+
+<tr>
+<td><code>Banner(icon, text, actions…)</code></td>
+<td>A message across the top of the content that stays until acted on</td>
+</tr>
+
+<tr>
+<td><code>SectionTitle</code>, <code>Heading</code>, <code>Divider</code></td>
+<td>A small heading over a list&rsquo;s rows; one for content with its own margins; a line between groups</td>
+</tr>
+
+<tr>
+<td><code>Text</code>, <code>Paragraph</code> (<code>look.go</code>)</td>
+<td>One line; text that breaks into lines at the width it has</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="overlays-overlays-go">Overlays — <code>overlays.go</code></h2>
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/menu-dark.png">
+  <img alt="The menu open under the top bar, with three choices" src="../images/menu-light.png" width="240">
+</picture>
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>Dialog(name, Dialog{…})</code></td>
+<td>A question over the dimmed screen: an icon, a title, a text, more content, one or two actions. Returns <code>Open</code>, <code>Confirmed</code> or <code>Dismissed</code></td>
+</tr>
+
+<tr>
+<td><code>BottomSheet(name, content)</code></td>
+<td>Choices or a short form in a sheet rising from the bottom</td>
+</tr>
+
+<tr>
+<td><code>StandardSheet(name, &amp;sheet, peek, content)</code></td>
+<td>A sheet over the screen that does not dim it (a map&rsquo;s places): it rests low or expanded, and a finger drags it by its handle</td>
+</tr>
+
+<tr>
+<td><code>SideSheet(name, title, content)</code></td>
+<td>Filters or details in a sheet sliding in from the end, with a title and a cross</td>
+</tr>
+
+<tr>
+<td><code>Snackbar(&amp;snackbar)</code></td>
+<td>A short note at the bottom for a few seconds, with an action (<code>snackbar.Show(text, action, duration)</code>)</td>
+</tr>
+
+<tr>
+<td><code>Menu(icon, choices)</code></td>
+<td>A button that opens a list of choices; returns the one chosen</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="pickers-pickers-go">Pickers — <code>pickers.go</code></h2>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>DatePicker(name, &amp;picker, &amp;date)</code></td>
+<td>A day chosen a month at a time, in a dialog; <code>DateNames</code> for another language</td>
+</tr>
+
+<tr>
+<td><code>TimePicker(name, &amp;picker, &amp;date)</code></td>
+<td>A time on Material&rsquo;s dial: the hours 1 to 12 round it and 13 to 00 inside, then the minutes; touched or dragged round</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="progress-progress-go">Progress — <code>progress.go</code></h2>
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/feedback-dark.png">
+  <img alt="Loading indicators, wavy and linear progress, and skeletons" src="../images/feedback-light.png" width="240">
+</picture>
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>LoadingIndicator(size)</code>, <code>ContainedLoadingIndicator(size)</code></td>
+<td>Expressive&rsquo;s indicator for a short wait: a filled shape turning and morphing from one form to the next, alone or on a round container</td>
+</tr>
+
+<tr>
+<td><code>CircularProgress(fraction, size, wavy)</code></td>
+<td>A ring filling as work gets done, or an arc chasing round (<code>Indeterminate</code>); wavy as Expressive draws it</td>
+</tr>
+
+<tr>
+<td><code>WavyProgress(fraction)</code>, <code>LinearProgress(fraction)</code></td>
+<td>A line filling with a travelling wave, a track and a stop dot; the plain line</td>
+</tr>
+
+<tr>
+<td><code>VideoPlayer(name, video, height)</code></td>
+<td>A film (go-ui&rsquo;s <code>window.Video</code>) in a rounded box, a round play button over it while paused, a line of how far it has played; touching it plays or pauses</td>
+</tr>
+
+<tr>
+<td><code>Skeleton(width, height, radius)</code></td>
+<td>A quiet block with a light crossing it, standing in for content still coming</td>
+</tr>
+</tbody>
+</table>
+<p>go-renderer draws rounded rectangles, shadows, text and icons; the indicators&rsquo; shapes are made of
+rectangles in a box the program paints itself (go-ui&rsquo;s <code>Context.Paint</code>): a shape is filled row by
+row and edged with small dots, a wave or an arc is a line of dots. An indicator asks for frames
+while it is on screen, and a screen without one sleeps: five of them at once take about a third of
+a core on a OnePlus 7 Pro, and nothing once the screen is left.</p>
+
+<h2 id="gestures-gestures-go-and-the-stick-stick-go">Gestures — <code>gestures.go</code>, and the stick — <code>stick.go</code></h2>
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../images/tabs-dark.png">
+  <img alt="Tabs over swiping pages, a carousel of places and a multi-browse carousel of photos of a coast" src="../images/tabs-light.png" width="240">
+</picture>
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it is</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>LongPressed()</code></td>
+<td>Whether the piece drawn just before was held: the phone buzzes, and a list starts choosing rows</td>
+</tr>
+
+<tr>
+<td><code>PullToRefresh(name, refreshing, layout, rows)</code></td>
+<td>A list that refreshes when pulled down past its top and let go; the indicator stays while <code>refreshing</code></td>
+</tr>
+
+<tr>
+<td><code>SwipeToDismiss(name, row)</code></td>
+<td>A row a finger slides away, a bin in the gap it leaves</td>
+</tr>
+
+<tr>
+<td><code>Carousel(name, &amp;carousel, count, itemWidth, item)</code>, <code>CarouselItem</code></td>
+<td>A row of tiles slid sideways, gliding on and settling at a tile</td>
+</tr>
+
+<tr>
+<td><code>CarouselPicture(picture, height, title)</code></td>
+<td>A carousel item made of a photo, its title on a dark veil at its foot</td>
+</tr>
+
+<tr>
+<td><code>MultiBrowseCarousel(name, &amp;carousel, count, largeWidth, height, item)</code></td>
+<td>Material&rsquo;s multi-browse carousel: large tiles, then a medium and a small one; tiles shrink towards the edges and grow as they come in</td>
+</tr>
+
+<tr>
+<td><code>Stick(name, &amp;stick, size)</code></td>
+<td>An on-screen stick for walking or driving with a thumb</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="pictures">Pictures</h2>
+
+<p>Photos are go-renderer&rsquo;s <code>draw2d.Image</code>: decode one once (<code>draw2d.DecodeImage</code> reads a PNG, JPEG
+or GIF the program embeds) and keep it. <code>context.Image(picture, layout, radius)</code> draws it filling a
+box, cropped evenly where their shapes differ; the pieces take one where a photo belongs:
+<code>Item.Picture</code> in a list row&rsquo;s avatar, <code>PictureAvatar</code>, <code>CarouselPicture</code> in a carousel. The
+gallery paints its own pictures of a coast at different times of day, so it ships no photos.</p>
+<pre><code class="language-go"><span class="cp">//go:embed north-cape.jpg</span>
+<span class="kd">var</span> <span class="nx">northCapeFile</span> <span class="p">[]</span><span class="kt">byte</span>
+
+<span class="nx">northCape</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">draw2d</span><span class="p">.</span><span class="nf">DecodeImage</span><span class="p">(</span><span class="nx">bytes</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="nx">northCapeFile</span><span class="p">))</span>
+<span class="err">…</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">ListItem</span><span class="p">(</span><span class="s">&#34;north&#34;</span><span class="p">,</span> <span class="nx">material</span><span class="p">.</span><span class="nx">Item</span><span class="p">{</span><span class="nx">Picture</span><span class="p">:</span> <span class="nx">northCape</span><span class="p">,</span> <span class="nx">Headline</span><span class="p">:</span> <span class="s">&#34;North Cape&#34;</span><span class="p">})</span>
+</code></pre>
+
+<h2 id="films">Films</h2>
+
+<p><code>window.OpenVideo(film)</code> opens a film (the bytes of an MP4 or WebM, often embedded) and
+<code>look.VideoPlayer</code> shows it: on Android the phone&rsquo;s own decoders read it, in a browser the browser
+does, without sound for now; on the desktop films do not play yet (<code>window.ErrVideoUnsupported</code>).
+The gallery&rsquo;s film, six seconds of a made-up coast at dusk, plays in a card on the tabs screen; on
+a OnePlus 7 Pro it takes about two fifths of a core while it plays.</p>
+<pre><code class="language-go"><span class="cp">//go:embed harbour.mp4</span>
+<span class="kd">var</span> <span class="nx">harbour</span> <span class="p">[]</span><span class="kt">byte</span>
+
+<span class="nx">video</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">window</span><span class="p">.</span><span class="nf">OpenVideo</span><span class="p">(</span><span class="nx">harbour</span><span class="p">)</span>
+<span class="nx">video</span><span class="p">.</span><span class="nx">Loop</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="err">…</span>
+<span class="nx">look</span><span class="p">.</span><span class="nf">VideoPlayer</span><span class="p">(</span><span class="s">&#34;harbour&#34;</span><span class="p">,</span> <span class="nx">video</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+</code></pre>
+
+<hr>
+
+<p><a href="./overview">← All the documentation</a></p>
