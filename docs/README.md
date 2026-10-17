@@ -3,6 +3,9 @@
 | | Page | What is in it |
 |---|---|---|
 | 🚀 | [Getting started](getting-started.md) | What the two parts are, a program's first lines, and building against go-ui and go-renderer. |
+| 🎓 | [Tutorial](tutorial/README.md) | A lighthouse app in five lessons, from the first screen to a phone. |
+| 🔎 | [Components](components/README.md) | Every piece one by one: when to use it, concrete cases, code. |
+| 📚 | [Reference](reference/README.md) | Every type and function of `material`. |
 | 🧩 | [The pieces](pieces.md) | Every piece by Material's catalogue, with pictures, photos and films. |
 | 🎨 | [Colours](colours.md) | The wallpaper's colours, Material's baseline, and a whole scheme from one colour. |
 | 📱 | [Feeling at home on a phone](phone.md) | Gestures, the back gesture and motion, turning the phone, notifications, links, the clipboard, preferences. |
