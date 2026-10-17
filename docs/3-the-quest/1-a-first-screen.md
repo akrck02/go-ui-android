@@ -200,4 +200,4 @@ look.TopAppBar(material.TopBar{Title: "Lighthouses", Subtitle: fmt.Sprint(lit, "
 
 ---
 
-[← Tutorial](README.md) · [Lesson 2: screens and the back gesture →](02-screens-and-back.md)
+[← Tutorial](0-the-quest.md) · [Lesson 2: screens and the back gesture →](2-screens-and-back.md)

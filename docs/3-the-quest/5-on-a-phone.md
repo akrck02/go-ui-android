@@ -78,7 +78,7 @@ GO_UI_APK_STORE_PASSWORD=… go run github.com/akrck02/go-ui-android/cmd/go-ui-a
 ```
 
 `-bundle` writes the App Bundle (`.aab`) Google Play asks for. Every flag is in
-[packaging](../packaging.md).
+[packaging](../4-guides/5-packaging.md).
 
 #### Checkpoint
 
@@ -132,12 +132,12 @@ with `show` holding the `switch` over the places that was inside `Body`. On the 
 
 ## Where next
 
-- [The pieces](../pieces.md): every Material piece, with pictures.
-- [Feeling at home on a phone](../phone.md): gestures, turning the phone, notifications, services.
-- [Screen readers](../screen-readers.md): how TalkBack reads the app.
-- [The gallery](../gallery.md): every piece in one program, to read its code.
-- [The reference](../reference/README.md).
+- [The pieces](../4-guides/1-pieces.md): every Material piece, with pictures.
+- [Feeling at home on a phone](../4-guides/3-phone.md): gestures, turning the phone, notifications, services.
+- [Screen readers](../4-guides/4-screen-readers.md): how TalkBack reads the app.
+- [The gallery](../4-guides/6-gallery.md): every piece in one program, to read its code.
+- [The reference](../6-reference/0-reference.md).
 
 ---
 
-[← Lesson 4](04-colours-and-settings.md) · [Tutorial](README.md)
+[← Lesson 4](4-colours-and-settings.md) · [Tutorial](0-the-quest.md)

@@ -7,8 +7,8 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="images/drawer-dark.png">
-  <img alt="The navigation drawer open over the inputs screen, with its five destinations" src="images/drawer-light.png" width="240">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/drawer-dark.png">
+  <img alt="The navigation drawer open over the inputs screen, with its five destinations" src="../images/drawer-light.png" width="240">
 </picture>
 </p>
 
@@ -22,14 +22,14 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 | `TabPager(name, labels, &pager, page)` | Tabs over pages a finger swipes from side to side, the underline following them |
 | `Body(besideRail, content)`, `Enter(key, content)` | A screen's content kept clear of the cutout and the gesture bar; a screen rising into place |
 | `Navigation`, `Screens(name, &navigation, screen)`, `GoBack(&navigation)` | A stack of screens inside one place: `Go(key)` opens one sliding in from the right, `GoBack` from the system's back slides it away; the place's first screen is the key `""` |
-| `Back()`, `StatusBarScrim()` | The system's back for the screen (see [Back and motion](phone.md#back-and-motion)); the strip under the status bar alone |
+| `Back()`, `StatusBarScrim()` | The system's back for the screen (see [Back and motion](3-phone.md#back-and-motion)); the strip under the status bar alone |
 
 ## Actions — `actions.go`
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="images/actions-dark.png">
-  <img alt="Buttons, a split button, a button group, assist chips, a floating toolbar and a floating button" src="images/actions-light.png" width="240">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/actions-dark.png">
+  <img alt="Buttons, a split button, a button group, assist chips, a floating toolbar and a floating button" src="../images/actions-light.png" width="240">
 </picture>
 </p>
 
@@ -57,8 +57,8 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="images/inputs-dark.png">
-  <img alt="A search bar, text fields with a counter and a suffix, a dropdown and a password field" src="images/inputs-light.png" width="240">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/inputs-dark.png">
+  <img alt="A search bar, text fields with a counter and a suffix, a dropdown and a password field" src="../images/inputs-light.png" width="240">
 </picture>
 </p>
 
@@ -73,8 +73,8 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="images/lists-dark.png">
-  <img alt="A banner over a list of lighthouses with photos and switches, and an extended floating button" src="images/lists-light.png" width="240">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/lists-dark.png">
+  <img alt="A banner over a list of lighthouses with photos and switches, and an extended floating button" src="../images/lists-light.png" width="240">
 </picture>
 </p>
 
@@ -92,8 +92,8 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="images/menu-dark.png">
-  <img alt="The menu open under the top bar, with three choices" src="images/menu-light.png" width="240">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/menu-dark.png">
+  <img alt="The menu open under the top bar, with three choices" src="../images/menu-light.png" width="240">
 </picture>
 </p>
 
@@ -117,8 +117,8 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="images/feedback-dark.png">
-  <img alt="Loading indicators, wavy and linear progress, and skeletons" src="images/feedback-light.png" width="240">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/feedback-dark.png">
+  <img alt="Loading indicators, wavy and linear progress, and skeletons" src="../images/feedback-light.png" width="240">
 </picture>
 </p>
 
@@ -140,8 +140,8 @@ a core on a OnePlus 7 Pro, and nothing once the screen is left.
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="images/tabs-dark.png">
-  <img alt="Tabs over swiping pages, a carousel of places and a multi-browse carousel of photos of a coast" src="images/tabs-light.png" width="240">
+  <source media="(prefers-color-scheme: dark)" srcset="../images/tabs-dark.png">
+  <img alt="Tabs over swiping pages, a carousel of places and a multi-browse carousel of photos of a coast" src="../images/tabs-light.png" width="240">
 </picture>
 </p>
 
@@ -192,4 +192,4 @@ look.VideoPlayer("harbour", video, 180)
 
 ---
 
-[← All the documentation](README.md)
+[← All the documentation](../1-overview.md)

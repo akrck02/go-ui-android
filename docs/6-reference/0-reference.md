@@ -2,9 +2,9 @@
 
 | Package or tool | What it is |
 |---|---|
-| [`material`](material.md) | Material Design 3 pieces for go-ui: `Look`, its pieces, `Scheme` and the state structs some pieces keep. Generated from the doc comments (`python3 docs/reference/generate.py`) |
-| [The pieces](../pieces.md) | The same pieces by Material's catalogue, with pictures: the place to choose one |
-| [`cmd/go-ui-apk`](../packaging.md) | Every flag of the packaging tool |
+| [`material`](1-material.md) | Material Design 3 pieces for go-ui: `Look`, its pieces, `Scheme` and the state structs some pieces keep. Generated from the doc comments (`python3 docs/6-reference/generate.py`) |
+| [The pieces](../4-guides/1-pieces.md) | The same pieces by Material's catalogue, with pictures: the place to choose one |
+| [`cmd/go-ui-apk`](../4-guides/5-packaging.md) | Every flag of the packaging tool |
 
 ## The shape of every piece
 
@@ -33,4 +33,4 @@ repeated pieces get a scope each with `look.Context.Push`.
 
 ---
 
-[← Documentation](../README.md)
+[← Documentation](../1-overview.md)

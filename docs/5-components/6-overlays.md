@@ -80,4 +80,4 @@ look.TopAppBar(material.TopBar{Title: "North Point", Actions: func() {
 
 ---
 
-[← Containment](containment.md) · [Pickers →](pickers.md)
+[← Containment](5-containment.md) · [Pickers →](7-pickers.md)

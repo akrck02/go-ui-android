@@ -81,4 +81,4 @@ padded(look, func() {
 
 ---
 
-[← Actions](actions.md) · [Inputs →](inputs.md)
+[← Actions](2-actions.md) · [Inputs →](4-inputs.md)

@@ -3,8 +3,8 @@
 <table>
 <tr><th>Light</th><th>Dark</th></tr>
 <tr>
-<td><img alt="The actions screen in the light theme" src="images/actions-light.png" width="240"></td>
-<td><img alt="The actions screen in the dark theme" src="images/actions-dark.png" width="240"></td>
+<td><img alt="The actions screen in the light theme" src="../images/actions-light.png" width="240"></td>
+<td><img alt="The actions screen in the dark theme" src="../images/actions-dark.png" width="240"></td>
 </tr>
 </table>
 
@@ -29,4 +29,4 @@ surface and the raised containers over it, the outlines, the error colours and t
 
 ---
 
-[← All the documentation](README.md)
+[← All the documentation](../1-overview.md)

@@ -27,8 +27,8 @@ padded(look, func() {
 Indicators ask for frames only while on screen; a screen without one sleeps.
 
 `VideoPlayer(name, video, height)` plays a film (`window.OpenVideo`) in a rounded box, touched to
-play or pause: see [the pieces](../pieces.md#films).
+play or pause: see [the pieces](../4-guides/1-pieces.md#films).
 
 ---
 
-[← Pickers](pickers.md) · [Gestures →](gestures.md)
+[← Pickers](7-pickers.md) · [Gestures →](9-gestures.md)

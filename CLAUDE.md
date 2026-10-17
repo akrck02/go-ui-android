@@ -2,7 +2,7 @@
 
 Material Design 3 pieces for go-ui programs (`material`), a tool that packages a go-ui program as an
 Android application (`cmd/go-ui-apk`), and a gallery of every piece (`cmd/gallery`). Start with
-`docs/README.md`.
+`docs/1-overview.md`.
 
 ## Commands
 
