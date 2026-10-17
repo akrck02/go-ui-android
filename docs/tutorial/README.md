@@ -12,8 +12,8 @@ it installed on a phone.
 <img alt="Settings in the dark theme and the app's own colour" src="../images/tutorial/phone-settings.jpg" width="180">
 </p>
 
-**Before you start**, know go-ui's basics: [its Get started](../../../go-ui/docs/get-started.md)
-and, better, the first lessons of [its tutorial](../../../go-ui/docs/tutorial/README.md). This
+**Before you start**, know go-ui's basics: [its Get started](https://github.com/akrck02/go-ui/blob/main/docs/get-started.md)
+and, better, the first lessons of [its tutorial](https://github.com/akrck02/go-ui/blob/main/docs/tutorial/README.md). This
 tutorial uses the same immediate mode, with Material pieces instead of go-ui's own.
 
 | Lesson | You learn | You end with |
