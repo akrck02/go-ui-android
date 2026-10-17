@@ -39,7 +39,8 @@ Roboto, Android's typeface.
 go-ui-android builds against `go-ui` and `go-renderer` checked out beside it (`replace` in `go.mod`),
 until they publish versions with touches, insets, the wallpaper's palettes and the Android window.
 
-Then [package it for a phone](packaging.md), and see [every piece](pieces.md).
+Then [package it for a phone](packaging.md), and see [every piece](pieces.md). To build a whole app
+step by step, from the first screen to the phone, follow [the tutorial](tutorial/README.md).
 
 ---
 

@@ -108,6 +108,8 @@ own `NativeActivity` loads; go-ui-apk builds it with the NDK and packs it with t
 | | |
 |---|---|
 | [Getting started](docs/getting-started.md) | The two parts, a program's first lines, and building against go-ui. |
+| [Tutorial](docs/tutorial/README.md) | A lighthouse app in five lessons, from the first screen to a phone. |
+| [Reference](docs/reference/README.md) | Every type and function of `material`. |
 | [The pieces](docs/pieces.md) | Every piece by Material's catalogue, with pictures. |
 | [Colours](docs/colours.md) | The wallpaper's colours, Material's baseline, a scheme from one colour. |
 | [Feeling at home on a phone](docs/phone.md) | Gestures, the back gesture, turning the phone, notifications, services. |

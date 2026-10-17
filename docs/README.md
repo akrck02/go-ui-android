@@ -2,6 +2,8 @@
 
 | | Page | What is in it |
 |---|---|---|
+| 🎓 | [Tutorial: a lighthouse app](tutorial/README.md) | Five lessons, one app: a first screen, screens and the back gesture, fields and dialogs, colours, and installing it on a phone. |
+| 📚 | [Reference](reference/README.md) | Every type and function of `material`, generated from the doc comments, and the shape every piece follows. |
 | 🚀 | [Getting started](getting-started.md) | What the two parts are, a program's first lines, and building against go-ui and go-renderer. |
 | 🧩 | [The pieces](pieces.md) | Every piece by Material's catalogue, with pictures, photos and films. |
 | 🎨 | [Colours](colours.md) | The wallpaper's colours, Material's baseline, and a whole scheme from one colour. |
