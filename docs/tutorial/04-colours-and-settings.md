@@ -3,6 +3,14 @@
 Android 12 and later colour apps from the wallpaper (Material You). In this lesson the app does
 too, and a settings screen switches the dark theme and a colour of the app's own.
 
+| Mission | Pieces | Time |
+|---|---|---|
+| A settings screen | `System`, `FromColour`, dark theme | 10 min |
+
+#### The idea
+
+On Android 12 and later, the phone **paints every app with its wallpaper's colours**, like a house where every room matches the hall. `material.System` asks for those colours; `FromColour` mixes a whole matching set from one colour of your own.
+
 ## Schemes
 
 | Function | Gives |
@@ -33,6 +41,12 @@ func (program *app) settings(look material.Look) {
 To keep the choice between runs, use go-ui's `window.KeepPreference` in `Options.Hidden`, which is
 called when the app leaves the screen; Android may end it afterwards without a word
 ([feeling at home on a phone](../phone.md#the-phones-services)). More in [colours](../colours.md).
+
+#### Checkpoint
+
+On *Settings*, *Dark theme* darkens the app, and *The app's own colour* turns it teal; on a phone with Material You, the wallpaper's colours come back when it is off.
+
+![Achievement unlocked: Painter](../images/tutorial/quest/achievement-painter.svg)
 
 ## The whole program
 

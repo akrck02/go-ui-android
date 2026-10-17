@@ -4,6 +4,14 @@ The app runs on the desktop. In this lesson it becomes an Android package, insta
 emulator or your own phone. You need no Java code, Gradle or Android Studio: **go-ui-apk** builds
 the program with the NDK and packs it with the SDK's own tools.
 
+| Mission | Pieces | Time |
+|---|---|---|
+| The app installed | the SDK, the NDK, go-ui-apk, `adb` | 30 min |
+
+#### The idea
+
+go-ui-apk is a **removal company**: it packs your program (built for the phone's processor with the NDK), Android's paperwork (the manifest, the icon) and a signature into one box, the `.apk`, which the phone unpacks and installs.
+
 ## 1. Install the Android tools
 
 | You need | Why | How |
@@ -72,11 +80,55 @@ GO_UI_APK_STORE_PASSWORD=… go run github.com/akrck02/go-ui-android/cmd/go-ui-a
 `-bundle` writes the App Bundle (`.aab`) Google Play asks for. Every flag is in
 [packaging](../packaging.md).
 
+#### Checkpoint
+
+`adb install lighthouses.apk` says *Success*; the app is in the phone's launcher, opens on the list, and `adb logcat -s Go` shows what it prints.
+
+![Achievement unlocked: Shipper](../images/tutorial/quest/achievement-shipper.svg)
+
 ## What you learnt
 
 - go-ui-apk turns a Go `main` package into an `.apk` with the SDK, the NDK and a JDK.
 - `adb install` and `adb logcat -s Go` for trying and debugging.
 - Releases are signed with your own key; `-bundle` for Google Play.
+
+## Final challenge · Lighthouse network
+
+Turn the phone on its side: the app should move its destinations from the bar at the bottom to a **rail** down the left, as Android's own apps do on a wide screen.
+
+> **Hint:** `look.Wide()` says the screen has more width than height to spare; `NavigationRail` takes the same destinations as the bar, and `look.Body(true, …)` keeps the content beside it.
+
+Try it on your own first, then compare with the solution.
+
+![The final challenge: the app on its side, the destinations on a rail down the left](../images/tutorial/final.jpg)
+
+<details>
+<summary>🔓 Show the solution</summary>
+
+```go
+// in build, instead of the vertical box
+if look.Wide() {
+	context.Box(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func() {
+		look.NavigationRail(places, &program.place)
+		look.Body(true, func() { program.show(look) })
+	})
+	return
+}
+context.Box(ui.Layout{Direction: ui.Vertical, Width: ui.Grow(), Height: ui.Grow()}, func() {
+	look.Body(false, func() { program.show(look) })
+	look.NavigationBar(places, &program.place)
+})
+```
+
+with `show` holding the `switch` over the places that was inside `Body`. On the desktop, `-width 892 -height 412` gives the window a phone's side.
+
+</details>
+
+![Rare achievement unlocked: Lighthouse network](../images/tutorial/quest/achievement-final.svg)
+
+## Well done
+
+![Every achievement of the quest](../images/tutorial/quest/achievements-all.svg)
 
 ## Where next
 

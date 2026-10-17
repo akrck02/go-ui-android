@@ -3,6 +3,14 @@
 In this lesson a lighthouse's screen edits it, a dialog asks before removing it, and a note at the
 bottom offers to undo.
 
+| Mission | Pieces | Time |
+|---|---|---|
+| Editing, removing and undoing | `TextField`, `Slider`, `Dialog`, `Snackbar` | 15 min |
+
+#### The idea
+
+A dialog is a **question that needs an answer** before anything else happens; a snackbar is a **sticky note** on the fridge: it says what just happened and offers to take it back, and falls off by itself after a few seconds.
+
 ## Editing
 
 Lesson 2's `details` already has the pieces:
@@ -64,12 +72,18 @@ func (program *app) remove(name string) {
 `overlays` is deferred in `build`, so it is drawn over the screens and answers the back before
 them.
 
-## Practice
+#### Checkpoint
+
+The bin on a lighthouse's screen asks *Remove East Cape?*; *Remove* takes it out, goes back to the list and shows *East Cape removed* with *Undo*, which puts it back.
+
+![Achievement unlocked: Lamplighter](../images/tutorial/quest/achievement-lamplighter.svg)
+
+## Bonus (optional)
 
 Give the field an error, "A place is needed", while it is empty.
 
 <details>
-<summary>Solution</summary>
+<summary>🔓 Show the solution</summary>
 
 ```go
 field := material.Field{Label: "Where it stands", MaxLength: 60, Counter: true}

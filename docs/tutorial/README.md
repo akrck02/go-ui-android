@@ -1,5 +1,7 @@
 # Tutorial: a lighthouse app for phones
 
+![The quest map: Signwriter, Pathfinder, Lamplighter, Painter, Shipper, then the final challenge, Lighthouse network](../images/tutorial/quest/quest-map.svg)
+
 In five lessons you build an Android app in Go that looks and behaves like Android's own: a list
 of lighthouses, a screen for each, a dialog before removing one, a note to undo it, settings for
 the theme and the colours, and the back gesture. You try it on the desktop as you go, and end with
@@ -15,6 +17,8 @@ it installed on a phone.
 **Before you start**, know go-ui's basics: [its Get started](https://github.com/akrck02/go-ui/blob/main/docs/get-started.md)
 and, better, the first lessons of [its tutorial](https://github.com/akrck02/go-ui/blob/main/docs/tutorial/README.md). This
 tutorial uses the same immediate mode, with Material pieces instead of go-ui's own.
+
+Every lesson has the same shape, as in a quest: **the idea** in everyday words, **the code**, a **checkpoint** to know it works, a **bonus** with its solution folded, and an **achievement** to unlock. A final challenge waits at the end of lesson 5.
 
 | Lesson | You learn | You end with |
 |---|---|---|

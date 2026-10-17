@@ -4,6 +4,14 @@ A phone app moves between screens: destinations at the bottom, and inside one a 
 each sliding in over the one before. In this lesson the app gets both, and answers the system's
 **back gesture** as Android's own apps do.
 
+| Mission | Pieces | Time |
+|---|---|---|
+| A screen for each lighthouse | `NavigationBar`, `Navigation`, `Screens`, `GoBack` | 20 min |
+
+#### The idea
+
+Screens stack like **plates**: opening a lighthouse puts its screen on top, and the back gesture takes the top plate off. The navigation bar picks which **pile** you look at.
+
 ## Destinations
 
 `NavigationBar(destinations, &selected)` draws three to five destinations at the bottom, under the
@@ -89,12 +97,18 @@ func (program *app) goBack(look material.Look) {
 ```
 
 
-## Practice
+#### Checkpoint
+
+Touching *North Point* slides its screen in from the right; the arrow, or the phone's back gesture, slides it away; *Settings* in the bar opens the other destination.
+
+![Achievement unlocked: Pathfinder](../images/tutorial/quest/achievement-pathfinder.svg)
+
+## Bonus (optional)
 
 Make the settings destination a stack too, with an "About" row that opens an "About" screen.
 
 <details>
-<summary>Solution</summary>
+<summary>🔓 Show the solution</summary>
 
 Keep a second `material.Navigation` for settings, draw it with `look.Screens("settings", …)`,
 `Go("about")` from the row, and in `goBack` try `look.GoBack(&program.settingsNavigation)` while

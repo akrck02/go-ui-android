@@ -3,6 +3,14 @@
 In this lesson you set the app up and draw its first screen: a large title, a list of lighthouses
 with a switch on each, and a floating button to add one.
 
+| Mission | Pieces | Time |
+|---|---|---|
+| The list, in a phone-sized window | `material.Look`, schemes, `TopAppBar`, `ListItem` | 15 min |
+
+#### The idea
+
+go-ui is the **pencil**; `material` is a **stencil set** cut to Android's own shapes: the same lines, but every bar, row and button comes out the size and colour Android's apps use, so the app feels at home on a phone.
+
 ## The module
 
 Clone go-ui-android beside go-ui and go-renderer (and go-sound, which its gallery plays notes
@@ -165,12 +173,18 @@ go run . -width 412 -height 892
 Sizes are Material's: targets of at least 48 pixels, 16-pixel text. A finger has no hover, so
 pieces change only while pressed.
 
-## Practice
+#### Checkpoint
+
+In a 412 × 892 window: *Lighthouses* in large type, four rows with a bulb, a place and a switch, and *New lighthouse* floating at the bottom end.
+
+![Achievement unlocked: Signwriter](../images/tutorial/quest/achievement-signwriter.svg)
+
+## Bonus (optional)
 
 Show how many lighthouses are lit in the top bar's subtitle.
 
 <details>
-<summary>Solution</summary>
+<summary>🔓 Show the solution</summary>
 
 ```go
 lit := 0
