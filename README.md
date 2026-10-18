@@ -5,7 +5,7 @@
 # Go UI for Android
 
 **Android apps in Go that look like Android's own.** Material Design 3 pieces for
-[go-ui](https://github.com/akrck02/go-ui), and a tool that packages a go-ui program as an Android
+[Go UI](https://github.com/akrck02/go-ui), and a tool that packages a Go UI program as an Android
 app: no Java, Gradle or Android Studio. The same program still runs on the desktop and in a web page.
 
 [![Go](https://img.shields.io/github/go-mod/go-version/akrck02/go-ui-android)](go.mod)
@@ -98,7 +98,7 @@ adb install lighthouses.apk
 ## 🔍 How it works
 
 <p align="center">
-  <img alt="main.go, your program → material/, Material 3 pieces drawn with go-ui → an Android app (go-ui-apk), a desktop window (go run) or a web page (GOOS=js)" src="docs/images/how-it-works.svg" width="880">
+  <img alt="main.go, your program → material/, Material 3 pieces drawn with Go UI → an Android app (go-ui-apk), a desktop window (go run) or a web page (GOOS=js)" src="docs/images/how-it-works.svg" width="880">
 </p>
 
 Your program stays an ordinary Go `main` package. On Android it is a shared library that Android's
@@ -109,7 +109,7 @@ own `NativeActivity` loads; go-ui-apk builds it with the NDK and packs it with t
 
 | | |
 |---|---|
-| [Getting started](docs/2-getting-started.md) | The two parts, a program's first lines, and building against go-ui. |
+| [Getting started](docs/2-getting-started.md) | The two parts, a program's first lines, and building against Go UI. |
 | [Tutorial](docs/3-the-quest/0-the-quest.md) | A lighthouse app in five lessons, from the first screen to a phone. |
 | [Components](docs/5-components/0-components.md) | Every piece one by one, with concrete cases. |
 | [Reference](docs/6-reference/0-reference.md) | Every type and function of `material`. |

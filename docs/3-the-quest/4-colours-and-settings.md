@@ -19,7 +19,7 @@ On Android 12 and later, the phone **paints every app with its wallpaper's colou
 | `material.Baseline(dark)` | Material's own purple |
 | `material.FromColour(colour, dark)` | A whole scheme from one colour, as Material's tools make it |
 | `scheme.WithPrimary(…)` | A brand's colour in the primary roles only |
-| `scheme.Theme(dark)` | go-ui's theme from the scheme, for go-ui's own controls |
+| `scheme.Theme(dark)` | Go UI's theme from the scheme, for Go UI's own controls |
 
 `window.SystemPrefersDark()` says whether the phone (or the desktop, or the browser) is in its dark
 theme. Lesson 1's `build` already picks the scheme from `program.dark` and `program.ownColour`.
@@ -38,7 +38,7 @@ func (program *app) settings(look material.Look) {
 
 ![Settings in the dark theme, with the app's own teal](../images/tutorial/phone-settings.jpg)
 
-To keep the choice between runs, use go-ui's `window.KeepPreference` in `Options.Hidden`, which is
+To keep the choice between runs, use Go UI's `window.KeepPreference` in `Options.Hidden`, which is
 called when the app leaves the screen; Android may end it afterwards without a word
 ([feeling at home on a phone](../4-guides/3-phone.md#the-phones-services)). More in [colours](../4-guides/2-colours.md).
 

@@ -14,7 +14,7 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 
 | Piece | What it is |
 |---|---|
-| `TopAppBar(TopBar{…})` | The bar at the top, painted up under the status bar: a back arrow (a cross with `Close`, to leave a mode), a title and a subtitle, actions at its end; `Large` writes the title big under it, and with `Scrolled` (go-ui's `ScrollOffset` of the page under it) it shrinks into a small bar as the page goes up |
+| `TopAppBar(TopBar{…})` | The bar at the top, painted up under the status bar: a back arrow (a cross with `Close`, to leave a mode), a title and a subtitle, actions at its end; `Large` writes the title big under it, and with `Scrolled` (Go UI's `ScrollOffset` of the page under it) it shrinks into a small bar as the page goes up |
 | `NavigationBar(destinations, &selected)` | Three to five destinations at the bottom, painted down under the gesture bar; `Destination.Badge` marks one with a count or a dot |
 | `NavigationRail(destinations, &selected)` | The same down the left edge, on a wide screen (`Wide()`) |
 | `NavigationDrawer(name, title, destinations, &selected)` | Every destination in a drawer sliding in from the left |
@@ -127,11 +127,11 @@ overlays, pickers, progress and gestures. The package's files follow the same or
 | `LoadingIndicator(size)`, `ContainedLoadingIndicator(size)` | Expressive's indicator for a short wait: a filled shape turning and morphing from one form to the next, alone or on a round container |
 | `CircularProgress(fraction, size, wavy)` | A ring filling as work gets done, or an arc chasing round (`Indeterminate`); wavy as Expressive draws it |
 | `WavyProgress(fraction)`, `LinearProgress(fraction)` | A line filling with a travelling wave, a track and a stop dot; the plain line |
-| `VideoPlayer(name, video, height)` | A film (go-ui's `window.Video`) in a rounded box, a round play button over it while paused, a line of how far it has played; touching it plays or pauses |
+| `VideoPlayer(name, video, height)` | A film (Go UI's `window.Video`) in a rounded box, a round play button over it while paused, a line of how far it has played; touching it plays or pauses |
 | `Skeleton(width, height, radius)` | A quiet block with a light crossing it, standing in for content still coming |
 
-go-renderer draws rounded rectangles, shadows, text and icons; the indicators' shapes are made of
-rectangles in a box the program paints itself (go-ui's `Context.Paint`): a shape is filled row by
+Go Renderer draws rounded rectangles, shadows, text and icons; the indicators' shapes are made of
+rectangles in a box the program paints itself (Go UI's `Context.Paint`): a shape is filled row by
 row and edged with small dots, a wave or an arc is a line of dots. An indicator asks for frames
 while it is on screen, and a screen without one sleeps: five of them at once take about a third of
 a core on a OnePlus 7 Pro, and nothing once the screen is left.
@@ -157,7 +157,7 @@ a core on a OnePlus 7 Pro, and nothing once the screen is left.
 
 ## Pictures
 
-Photos are go-renderer's `draw2d.Image`: decode one once (`draw2d.DecodeImage` reads a PNG, JPEG
+Photos are Go Renderer's `draw2d.Image`: decode one once (`draw2d.DecodeImage` reads a PNG, JPEG
 or GIF the program embeds) and keep it. `context.Image(picture, layout, radius)` draws it filling a
 box, cropped evenly where their shapes differ; the pieces take one where a photo belongs:
 `Item.Picture` in a list row's avatar, `PictureAvatar`, `CarouselPicture` in a carousel. The

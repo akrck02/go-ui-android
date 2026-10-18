@@ -9,11 +9,11 @@ with a switch on each, and a floating button to add one.
 
 #### The idea
 
-go-ui is the **pencil**; `material` is a **stencil set** cut to Android's own shapes: the same lines, but every bar, row and button comes out the size and colour Android's apps use, so the app feels at home on a phone.
+Go UI is the **pencil**; `material` is a **stencil set** cut to Android's own shapes: the same lines, but every bar, row and button comes out the size and colour Android's apps use, so the app feels at home on a phone.
 
 ## The module
 
-Clone go-ui-android beside go-ui and go-renderer (and go-sound, which its gallery plays notes
+Clone Go UI for Android beside Go UI and Go Renderer (and Go Sound, which its gallery plays notes
 through), then make your module there:
 
 ```bash
@@ -80,12 +80,12 @@ func main() {
 ```
 
 `material.UseRoboto()` draws every text in Roboto, Android's typeface; call it before the window
-opens. `window.Options` and `RegisterFlags` are go-ui's: `-width 412 -height 892` gives the window a
+opens. `window.Options` and `RegisterFlags` are Go UI's: `-width 412 -height 892` gives the window a
 phone's size on the desktop, and `-capture` a picture.
 
 ## A frame with Material
 
-At every frame the program makes a **scheme** (Material's colour roles), gives go-ui's own
+At every frame the program makes a **scheme** (Material's colour roles), gives Go UI's own
 controls its theme, and makes a **`material.Look`**, which draws the pieces:
 
 ```go
@@ -161,7 +161,7 @@ func (program *app) list(look material.Look) {
 - `TopAppBar` with `Large` writes the title big, as a screen's first level does on Android.
 - `ListItem` is a Material row: an icon in a round avatar, a headline, a supporting line, and
   `Trailing` for what goes at its end. It returns `true` when touched.
-- Rows repeat, so each gets a scope with `context.Push` (go-ui's ids).
+- Rows repeat, so each gets a scope with `context.Push` (Go UI's ids).
 - `ExtendedFloatingButton` is the floating action button with its action written.
 
 ```bash

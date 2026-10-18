@@ -18,7 +18,7 @@ go-ui-apk is a **removal company**: it packs your program (built for the phone's
 |---|---|---|
 | The **Android SDK** command-line tools, with `platform-tools`, `build-tools` and a `platforms;android-…` | `aapt2`, `zipalign`, `apksigner`, `d8` and `adb` | [developer.android.com/studio#command-tools](https://developer.android.com/studio#command-tools), then `sdkmanager "platform-tools" "build-tools;35.0.0" "platforms;android-35"` |
 | The **NDK** | Compiles the Go program (cgo) for the phone's processor | `sdkmanager "ndk;27.2.12479018"` |
-| A **JDK** 17 or later | Compiles go-renderer's two small Java classes (the screen reader's, the keyboard's) | `javac` on the `PATH`, or `JAVA_HOME` |
+| A **JDK** 17 or later | Compiles Go Renderer's two small Java classes (the screen reader's, the keyboard's) | `javac` on the `PATH`, or `JAVA_HOME` |
 
 ```bash
 export ANDROID_HOME=$HOME/android-sdk

@@ -24,7 +24,7 @@ surface and the raised containers over it, the outlines, the error colours and t
   Material, so text keeps its contrast whatever the colour; the hues are worked in OKLCH, where
   they stay even. `PalettesFromColour` gives the palettes themselves.
 - **`scheme.WithPrimary(…)`** puts a brand's colour in the primary roles only.
-- **`scheme.Theme(dark)`** gives go-ui's own controls (its slider, text fields, menus) the scheme and
+- **`scheme.Theme(dark)`** gives Go UI's own controls (its slider, text fields, menus) the scheme and
   sizes for fingers; set it as the context's theme before the pieces.
 
 ---

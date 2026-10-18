@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: akrck02/papiro-deploy@main
         with:
-          title: "go-ui-android"
+          title: "Go UI for Android"
           description: "Material Design 3 for go-ui, and Android packaging"
           logo: "./docs/images/logo.svg"
           accent: "#3DDC84"

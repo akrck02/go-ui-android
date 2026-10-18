@@ -1,18 +1,18 @@
 <p align="center"><img alt="" src="images/logo.svg" width="120"></p>
 
-# Welcome to go-ui-android 👋
+# Welcome to Go UI for Android 👋
 
-**go-ui-android makes Android apps in Go that look and feel like Android's own**: Material Design pieces (bars, lists, buttons, dialogs) and a tool that turns the program into an app you install on a phone. No Java, no Android Studio.
+**Go UI for Android makes Android apps in Go that look and feel like Android's own**: Material Design pieces (bars, lists, buttons, dialogs) and a tool that turns the program into an app you install on a phone. No Java, no Android Studio.
 
 <p align="center"><img alt="Three phone screens of the gallery: buttons, a list of lighthouses with photos, tabs over pictures of a coast" src="images/hero-light.png" width="720"></p>
 
-You write the app once in Go with go-ui; the `material` pieces give it Android's looks (the wallpaper's colours, the back gesture, the on-screen keyboard), and `go-ui-apk` packs it into an `.apk`. The same program also opens on a computer, to try it as you go.
+You write the app once in Go with Go UI; the `material` pieces give it Android's looks (the wallpaper's colours, the back gesture, the on-screen keyboard), and `go-ui-apk` packs it into an `.apk`. The same program also opens on a computer, to try it as you go.
 
 ## Is it for me?
 
 - ✅ You write Go and want an **Android app**.
 - ✅ You want the app to feel **at home on a phone**: gestures, dark theme, TalkBack.
-- ✅ You already know a little of [go-ui](https://github.com/akrck02/go-ui).
+- ✅ You already know a little of [Go UI](https://github.com/akrck02/go-ui).
 
 ## Where to start
 
@@ -71,7 +71,7 @@ The menu on the left (or the files in `docs/`) follows this order.
 - Keyboards for Chinese and Japanese (they compose as Android's own keyboard does, which is tried),
   right-to-left layout and Arabic letters joined, and emoji joined into one (a
   family, a skin tone): other scripts and colour emoji are drawn with the phone's own fonts.
-- Sound in films: a film plays its pictures only (go-sound plays other sounds).
+- Sound in films: a film plays its pictures only (Go Sound plays other sounds).
 
 ## Words you will meet
 
@@ -86,21 +86,21 @@ The menu on the left (or the files in `docs/`) follows this order.
 
 ## The family
 
-go-ui-android is one of a family of small projects that work together:
+Go UI for Android is one of a family of small projects that work together:
 
 | Project | What it does |
 |---|---|
-| [go-renderer](https://github.com/akrck02/go-renderer) | draws 3D scenes and flat interfaces |
-| [go-ui](https://github.com/akrck02/go-ui) | buttons, panels and whole applications |
-| **go-ui-android** (this one) | Android apps that look like Android's own |
-| [go-sound](https://github.com/akrck02/go-sound) | sound and music |
-| [go-scene-builder](https://github.com/akrck02/go-scene-builder) | 3D scenes from a flat map |
-| [go-simulator](https://github.com/akrck02/go-simulator) | simulations that change a scene |
-| [go-simulator-terrain](https://github.com/akrck02/go-simulator-terrain) | ground shaped by rivers |
-| [go-simulator-climate](https://github.com/akrck02/go-simulator-climate) | weather and biomes |
-| [go-simulator-flora](https://github.com/akrck02/go-simulator-flora) | forests that grow |
-| [go-simulator-urban](https://github.com/akrck02/go-simulator-urban) | towns that grow |
-| [go-simulator-motion](https://github.com/akrck02/go-simulator-motion) | a scene that moves |
-| [go-3ds](https://github.com/akrck02/go-3ds) | Go on the Nintendo 3DS |
+| [Go Renderer](https://github.com/akrck02/go-renderer) | draws 3D scenes and flat interfaces |
+| [Go UI](https://github.com/akrck02/go-ui) | buttons, panels and whole applications |
+| **Go UI for Android** (this one) | Android apps that look like Android's own |
+| [Go Sound](https://github.com/akrck02/go-sound) | sound and music |
+| [Go Scene Builder](https://github.com/akrck02/go-scene-builder) | 3D scenes from a flat map |
+| [Go Simulator](https://github.com/akrck02/go-simulator) | simulations that change a scene |
+| [Go Terrain Simulator](https://github.com/akrck02/go-simulator-terrain) | ground shaped by rivers |
+| [Go Climate Simulator](https://github.com/akrck02/go-simulator-climate) | weather and biomes |
+| [Go Flora Simulator](https://github.com/akrck02/go-simulator-flora) | forests that grow |
+| [Go Urban Simulator](https://github.com/akrck02/go-simulator-urban) | towns that grow |
+| [Go Motion Simulator](https://github.com/akrck02/go-simulator-motion) | a scene that moves |
+| [Go for 3DS](https://github.com/akrck02/go-3ds) | Go on the Nintendo 3DS |
 
 > ⚠️ All of them are **educational experiments**, written with an AI assistant and pending review by their author: good for learning and playing, not for production.
