@@ -15,6 +15,7 @@ jobs:
           title: "go-ui-android"
           description: "Material Design 3 for go-ui, and Android packaging"
           logo: "./docs/images/logo.svg"
+          accent: "#3DDC84"
           path: "./docs"
           isObsidianProject: false
           showFooter: true
