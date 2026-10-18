@@ -1,12 +1,12 @@
 <h1 id="feeling-at-home-on-a-phone">📱 Feeling at home on a phone</h1>
 
 <p>What a phone does that a desktop does not: fingers that swipe and hold, the back gesture, a
-screen that turns, notifications, and the phone&rsquo;s own services. Most of it comes from go-ui and
-go-renderer; the pieces use it the way Android&rsquo;s own applications do.</p>
+screen that turns, notifications, and the phone&rsquo;s own services. Most of it comes from Go UI and
+Go Renderer; the pieces use it the way Android&rsquo;s own applications do.</p>
 
 <h2 id="gestures">Gestures</h2>
 
-<p>go-ui follows the one finger on a touch screen from where it comes down. Once it has moved a few
+<p>Go UI follows the one finger on a touch screen from where it comes down. Once it has moved a few
 pixels, the way it went first decides who takes it: the innermost list for up and down, the
 innermost of the sideways pieces (a carousel inside swiping pages) for sideways. The control it came
 down on is then not touched, and a finger that hardly moves stays a touch. So the pieces sit inside
@@ -14,7 +14,7 @@ each other freely: the gallery has a carousel inside a list inside swiping pages
 away inside a list pulled to refresh.</p>
 
 <ul>
-<li><strong>Long press.</strong> A finger held still on a piece for half a second (go-ui&rsquo;s <code>LongPressed</code>; with a
+<li><strong>Long press.</strong> A finger held still on a piece for half a second (Go UI&rsquo;s <code>LongPressed</code>; with a
 mouse, its right button) long-presses it, and lifting it then is no touch. <code>look.LongPressed()</code>
 after a piece tells, and gives the phone&rsquo;s short buzz, as Android&rsquo;s own applications do. A list
 starts choosing with it: the row held is chosen (<code>Item.Selected</code>), touches choose more, and the
@@ -30,7 +30,7 @@ top bar says how many, with a cross to stop (<code>TopBar.Close</code>) and acti
 </code></pre>
 
 <ul>
-<li><strong>Pull to refresh.</strong> The indicator follows the pull (go-ui&rsquo;s <code>ScrollPull</code>); let go past 64 pixels,
+<li><strong>Pull to refresh.</strong> The indicator follows the pull (Go UI&rsquo;s <code>ScrollPull</code>); let go past 64 pixels,
 <code>PullToRefresh</code> returns true, and the program refreshes, keeping <code>refreshing</code> set until done.</li>
 <li><strong>Swiping pages.</strong> A page let go past a third of the way, or flicked, turns to the next; the tab
 underline moves with the pages, between two tabs while a page is half way.</li>
@@ -66,7 +66,7 @@ place when it is first shown.</p>
 <p>They leave with motion too, though a program simply stops drawing them: a dialog answered fades
 out, a sheet slides back down, the drawer slides back off the side, the snackbar fades when its time
 is up, a side sheet slides back off its side, a floating menu&rsquo;s actions sink and fade as it
-closes, and a row&rsquo;s more folds back under it. go-ui keeps what such a layer
+closes, and a row&rsquo;s more folds back under it. Go UI keeps what such a layer
 painted last (<code>LayerOptions.Leave</code>) and lets that picture go; nothing in it can be touched on its
 way out.</p>
 
@@ -92,7 +92,7 @@ moves the destinations from a bar at the bottom to a rail down the left:</p>
 
 <h2 id="notifications">Notifications</h2>
 
-<p>A program&rsquo;s notifications go through go-ui&rsquo;s window: <code>window.Notify(id, title, text)</code> shows one in
+<p>A program&rsquo;s notifications go through Go UI&rsquo;s window: <code>window.Notify(id, title, text)</code> shows one in
 the phone&rsquo;s shade, even while the program is in the background, and touching it opens the program.
 Android 13 and later show them only once the person allows it: check <code>window.NotificationsAllowed()</code>
 and ask with <code>window.AskForNotifications()</code> when they do something that needs them. Build the
@@ -101,7 +101,7 @@ page&rsquo;s notifications; on the desktop they are not shown yet.</p>
 
 <h2 id="the-phone-s-services">The phone&rsquo;s services</h2>
 
-<p>What a program asks of the phone goes through go-ui&rsquo;s window, and works in a browser too:</p>
+<p>What a program asks of the phone goes through Go UI&rsquo;s window, and works in a browser too:</p>
 
 <ul>
 <li><strong>Links and sharing.</strong> <code>window.OpenLink(link)</code> opens a web page in the browser, <code>mailto:</code> in the
@@ -113,7 +113,7 @@ copy and paste through it.</li>
 values between runs. Android may end a program in the background without a word, so keep them
 in <code>Options.Hidden</code>, called when the program leaves the screen: the gallery keeps its screen, its
 theme and its colours there, and comes back as it was left.</li>
-<li><strong>Sound.</strong> The feedback screen plays a note through <a href="https://github.com/akrck02/go-sound" target="_blank">go-sound</a>,
+<li><strong>Sound.</strong> The feedback screen plays a note through <a href="https://github.com/akrck02/go-sound" target="_blank">Go Sound</a>,
 which goes quiet when the gallery leaves the screen (<code>Options.Hidden</code>) and plays again when it
 comes back (<code>Options.Shown</code>). go-ui-apk passes the NDK&rsquo;s C++ compiler too, for the sound output&rsquo;s
 C++ (Oboe).</li>

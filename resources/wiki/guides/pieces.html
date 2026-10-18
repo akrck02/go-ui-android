@@ -23,7 +23,7 @@ overlays, pickers, progress and gestures. The package&rsquo;s files follow the s
 <tbody>
 <tr>
 <td><code>TopAppBar(TopBar{…})</code></td>
-<td>The bar at the top, painted up under the status bar: a back arrow (a cross with <code>Close</code>, to leave a mode), a title and a subtitle, actions at its end; <code>Large</code> writes the title big under it, and with <code>Scrolled</code> (go-ui&rsquo;s <code>ScrollOffset</code> of the page under it) it shrinks into a small bar as the page goes up</td>
+<td>The bar at the top, painted up under the status bar: a back arrow (a cross with <code>Close</code>, to leave a mode), a title and a subtitle, actions at its end; <code>Large</code> writes the title big under it, and with <code>Scrolled</code> (Go UI&rsquo;s <code>ScrollOffset</code> of the page under it) it shrinks into a small bar as the page goes up</td>
 </tr>
 
 <tr>
@@ -364,7 +364,7 @@ overlays, pickers, progress and gestures. The package&rsquo;s files follow the s
 
 <tr>
 <td><code>VideoPlayer(name, video, height)</code></td>
-<td>A film (go-ui&rsquo;s <code>window.Video</code>) in a rounded box, a round play button over it while paused, a line of how far it has played; touching it plays or pauses</td>
+<td>A film (Go UI&rsquo;s <code>window.Video</code>) in a rounded box, a round play button over it while paused, a line of how far it has played; touching it plays or pauses</td>
 </tr>
 
 <tr>
@@ -373,8 +373,8 @@ overlays, pickers, progress and gestures. The package&rsquo;s files follow the s
 </tr>
 </tbody>
 </table>
-<p>go-renderer draws rounded rectangles, shadows, text and icons; the indicators&rsquo; shapes are made of
-rectangles in a box the program paints itself (go-ui&rsquo;s <code>Context.Paint</code>): a shape is filled row by
+<p>Go Renderer draws rounded rectangles, shadows, text and icons; the indicators&rsquo; shapes are made of
+rectangles in a box the program paints itself (Go UI&rsquo;s <code>Context.Paint</code>): a shape is filled row by
 row and edged with small dots, a wave or an arc is a line of dots. An indicator asks for frames
 while it is on screen, and a screen without one sleeps: five of them at once take about a third of
 a core on a OnePlus 7 Pro, and nothing once the screen is left.</p>
@@ -436,7 +436,7 @@ a core on a OnePlus 7 Pro, and nothing once the screen is left.</p>
 
 <h2 id="pictures">Pictures</h2>
 
-<p>Photos are go-renderer&rsquo;s <code>draw2d.Image</code>: decode one once (<code>draw2d.DecodeImage</code> reads a PNG, JPEG
+<p>Photos are Go Renderer&rsquo;s <code>draw2d.Image</code>: decode one once (<code>draw2d.DecodeImage</code> reads a PNG, JPEG
 or GIF the program embeds) and keep it. <code>context.Image(picture, layout, radius)</code> draws it filling a
 box, cropped evenly where their shapes differ; the pieces take one where a photo belongs:
 <code>Item.Picture</code> in a list row&rsquo;s avatar, <code>PictureAvatar</code>, <code>CarouselPicture</code> in a carousel. The

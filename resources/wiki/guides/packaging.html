@@ -8,7 +8,7 @@ go run github.com/akrck02/go-ui-android/cmd/go-ui-apk -name Gallery -id io.examp
 <p>It builds the program as a shared library for each processor asked for (arm64 phones by default) with the NDK&rsquo;s compiler (aligned to 16 KB
 pages, which Android 15 and later phones need), writes the manifest and a window theme that lets the
 program paint under the system&rsquo;s bars (light or dark with the phone) and beside a camera&rsquo;s cutout,
-compiles go-renderer&rsquo;s two Java classes (what a screen reader reads, and the view the on-screen
+compiles Go Renderer&rsquo;s two Java classes (what a screen reader reads, and the view the on-screen
 keyboard types in) with <code>javac</code> and the build tools&rsquo; <code>d8</code>, and packs, aligns and signs the package with the SDK&rsquo;s own <code>aapt2</code>, <code>zipalign</code> and <code>apksigner</code>. The
 window shrinks while the on-screen keyboard is up. It signs with the debug key in
 <code>~/.android/debug.keystore</code>, making it when missing, for phones and the emulator; a release is

@@ -23,11 +23,11 @@ with a switch on each, and a floating button to add one.</p>
 
 <h4 id="the-idea">The idea</h4>
 
-<p>go-ui is the <strong>pencil</strong>; <code>material</code> is a <strong>stencil set</strong> cut to Android&rsquo;s own shapes: the same lines, but every bar, row and button comes out the size and colour Android&rsquo;s apps use, so the app feels at home on a phone.</p>
+<p>Go UI is the <strong>pencil</strong>; <code>material</code> is a <strong>stencil set</strong> cut to Android&rsquo;s own shapes: the same lines, but every bar, row and button comes out the size and colour Android&rsquo;s apps use, so the app feels at home on a phone.</p>
 
 <h2 id="the-module">The module</h2>
 
-<p>Clone go-ui-android beside go-ui and go-renderer (and go-sound, which its gallery plays notes
+<p>Clone Go UI for Android beside Go UI and Go Renderer (and Go Sound, which its gallery plays notes
 through), then make your module there:</p>
 <pre><code class="language-bash"><span class="nb">cd</span> workspace
 git clone https://github.com/akrck02/go-ui-android
@@ -90,12 +90,12 @@ go mod init example.com/lighthouses
 </code></pre>
 
 <p><code>material.UseRoboto()</code> draws every text in Roboto, Android&rsquo;s typeface; call it before the window
-opens. <code>window.Options</code> and <code>RegisterFlags</code> are go-ui&rsquo;s: <code>-width 412 -height 892</code> gives the window a
+opens. <code>window.Options</code> and <code>RegisterFlags</code> are Go UI&rsquo;s: <code>-width 412 -height 892</code> gives the window a
 phone&rsquo;s size on the desktop, and <code>-capture</code> a picture.</p>
 
 <h2 id="a-frame-with-material">A frame with Material</h2>
 
-<p>At every frame the program makes a <strong>scheme</strong> (Material&rsquo;s colour roles), gives go-ui&rsquo;s own
+<p>At every frame the program makes a <strong>scheme</strong> (Material&rsquo;s colour roles), gives Go UI&rsquo;s own
 controls its theme, and makes a <strong><code>material.Look</code></strong>, which draws the pieces:</p>
 <pre><code class="language-go"><span class="c1">// build describes the app for this frame.</span>
 <span class="kd">func</span> <span class="p">(</span><span class="nx">program</span> <span class="o">*</span><span class="nx">app</span><span class="p">)</span> <span class="nf">build</span><span class="p">(</span><span class="nx">context</span> <span class="o">*</span><span class="nx">ui</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
@@ -168,7 +168,7 @@ gesture bar; <code>NavigationBar</code> comes in lesson 2.</p>
 <li><code>TopAppBar</code> with <code>Large</code> writes the title big, as a screen&rsquo;s first level does on Android.</li>
 <li><code>ListItem</code> is a Material row: an icon in a round avatar, a headline, a supporting line, and
 <code>Trailing</code> for what goes at its end. It returns <code>true</code> when touched.</li>
-<li>Rows repeat, so each gets a scope with <code>context.Push</code> (go-ui&rsquo;s ids).</li>
+<li>Rows repeat, so each gets a scope with <code>context.Push</code> (Go UI&rsquo;s ids).</li>
 <li><code>ExtendedFloatingButton</code> is the floating action button with its action written.</li>
 </ul>
 <pre><code class="language-bash">go run . -width <span class="m">412</span> -height <span class="m">892</span>

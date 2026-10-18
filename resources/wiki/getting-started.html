@@ -1,19 +1,19 @@
 <h1 id="getting-started">🚀 Getting started</h1>
 
-<p>Two things for a <a href="https://github.com/akrck02/go-ui" target="_blank">go-ui</a> program that should feel at home on a
+<p>Two things for a <a href="https://github.com/akrck02/go-ui" target="_blank">Go UI</a> program that should feel at home on a
 phone: <strong><code>material</code></strong>, pieces drawn the way Android&rsquo;s own applications are (Material Design 3, with
 Material 3 Expressive&rsquo;s newer pieces), and <strong><code>go-ui-apk</code></strong>, a tool that turns the program into an
 Android package.</p>
 
 <p>Neither needs Java, Gradle or Android Studio. The program stays an ordinary Go <code>main</code> package that
-calls go-ui&rsquo;s <code>window.Run</code>: on the desktop it opens a window, built for WebAssembly it draws in a web
-page, and on Android it is a shared library that Android&rsquo;s own <code>NativeActivity</code> loads (go-renderer&rsquo;s
+calls Go UI&rsquo;s <code>window.Run</code>: on the desktop it opens a window, built for WebAssembly it draws in a web
+page, and on Android it is a shared library that Android&rsquo;s own <code>NativeActivity</code> loads (Go Renderer&rsquo;s
 <code>android</code> package).</p>
 
 <h2 id="using-the-pieces">Using the pieces</h2>
 
-<p>A program makes a <code>material.Look</code> in every frame, from the go-ui context and a colour scheme, and
-calls its pieces. Pieces that can be touched return <code>true</code> in the frame they are touched, as go-ui&rsquo;s
+<p>A program makes a <code>material.Look</code> in every frame, from the Go UI context and a colour scheme, and
+calls its pieces. Pieces that can be touched return <code>true</code> in the frame they are touched, as Go UI&rsquo;s
 own controls do; the ones that keep something between frames (a pager, a carousel, a snackbar, a
 picker) take a small struct of the program&rsquo;s.</p>
 <pre><code class="language-go"><span class="nx">dark</span> <span class="o">:=</span> <span class="nx">window</span><span class="p">.</span><span class="nf">SystemPrefersDark</span><span class="p">()</span>
@@ -27,14 +27,14 @@ picker) take a small struct of the program&rsquo;s.</p>
 </code></pre>
 
 <p>Sizes are Material&rsquo;s: targets of at least 48 pixels, bars 64 and 80 pixels tall, 16-pixel text. A
-finger has no hover, so pieces change only while pressed. Each piece takes the name go-ui tells it
+finger has no hover, so pieces change only while pressed. Each piece takes the name Go UI tells it
 apart by (its label, its icon or a name given); rows that repeat get a scope each with
-<code>context.Push</code>, as in go-ui. <code>material.UseRoboto()</code>, before the window opens, draws every text in
+<code>context.Push</code>, as in Go UI. <code>material.UseRoboto()</code>, before the window opens, draws every text in
 Roboto, Android&rsquo;s typeface.</p>
 
-<h2 id="building-against-go-ui-and-go-renderer">Building against go-ui and go-renderer</h2>
+<h2 id="building-against-go-ui-and-go-renderer">Building against Go UI and Go Renderer</h2>
 
-<p>go-ui-android builds against <code>go-ui</code> and <code>go-renderer</code> checked out beside it (<code>replace</code> in <code>go.mod</code>),
+<p>Go UI for Android builds against <code>go-ui</code> and <code>go-renderer</code> checked out beside it (<code>replace</code> in <code>go.mod</code>),
 until they publish versions with touches, insets, the wallpaper&rsquo;s palettes and the Android window.</p>
 
 <p>Then <a href="./guides/packaging">package it for a phone</a>, and see <a href="./guides/pieces">every piece</a>.</p>
