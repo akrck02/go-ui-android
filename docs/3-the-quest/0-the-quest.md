@@ -14,9 +14,9 @@ it installed on a phone.
 <img alt="Settings in the dark theme and the app's own colour" src="../images/tutorial/phone-settings.jpg" width="180">
 </p>
 
-**Before you start**, know go-ui's basics: [its Get started](https://github.com/akrck02/go-ui/blob/main/docs/2-get-started.md)
+**Before you start**, know Go UI's basics: [its Get started](https://github.com/akrck02/go-ui/blob/main/docs/2-get-started.md)
 and, better, the first lessons of [its tutorial](https://github.com/akrck02/go-ui/blob/main/docs/3-the-quest/0-the-quest.md). This
-tutorial uses the same immediate mode, with Material pieces instead of go-ui's own.
+tutorial uses the same immediate mode, with Material pieces instead of Go UI's own.
 
 Every lesson has the same shape, as in a quest: **the idea** in everyday words, **the code**, a **checkpoint** to know it works, a **bonus** with its solution folded, and an **achievement** to unlock. A final challenge waits at the end of lesson 5.
 

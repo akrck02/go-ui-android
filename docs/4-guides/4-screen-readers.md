@@ -2,7 +2,7 @@
 
 Every piece reads under TalkBack as Android's own do: a finger moved over the screen reads what is
 under it ("Lamp, switch, on"), a swipe goes to the next thing, a double tap presses it, and the
-thing read is ringed. go-ui works the list out from the boxes ([its docs](https://github.com/akrck02/go-ui/blob/main/docs/4-guide.md#screen-readers)):
+thing read is ringed. Go UI works the list out from the boxes ([its docs](https://github.com/akrck02/go-ui/blob/main/docs/4-guide.md#screen-readers)):
 a control is read by the texts inside it, texts side by side are read together, a list holds its
 rows, and what is behind a dialog or a sheet is left out. The pieces add what the boxes cannot
 tell:
