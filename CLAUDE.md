@@ -14,7 +14,8 @@ go run ./cmd/gallery -capture frame.png
 ANDROID_HOME=… ANDROID_NDK_HOME=… go run ./cmd/go-ui-apk -name Gallery -id io.github.akrck02.gallery ./cmd/gallery
 ```
 
-It builds against `../go-ui` and `../go-renderer` (`replace` in `go.mod`).
+It asks for Go UI, Go Renderer and Go Sound by their versions (`go.mod`); a `go.work` beside them
+builds against local copies instead.
 
 ## Rules
 
