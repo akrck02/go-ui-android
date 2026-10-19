@@ -1,3 +1,9 @@
+github.com/akrck02/go-renderer v0.1.0 h1:XcuTMfi8P0+69nnNxjZZ+ytQ4DL1ulMiLZU3oHluXxw=
+github.com/akrck02/go-renderer v0.1.0/go.mod h1:Z835tJYTrI/B+rxk5BbIMsDFokk+P36R8kZ0CVbEZzA=
+github.com/akrck02/go-sound v0.1.0 h1:BTEY1QXCA1QJ5TPKIiDEE5NbNCKPhNau83hDnRkLlDo=
+github.com/akrck02/go-sound v0.1.0/go.mod h1:7xA0xsX82BV2o7M8sc1KMgpxPQed5DQXhXqO3xk6Ysc=
+github.com/akrck02/go-ui v0.1.1 h1:0doyqtJqZqjOXo1qOjshAkR/hxPZYg7BBPq/rXlgEr0=
+github.com/akrck02/go-ui v0.1.1/go.mod h1:O2qBdFyWLfJGvjf0tCGGdz9vgCnMuonNAjbRqXXWnLk=
 github.com/ebitengine/oto/v3 v3.5.1 h1:7gL5DxxSQp8S1Me2jDSp+gSAyondYxpjM5RPBBqLT0c=
 github.com/ebitengine/oto/v3 v3.5.1/go.mod h1:Elkm7yzTRns3w2efvibzVOoQ65YOwmec9a76dCiK10o=
 github.com/ebitengine/purego v0.11.0 h1:jhp/D+Nyv7UUW8HAcmcjt2N2rYrYi9m3SL21k0Ua/NI=

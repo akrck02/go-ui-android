@@ -13,18 +13,13 @@ Go UI is the **pencil**; `material` is a **stencil set** cut to Android's own sh
 
 ## The module
 
-Clone Go UI for Android beside Go UI and Go Renderer (and Go Sound, which its gallery plays notes
-through), then make your module there:
+Make your module and ask for Go UI for Android, which brings Go UI, Go Renderer and Go Sound with
+it:
 
 ```bash
-cd workspace
-git clone https://github.com/akrck02/go-ui-android
-git clone https://github.com/akrck02/go-sound
 mkdir lighthouses && cd lighthouses
 go mod init example.com/lighthouses
-for module in go-renderer go-ui go-ui-android go-sound; do
-	go mod edit -require github.com/akrck02/$module@v0.0.0 -replace github.com/akrck02/$module=../$module
-done
+go get github.com/akrck02/go-ui-android@latest
 ```
 
 ## The data and `main`

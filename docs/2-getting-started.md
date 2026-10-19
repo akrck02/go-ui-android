@@ -36,8 +36,9 @@ Roboto, Android's typeface.
 
 ## Building against Go UI and Go Renderer
 
-Go UI for Android builds against `go-ui` and `go-renderer` checked out beside it (`replace` in `go.mod`),
-until they publish versions with touches, insets, the wallpaper's palettes and the Android window.
+Go UI for Android asks for Go UI, Go Renderer and Go Sound by their versions, which Go downloads
+like any other module. To change one of them at the same time, clone it beside Go UI for Android
+and join the two with a workspace (`go work init . ../go-ui`): Go then builds against your copy.
 
 Then [package it for a phone](4-guides/5-packaging.md), and see [every piece](4-guides/1-pieces.md).
 
