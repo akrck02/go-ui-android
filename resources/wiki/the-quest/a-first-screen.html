@@ -27,16 +27,11 @@ with a switch on each, and a floating button to add one.</p>
 
 <h2 id="the-module">The module</h2>
 
-<p>Clone Go UI for Android beside Go UI and Go Renderer (and Go Sound, which its gallery plays notes
-through), then make your module there:</p>
-<pre><code class="language-bash"><span class="nb">cd</span> workspace
-git clone https://github.com/akrck02/go-ui-android
-git clone https://github.com/akrck02/go-sound
-mkdir lighthouses <span class="o">&amp;&amp;</span> <span class="nb">cd</span> lighthouses
+<p>Make your module and ask for Go UI for Android, which brings Go UI, Go Renderer and Go Sound with
+it:</p>
+<pre><code class="language-bash">mkdir lighthouses <span class="o">&amp;&amp;</span> <span class="nb">cd</span> lighthouses
 go mod init example.com/lighthouses
-<span class="k">for</span> module in go-renderer go-ui go-ui-android go-sound<span class="p">;</span> <span class="k">do</span>
-	go mod edit -require github.com/akrck02/<span class="nv">$module</span>@v0.0.0 -replace github.com/akrck02/<span class="nv">$module</span><span class="o">=</span>../<span class="nv">$module</span>
-<span class="k">done</span>
+go get github.com/akrck02/go-ui-android@latest
 </code></pre>
 
 <h2 id="the-data-and-main">The data and <code>main</code></h2>
