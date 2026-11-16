@@ -204,3 +204,15 @@ func TestIconAndSplashFlagsAreChecked(t *testing.T) {
 		t.Fatal("the splash colours are not the window's background")
 	}
 }
+
+// The activity is go-renderer's, which keeps a touched notification's intent for the program.
+func TestTheActivityKeepsATouchedNotification(t *testing.T) {
+	written, err := application{Name: "Example", ID: "io.example.app", VersionCode: 1, VersionName: "1.0", MinimumSDK: 26, TargetSDK: 34}.manifest()
+	if err != nil {
+		t.Fatal(err)
+	}
+	manifest := string(written)
+	if !strings.Contains(manifest, `<activity android:name="io.github.akrck02.gorenderer.Activity"`) {
+		t.Fatalf("the manifest's activity is not go-renderer's:\n%s", manifest)
+	}
+}

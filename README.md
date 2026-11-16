@@ -102,8 +102,8 @@ adb install lighthouses.apk
 </p>
 
 Your program stays an ordinary Go `main` package. On Android it is a shared library that Android's
-own `NativeActivity` loads; go-ui-apk builds it with the NDK and packs it with the SDK's own tools.
-[More on packaging →](docs/4-guides/5-packaging.md)
+own `NativeActivity` loads, through Go Renderer's small subclass of it; go-ui-apk builds it with the
+NDK and packs it with the SDK's own tools. [More on packaging →](docs/4-guides/5-packaging.md)
 
 ## 📚 Documentation
 

@@ -14,7 +14,8 @@ import (
 )
 
 // The package carries go-renderer's Java classes: ScreenReader, what TalkBack reads of the window,
-// and TextInput, the view the on-screen keyboard types in, which Android only lets Java answer. They
+// TextInput, the view the on-screen keyboard types in, which Android only lets Java answer, and
+// Activity, the activity that keeps a touched notification's intent. They
 // are compiled here from their source, against the platform's android.jar, and turned into
 // Android's classes.dex by the build tools' d8.
 

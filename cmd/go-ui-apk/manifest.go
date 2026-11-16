@@ -7,6 +7,8 @@ import (
 	"os"
 	"regexp"
 	"text/template"
+
+	"github.com/akrck02/go-renderer/android/java"
 )
 
 // application is what the package says about the program.
@@ -79,8 +81,9 @@ func (app application) check() error {
 	return app.checkRelease()
 }
 
-// The manifest: Android's NativeActivity runs the program's library. The package's only Java is
-// the screen reader's class (hasCode), which the library loads itself.
+// The manifest: go-renderer's Activity, Android's NativeActivity keeping the intent that brings it
+// back (a touched notification's, see window.OpenedNotification), runs the program's library. The
+// package's only Java is go-renderer's classes (hasCode).
 // The activity keeps running through rotations and theme changes, which the program follows itself,
 // and the on-screen keyboard shrinks the window rather than covering what is typed in.
 var manifestTemplate = template.Must(template.New("manifest").Funcs(template.FuncMap{"xml": escapeXML}).Parse(
@@ -96,7 +99,7 @@ var manifestTemplate = template.Must(template.New("manifest").Funcs(template.Fun
   {{- end}}
   <application android:label="{{xml .Name}}" android:hasCode="true" android:theme="@style/WindowTheme"
       {{- if or .Icon .IconForeground}} android:icon="@mipmap/icon"{{end}}{{if .Debuggable}} android:debuggable="true"{{end}}>
-    <activity android:name="android.app.NativeActivity" android:label="{{xml .Name}}"
+    <activity android:name="` + java.ActivityClass + `" android:label="{{xml .Name}}"
         android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|density"
         android:windowSoftInputMode="adjustResize" android:exported="true">
       <meta-data android:name="android.app.lib_name" android:value="` + libraryName + `" />
