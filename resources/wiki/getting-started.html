@@ -29,8 +29,8 @@ picker) take a small struct of the program&rsquo;s.</p>
 <p>Sizes are Material&rsquo;s: targets of at least 48 pixels, bars 64 and 80 pixels tall, 16-pixel text. A
 finger has no hover, so pieces change only while pressed. Each piece takes the name Go UI tells it
 apart by (its label, its icon or a name given); rows that repeat get a scope each with
-<code>context.Push</code>, as in Go UI. <code>material.UseRoboto()</code>, before the window opens, draws every text in
-Roboto, Android&rsquo;s typeface.</p>
+<code>context.Push</code>, as in Go UI. <code>options.Fonts = material.Roboto()</code> draws every text in Roboto, Android&rsquo;s
+typeface.</p>
 
 <h2 id="building-against-go-ui-and-go-renderer">Building against Go UI and Go Renderer</h2>
 

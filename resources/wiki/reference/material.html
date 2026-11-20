@@ -49,8 +49,8 @@ stick.go        an on-screen stick
 </tr>
 
 <tr>
-<td><code>func UseRoboto()</code></td>
-<td>UseRoboto draws every text in Roboto, Android&rsquo;s own typeface (SIL Open Font License, in fonts/).</td>
+<td><code>func Roboto() overlay.Fonts</code></td>
+<td>Roboto gives Roboto, Android&rsquo;s own typeface (SIL Open Font License, in fonts/), for the window to measure and draw every text in: options.Fonts = material.Roboto().</td>
 </tr>
 </tbody>
 </table>
@@ -804,7 +804,7 @@ stick.go        an on-screen stick
 </tr>
 
 <tr>
-<td><code>func (stick *Stick) Place(area draw2d.Rect, size float32)</code></td>
+<td><code>func (stick *Stick) Place(area draw2d.Rectangle, size float32)</code></td>
 <td>Place says where a stick of a program&rsquo;s own drawing is, and its side, for Follow.</td>
 </tr>
 
