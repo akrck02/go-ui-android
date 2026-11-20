@@ -199,3 +199,17 @@ func TestAScreenReaderReachesAndNamesEveryScreen(t *testing.T) {
 		}
 	}
 }
+
+// A touched notification about the Feedback screen opens it, wherever the gallery was; a target it
+// does not know leaves the gallery where it is.
+func TestANotificationTouchedOpensTheScreenItIsAbout(t *testing.T) {
+	program := &gallery{screen: tabsScreen}
+	program.arriveFrom("somewhere else")
+	if program.screen != tabsScreen {
+		t.Fatalf("an unknown target moved the gallery to screen %d", program.screen)
+	}
+	program.arriveFrom(feedbackTarget)
+	if program.screen != feedbackScreen {
+		t.Fatalf("the notification's target left the gallery on screen %d", program.screen)
+	}
+}
