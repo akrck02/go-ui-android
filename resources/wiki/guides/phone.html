@@ -99,6 +99,12 @@ and ask with <code>window.AskForNotifications()</code> when they do something th
 package with <code>go-ui-apk -notifications</code>, which names the permission. In a browser they are the
 page&rsquo;s notifications; on the desktop they are not shown yet.</p>
 
+<p>A notification can say what it is about: <code>window.NotifyAbout(id, title, text, target)</code> gives it a
+target in the program&rsquo;s own words (a screen, a thing&rsquo;s id). Touching it opens the program, and
+<code>window.OpenedNotification()</code>, asked in every frame, returns the target once, so the program shows
+that thing: also when the program was already open, because go-ui-apk&rsquo;s package runs go-renderer&rsquo;s
+activity, which keeps the intent a touched notification brings.</p>
+
 <h2 id="the-phone-s-services">The phone&rsquo;s services</h2>
 
 <p>What a program asks of the phone goes through Go UI&rsquo;s window, and works in a browser too:</p>
