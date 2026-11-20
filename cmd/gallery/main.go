@@ -164,6 +164,7 @@ func (program *gallery) places() []material.Destination {
 
 // build describes the interface for this frame.
 func (program *gallery) build(context *ui.Context) {
+	program.openNotification()
 	dark := program.isDark()
 	scheme := program.scheme(dark)
 	context.Theme = scheme.Theme(dark)

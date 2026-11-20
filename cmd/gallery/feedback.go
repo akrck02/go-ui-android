@@ -91,9 +91,32 @@ func (overlays *overlaysState) notify() {
 		overlays.snackbar.Show("Allow notifications, then touch again", "", after(4))
 		return
 	}
-	if window.Notify(1, "Harbour Light", "Lit for the night, reaching 18 miles") {
+	if window.NotifyAbout(1, "Harbour Light", "Lit for the night, reaching 18 miles", feedbackTarget) {
 		overlays.snackbar.Show("Notification sent: look at the shade", "", after(4))
 		return
 	}
 	overlays.snackbar.Show("Notifications are not shown here", "", after(4))
+}
+
+// feedbackTarget is what the gallery's notification is about, in the gallery's own words: the screen
+// that sent it, which a touch on it opens again.
+const feedbackTarget = "feedback"
+
+// openNotification brings the gallery to what a touched notification is about, once.
+func (program *gallery) openNotification() {
+	target, opened := window.OpenedNotification()
+	if !opened {
+		return
+	}
+	program.arriveFrom(target)
+}
+
+// arriveFrom shows the screen a notification's target names, with a note saying where the touch came
+// from; a target the gallery does not know leaves it where it is.
+func (program *gallery) arriveFrom(target string) {
+	if target != feedbackTarget {
+		return
+	}
+	program.screen = feedbackScreen
+	program.overlays.snackbar.Show("Opened from the notification", "", after(4))
 }
