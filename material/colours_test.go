@@ -7,9 +7,9 @@ import (
 )
 
 func TestABrandsColourTakesThePrimaryRoles(t *testing.T) {
-	brand := draw2d.Hex("#00668b")
-	scheme := Baseline(false).WithPrimary(brand, draw2d.Hex("#ffffff"), draw2d.Hex("#c4e7ff"), draw2d.Hex("#001e2c"))
-	if scheme.Primary != brand || scheme.SecondaryContainer != draw2d.Hex("#c4e7ff") {
+	brand := draw2d.MustHex("#00668b")
+	scheme := Baseline(false).WithPrimary(brand, draw2d.MustHex("#ffffff"), draw2d.MustHex("#c4e7ff"), draw2d.MustHex("#001e2c"))
+	if scheme.Primary != brand || scheme.SecondaryContainer != draw2d.MustHex("#c4e7ff") {
 		t.Fatalf("scheme %+v: the brand's colour and container are not used", scheme)
 	}
 	if theme := scheme.Theme(false); theme.ControlHeight != 48 || theme.Primary != brand {
@@ -18,7 +18,7 @@ func TestABrandsColourTakesThePrimaryRoles(t *testing.T) {
 }
 
 func TestTextOnAMarkIsReadable(t *testing.T) {
-	if readableOn(draw2d.Hex("#ffeb3b"))[0] != 0 || readableOn(draw2d.Hex("#1a237e"))[0] != 1 {
+	if readableOn(draw2d.MustHex("#ffeb3b"))[0] != 0 || readableOn(draw2d.MustHex("#1a237e"))[0] != 1 {
 		t.Fatal("want dark text on yellow and light text on navy")
 	}
 }

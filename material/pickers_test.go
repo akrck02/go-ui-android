@@ -44,10 +44,10 @@ func TestATimeIsChosenOnTheDial(t *testing.T) {
 	dial := picker.dial
 	middleX, middleY := float64(dial.X+dial.Width/2), float64(dial.Y+dial.Height/2)
 	tapAt := func(x, y float64) {
-		screen.state.MoveCursor(x, y)
-		screen.state.SetButton(input.MouseLeft, true)
+		screen.state.Feed().MoveCursor(x, y)
+		screen.state.Feed().SetButton(input.MouseLeft, true)
 		screen.frame()
-		screen.state.SetButton(input.MouseLeft, false)
+		screen.state.Feed().SetButton(input.MouseLeft, false)
 		screen.frame()
 	}
 	tapAt(middleX+float64(dial.Width)*0.4, middleY) // three o'clock, outer ring

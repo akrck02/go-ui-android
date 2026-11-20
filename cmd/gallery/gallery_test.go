@@ -29,7 +29,7 @@ func TestEveryScreenLeadsToEveryOther(t *testing.T) {
 		context.Begin(state)
 		program.build(context)
 		context.End()
-		state.EndFrame()
+		state.Feed().EndFrame()
 	}
 	tap := func(label string) {
 		area, found := context.Area("navigate " + label)
@@ -71,7 +71,7 @@ func TestALighthouseHeldIsChosenAndTheBinRemovesIt(t *testing.T) {
 		context.Begin(state)
 		program.build(context)
 		context.End()
-		state.EndFrame()
+		state.Feed().EndFrame()
 	}
 	touch := func(frames int, path ...string) {
 		area, found := context.Area(path...)
@@ -94,7 +94,7 @@ func TestALighthouseHeldIsChosenAndTheBinRemovesIt(t *testing.T) {
 	if !program.lists.choosing() || program.lists.chosenCount() != 1 {
 		t.Fatal("holding Seal Rock did not choose it")
 	}
-	state.PressBack()
+	state.Feed().PressBack()
 	frame()
 	if program.lists.choosing() || program.screen != listsScreen {
 		t.Fatalf("after the back, choosing %v on screen %d; want nothing chosen, still on the lists", program.lists.choosing(), program.screen)
@@ -123,7 +123,7 @@ func TestALighthouseTouchedOpensItsDetails(t *testing.T) {
 		context.Begin(state)
 		program.build(context)
 		context.End()
-		state.EndFrame()
+		state.Feed().EndFrame()
 	}
 	settle := func() {
 		for range 30 {
@@ -143,12 +143,12 @@ func TestALighthouseTouchedOpensItsDetails(t *testing.T) {
 	if program.lists.navigation.Current() != "Seal Rock" {
 		t.Fatalf("on %q after touching Seal Rock; want its details", program.lists.navigation.Current())
 	}
-	state.PressBack()
+	state.Feed().PressBack()
 	settle()
 	if program.lists.navigation.Current() != "" || program.screen != listsScreen {
 		t.Fatalf("on %q of screen %d after the back; want the list", program.lists.navigation.Current(), program.screen)
 	}
-	state.PressBack()
+	state.Feed().PressBack()
 	settle()
 	if program.screen != actionsScreen {
 		t.Fatal("the next back did not leave the lists")
@@ -167,7 +167,7 @@ func TestAScreenReaderReachesAndNamesEveryScreen(t *testing.T) {
 		context.Begin(state)
 		program.build(context)
 		context.End()
-		state.EndFrame()
+		state.Feed().EndFrame()
 	}
 	find := func(label string) (ui.AccessibleNode, bool) {
 		for _, node := range context.ScreenReaderNodes() {

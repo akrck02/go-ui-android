@@ -27,7 +27,7 @@ repeated pieces get a scope each with `look.Context.Push`.
 |---|---|
 | `material.NavigationBarHeight` | 80: what to lift floating things by over the navigation bar |
 | `material.Indeterminate` | -1: a progress indicator with no known fraction |
-| `material.UseRoboto()` | Draws every text in Roboto; before the window opens |
+| `material.Roboto()` | Roboto, Android's typeface, for `window.Options.Fonts` |
 | `material.EnglishWords`, `EnglishDates`, `EnglishTimes` | The pieces' own words; replace them with `Look.Words`, `DateNames`, `TimeNames` in another language |
 | `material.PalettesFromColour(colour)` | Tonal palettes from one colour |
 

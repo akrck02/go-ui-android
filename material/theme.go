@@ -31,12 +31,12 @@ func (scheme Scheme) Theme(dark bool) ui.Theme {
 //go:embed fonts/Roboto-Regular.ttf fonts/Roboto-Medium.ttf fonts/Roboto-Bold.ttf
 var roboto embed.FS
 
-// UseRoboto draws every text in Roboto, Android's own typeface (SIL Open Font License, in fonts/).
-// Call it before the window makes its interface, which reads the fonts. A program with a typeface
-// of its own gives it to go-renderer's overlay.UseFonts instead.
-func UseRoboto() {
+// Roboto gives Roboto, Android's own typeface (SIL Open Font License, in fonts/), for the window to
+// measure and draw every text in: options.Fonts = material.Roboto(). A program with a typeface of
+// its own gives its own overlay.Fonts instead.
+func Roboto() overlay.Fonts {
 	regular, _ := roboto.ReadFile("fonts/Roboto-Regular.ttf") // embedded: they are always there
 	medium, _ := roboto.ReadFile("fonts/Roboto-Medium.ttf")
 	bold, _ := roboto.ReadFile("fonts/Roboto-Bold.ttf")
-	overlay.UseFonts(overlay.Fonts{Regular: regular, Medium: medium, Bold: bold})
+	return overlay.Fonts{Regular: regular, Medium: medium, Bold: bold}
 }

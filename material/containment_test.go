@@ -48,14 +48,14 @@ func (screen *screen) hold(frames int, path ...string) {
 		screen.t.Fatalf("nothing called %v was laid out", path)
 	}
 	x, y := float64(area.X+area.Width/2), float64(area.Y+area.Height/2)
-	screen.state.SetTouch(1, x, y)
-	screen.state.MoveCursor(x, y)
-	screen.state.SetButton(input.MouseLeft, true)
+	screen.state.Feed().SetTouch(1, x, y)
+	screen.state.Feed().MoveCursor(x, y)
+	screen.state.Feed().SetButton(input.MouseLeft, true)
 	for range frames {
 		screen.frame()
 	}
-	screen.state.SetButton(input.MouseLeft, false)
-	screen.state.LiftTouch(1)
+	screen.state.Feed().SetButton(input.MouseLeft, false)
+	screen.state.Feed().LiftTouch(1)
 	screen.frame()
 }
 

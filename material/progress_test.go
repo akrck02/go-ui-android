@@ -26,7 +26,7 @@ func TestLoadingIndicatorsPaintAndKeepMoving(t *testing.T) {
 		if wanted := map[bool]int{true: 1, false: 5}[name == "skeleton"]; painted < wanted {
 			t.Fatalf("%s painted %d rectangles; want a shape made of many", name, painted)
 		}
-		if _, wanted := screen.state.TakeFrameRequest(); !wanted {
+		if _, wanted := screen.state.Feed().TakeFrameRequest(); !wanted {
 			t.Fatalf("%s does not ask for its next frame", name)
 		}
 	}
@@ -35,7 +35,7 @@ func TestLoadingIndicatorsPaintAndKeepMoving(t *testing.T) {
 func TestAKnownProgressStandsStill(t *testing.T) {
 	screen := newScreen(t, func(look Look) { look.CircularProgress(0.5, 48, false) })
 	screen.frame()
-	if _, wanted := screen.state.TakeFrameRequest(); wanted {
+	if _, wanted := screen.state.Feed().TakeFrameRequest(); wanted {
 		t.Fatal("a still ring asks for frames: a screen showing it never sleeps")
 	}
 }

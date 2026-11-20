@@ -124,12 +124,12 @@ func TestTheBackGoesToTheScreenWhenNoDialogIsOpen(t *testing.T) {
 		}
 	})
 	screen.frame()
-	screen.state.PressBack()
+	screen.state.Feed().PressBack()
 	screen.frame()
 	if dialog || wentBack {
 		t.Fatalf("dialog open %v, screen went back %v: the dialog closes first", dialog, wentBack)
 	}
-	screen.state.PressBack()
+	screen.state.Feed().PressBack()
 	screen.frame()
 	if !wentBack {
 		t.Fatal("the screen did not go back")
@@ -200,7 +200,7 @@ func TestScreensAreGoneToAndBackFrom(t *testing.T) {
 	if drawn["list"] || !drawn["seal rock"] || navigation.Depth() != 2 {
 		t.Fatalf("drawn %v at depth %d once there; want the new screen alone", drawn, navigation.Depth())
 	}
-	screen.state.PressBack()
+	screen.state.Feed().PressBack()
 	screen.frame()
 	if navigation.Current() != "list" || !drawn["seal rock"] {
 		t.Fatalf("on %q, drawn %v after the back; want the list, the details sliding out", navigation.Current(), drawn)
@@ -208,7 +208,7 @@ func TestScreensAreGoneToAndBackFrom(t *testing.T) {
 	for range 30 {
 		screen.frame()
 	}
-	screen.state.PressBack()
+	screen.state.Feed().PressBack()
 	screen.frame()
 	if navigation.Current() != "list" || navigation.Back() {
 		t.Fatal("the first screen was gone back from")

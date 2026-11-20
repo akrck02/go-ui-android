@@ -42,8 +42,8 @@ func TestATextFieldTakesWhatIsTyped(t *testing.T) {
 	if !screen.context.Typing() {
 		t.Fatal("a touched field is not being typed in: the keyboard would not come up")
 	}
-	screen.state.AddCharacter('Ñ')
-	screen.state.AddCharacter('o')
+	screen.state.Feed().AddCharacter('Ñ')
+	screen.state.Feed().AddCharacter('o')
 	screen.frame()
 	if name != "Ño" {
 		t.Fatalf("name %q; want what was typed", name)
@@ -125,8 +125,8 @@ func TestASearchOpensReadyToTypeAndCloses(t *testing.T) {
 	if !search.Active || !screen.context.Typing() {
 		t.Fatalf("active %v, typing %v after touching the pill; want the search open with the keyboard up", search.Active, screen.context.Typing())
 	}
-	screen.state.AddCharacter('s')
-	screen.state.AddCharacter('e')
+	screen.state.Feed().AddCharacter('s')
+	screen.state.Feed().AddCharacter('e')
 	screen.frame()
 	screen.frame()
 	if search.Query != "se" || screen.drawn("North Cape") || !screen.drawn("Seal Rock") {

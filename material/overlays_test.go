@@ -26,10 +26,10 @@ func TestADialogSaysWhatWasChosen(t *testing.T) {
 		t.Fatalf("answer %v after Cancel; want Dismissed", answer)
 	}
 	answer = Open
-	screen.state.MoveCursor(5, 5) // the dimmed screen around the card
-	screen.state.SetButton(input.MouseLeft, true)
+	screen.state.Feed().MoveCursor(5, 5) // the dimmed screen around the card
+	screen.state.Feed().SetButton(input.MouseLeft, true)
 	screen.frame()
-	screen.state.SetButton(input.MouseLeft, false)
+	screen.state.Feed().SetButton(input.MouseLeft, false)
 	screen.frame()
 	if answer != Dismissed {
 		t.Fatalf("answer %v after a touch outside; want Dismissed", answer)
@@ -143,8 +143,8 @@ func TestAStandardSheetIsDraggedUpAndSettles(t *testing.T) {
 	for range 15 {
 		screen.frame()
 	}
-	screen.state.SetButton(input.MouseLeft, false)
-	screen.state.LiftTouch(1)
+	screen.state.Feed().SetButton(input.MouseLeft, false)
+	screen.state.Feed().LiftTouch(1)
 	for range 30 {
 		screen.frame()
 	}

@@ -31,8 +31,8 @@ look.NavigationBar(places, &screen)
 Sizes are Material's: targets of at least 48 pixels, bars 64 and 80 pixels tall, 16-pixel text. A
 finger has no hover, so pieces change only while pressed. Each piece takes the name Go UI tells it
 apart by (its label, its icon or a name given); rows that repeat get a scope each with
-`context.Push`, as in Go UI. `material.UseRoboto()`, before the window opens, draws every text in
-Roboto, Android's typeface.
+`context.Push`, as in Go UI. `options.Fonts = material.Roboto()` draws every text in Roboto, Android's
+typeface.
 
 ## Building against Go UI and Go Renderer
 

@@ -18,7 +18,7 @@ type Stick struct {
 	Held     bool
 	Finger   int64 // the finger holding it, while Held
 
-	area draw2d.Rect // where it was laid out, in the last frame
+	area draw2d.Rectangle // where it was laid out, in the last frame
 	size float32
 }
 
@@ -88,7 +88,7 @@ func (stick *Stick) Follow(touches []input.Touch) {
 }
 
 // Place says where a stick of a program's own drawing is, and its side, for Follow.
-func (stick *Stick) Place(area draw2d.Rect, size float32) {
+func (stick *Stick) Place(area draw2d.Rectangle, size float32) {
 	stick.area, stick.size = area, size
 }
 

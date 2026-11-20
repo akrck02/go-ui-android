@@ -110,7 +110,7 @@ func main() {
 		},
 		dark: options.Dark || window.SystemPrefersDark(),
 	}
-	material.UseRoboto() // Android's typeface, before the window reads the fonts
+	options.Fonts = material.Roboto() // Android's typeface, for every text
 	if err := window.Run(options, program.build); err != nil {
 		log.Fatal(err)
 	}
@@ -120,7 +120,7 @@ func main() {
 func (program *app) build(context *ui.Context) {
 	scheme := material.System(program.dark) // the wallpaper's colours on Android 12 and later
 	if program.ownColour {
-		scheme = material.FromColour(draw2d.Hex("#00796b"), program.dark)
+		scheme = material.FromColour(draw2d.MustHex("#00796b"), program.dark)
 	}
 	context.Theme = scheme.Theme(program.dark)
 	look := material.New(context, scheme)

@@ -23,7 +23,7 @@ func TestEveryShadeHasItsTone(t *testing.T) {
 }
 
 func TestAColoursSchemeKeepsItsHue(t *testing.T) {
-	seed := draw2d.Hex("#e8743b") // an orange
+	seed := draw2d.MustHex("#e8743b") // an orange
 	_, _, seedHue := oklch(seed)
 	for _, dark := range []bool{false, true} {
 		scheme := FromColour(seed, dark)
@@ -35,7 +35,7 @@ func TestAColoursSchemeKeepsItsHue(t *testing.T) {
 }
 
 func TestAColoursSchemeReadsWell(t *testing.T) {
-	for _, seed := range []draw2d.Color{draw2d.Hex("#1a73e8"), draw2d.Hex("#2e7d32"), draw2d.Hex("#c2185b"), draw2d.Hex("#ffeb3b")} {
+	for _, seed := range []draw2d.Color{draw2d.MustHex("#1a73e8"), draw2d.MustHex("#2e7d32"), draw2d.MustHex("#c2185b"), draw2d.MustHex("#ffeb3b")} {
 		for _, dark := range []bool{false, true} {
 			scheme := FromColour(seed, dark)
 			for _, pair := range [][2]draw2d.Color{

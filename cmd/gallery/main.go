@@ -76,7 +76,7 @@ func main() {
 	}
 	options.Hidden = program.hidden
 	options.Shown = program.sounds.resume
-	material.UseRoboto()          // before the window makes its interface, which reads the fonts
+	options.Fonts = material.Roboto() // the interface measures and draws its text in Roboto
 	if err := window.Run(options, program.build); err != nil {
 		log.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func (program *gallery) setDark(dark bool) { program.dark, program.themeSet = da
 const projectPage = "https://github.com/akrck02/go-ui-android"
 
 // seeds are the colours a scheme can be made from, besides the wallpaper.
-var seeds = []draw2d.Color{draw2d.Hex("#00897b"), draw2d.Hex("#e8743b"), draw2d.Hex("#c2185b"), draw2d.Hex("#558b2f")}
+var seeds = []draw2d.Color{draw2d.MustHex("#00897b"), draw2d.MustHex("#e8743b"), draw2d.MustHex("#c2185b"), draw2d.MustHex("#558b2f")}
 
 // scheme is the wallpaper's colours (on Android 12 and later; Material's baseline elsewhere), or
 // a whole scheme made from the colour chosen.

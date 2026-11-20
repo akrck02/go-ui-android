@@ -67,7 +67,7 @@ func (look Look) loading(size float32, contained bool) {
 	if contained {
 		fill, scale = scheme.OnPrimaryContainer, 0.3
 	}
-	look.Context.Paint(ui.Layout{Width: ui.Fixed(size), Height: ui.Fixed(size)}, func(area draw2d.Rect, drawing *draw2d.List) {
+	look.Context.Paint(ui.Layout{Width: ui.Fixed(size), Height: ui.Fixed(size)}, func(area draw2d.Rectangle, drawing *draw2d.List) {
 		if contained {
 			drawing.Rectangle(area, size/2, scheme.PrimaryContainer, draw2d.Transparent, 0)
 		}
@@ -103,11 +103,11 @@ func fillShape(drawing *draw2d.List, middleX, middleY float64, form shape, colou
 		crossings := crossingsAt(outline[:], middle)
 		for pair := 0; pair+1 < len(crossings); pair += 2 {
 			left, right := crossings[pair], crossings[pair+1]
-			drawing.Rectangle(draw2d.Rect{X: float32(left), Y: float32(y), Width: float32(right - left), Height: row + 0.1}, 0, colour, draw2d.Transparent, 0)
+			drawing.Rectangle(draw2d.Rectangle{X: float32(left), Y: float32(y), Width: float32(right - left), Height: row + 0.1}, 0, colour, draw2d.Transparent, 0)
 		}
 	}
 	for _, point := range outline {
-		drawing.Rectangle(draw2d.Rect{X: float32(point[0] - 0.6), Y: float32(point[1] - 0.6), Width: 1.2, Height: 1.2}, 0.6, colour, draw2d.Transparent, 0)
+		drawing.Rectangle(draw2d.Rectangle{X: float32(point[0] - 0.6), Y: float32(point[1] - 0.6), Width: 1.2, Height: 1.2}, 0.6, colour, draw2d.Transparent, 0)
 	}
 }
 
@@ -141,7 +141,7 @@ func easeInOut(progress float64) float64 {
 // dot paints a round dot of a diameter centred on a point.
 func dot(drawing *draw2d.List, x, y, diameter float64, colour draw2d.Color) {
 	radius := diameter / 2
-	drawing.Rectangle(draw2d.Rect{X: float32(x - radius), Y: float32(y - radius), Width: float32(diameter), Height: float32(diameter)},
+	drawing.Rectangle(draw2d.Rectangle{X: float32(x - radius), Y: float32(y - radius), Width: float32(diameter), Height: float32(diameter)},
 		float32(radius), colour, draw2d.Transparent, 0)
 }
 
@@ -163,7 +163,7 @@ func (look Look) CircularProgress(fraction float32, size float32, wavy bool) {
 		start = elapsed*2*math.Pi/1.6 - math.Pi/2 + cycle*math.Pi
 		look.Context.RequestFrame(frameDelay)
 	}
-	look.Context.Paint(ui.Layout{Width: ui.Fixed(size), Height: ui.Fixed(size)}, func(area draw2d.Rect, drawing *draw2d.List) {
+	look.Context.Paint(ui.Layout{Width: ui.Fixed(size), Height: ui.Fixed(size)}, func(area draw2d.Rectangle, drawing *draw2d.List) {
 		middleX, middleY := float64(area.X+area.Width/2), float64(area.Y+area.Height/2)
 		const stroke = 4
 		radius := float64(size)/2 - stroke - 2
@@ -199,7 +199,7 @@ func arc(drawing *draw2d.List, middleX, middleY, radius, start, sweep, amplitude
 func (look Look) WavyProgress(fraction float32) {
 	scheme := look.Scheme
 	elapsed := time.Since(loadingEpoch).Seconds()
-	look.Context.Paint(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(12)}, func(area draw2d.Rect, drawing *draw2d.List) {
+	look.Context.Paint(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(12)}, func(area draw2d.Rectangle, drawing *draw2d.List) {
 		const stroke, amplitude, wavelength = 4.0, 3.0, 40.0
 		left, right := float64(area.X)+stroke/2, float64(area.Right())-stroke/2
 		middle := float64(area.Y + area.Height/2)
@@ -210,7 +210,7 @@ func (look Look) WavyProgress(fraction float32) {
 		}
 		flat := func(from, to float64) {
 			if to > from {
-				drawing.Rectangle(draw2d.Rect{X: float32(from - stroke/2), Y: float32(middle - stroke/2), Width: float32(to - from + stroke), Height: stroke},
+				drawing.Rectangle(draw2d.Rectangle{X: float32(from - stroke/2), Y: float32(middle - stroke/2), Width: float32(to - from + stroke), Height: stroke},
 					stroke/2, scheme.SecondaryContainer, draw2d.Transparent, 0)
 			}
 		}
@@ -242,7 +242,7 @@ func (look Look) Skeleton(width, height ui.Sizing, radius float32) {
 	elapsed := time.Since(loadingEpoch).Seconds()
 	base := scheme.SurfaceContainerHighest
 	light := mix(base, scheme.Surface, 0.6)
-	look.Context.Paint(ui.Layout{Width: width, Height: height}, func(area draw2d.Rect, drawing *draw2d.List) {
+	look.Context.Paint(ui.Layout{Width: width, Height: height}, func(area draw2d.Rectangle, drawing *draw2d.List) {
 		drawing.Rectangle(area, radius, base, draw2d.Transparent, 0)
 		// a soft band of light crossing every 1.5 seconds, made of strips fading out at its sides
 		drawing.PushClip(area)
@@ -254,7 +254,7 @@ func (look Look) Skeleton(width, height ui.Sizing, radius float32) {
 			share := float64(strip) / strips
 			strength := float32(math.Sin(math.Pi * (share + 0.5/strips)))
 			colour := draw2d.Color{light[0], light[1], light[2], strength * 0.7}
-			drawing.Rectangle(draw2d.Rect{X: float32(position + share*band), Y: area.Y, Width: band/strips + 0.5, Height: area.Height}, 0, colour, draw2d.Transparent, 0)
+			drawing.Rectangle(draw2d.Rectangle{X: float32(position + share*band), Y: area.Y, Width: band/strips + 0.5, Height: area.Height}, 0, colour, draw2d.Transparent, 0)
 		}
 	})
 	look.Context.RequestFrame(frameDelay)

@@ -349,14 +349,14 @@ func (look Look) tabStrip(name string, labels []string, selected *int, at float3
 			}
 		})
 		// the underline, painted where the position says, as wide as a short label
-		look.Context.Paint(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(3)}, func(area draw2d.Rect, drawing *draw2d.List) {
+		look.Context.Paint(ui.Layout{Width: ui.Grow(), Height: ui.Fixed(3)}, func(area draw2d.Rectangle, drawing *draw2d.List) {
 			if len(labels) == 0 {
 				return
 			}
 			tab := area.Width / float32(len(labels))
 			width := min(tab*0.6, 96)
 			x := area.X + at*tab + (tab-width)/2
-			drawing.Rectangle(draw2d.Rect{X: x, Y: area.Y, Width: width, Height: area.Height}, 1.5, scheme.Primary, draw2d.Transparent, 0)
+			drawing.Rectangle(draw2d.Rectangle{X: x, Y: area.Y, Width: width, Height: area.Height}, 1.5, scheme.Primary, draw2d.Transparent, 0)
 		})
 		look.Divider()
 	})

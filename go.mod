@@ -3,9 +3,9 @@ module github.com/akrck02/go-ui-android
 go 1.25.6
 
 require (
-	github.com/akrck02/go-renderer v0.1.0
-	github.com/akrck02/go-sound v0.1.0
-	github.com/akrck02/go-ui v0.1.1
+	github.com/akrck02/go-renderer v0.4.0
+	github.com/akrck02/go-sound v0.1.1
+	github.com/akrck02/go-ui v0.2.0
 )
 
 require (

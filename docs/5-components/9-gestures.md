@@ -12,7 +12,7 @@ small one, growing as they come in.
 
 ```go
 places := []string{"Cliffs", "Harbour", "Reef", "Dunes", "Island"}
-tints := []draw2d.Color{draw2d.Hex("#b3d4e0"), draw2d.Hex("#c9e0b3"), draw2d.Hex("#e0cdb3"), draw2d.Hex("#e0b3c4"), draw2d.Hex("#c4b3e0")}
+tints := []draw2d.Color{draw2d.MustHex("#b3d4e0"), draw2d.MustHex("#c9e0b3"), draw2d.MustHex("#e0cdb3"), draw2d.MustHex("#e0b3c4"), draw2d.MustHex("#c4b3e0")}
 look.SectionTitle("Places")
 look.Carousel("places", &carousel, len(places), 140, func(index int) {
 	look.CarouselItem(160, tints[index], "map-pin", places[index])

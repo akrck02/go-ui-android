@@ -26,29 +26,29 @@ type Scheme struct {
 func Baseline(dark bool) Scheme {
 	if dark {
 		return Scheme{
-			Primary: draw2d.Hex("#d0bcff"), OnPrimary: draw2d.Hex("#381e72"),
-			PrimaryContainer: draw2d.Hex("#4f378b"), OnPrimaryContainer: draw2d.Hex("#eaddff"),
-			SecondaryContainer: draw2d.Hex("#4a4458"), OnSecondaryContainer: draw2d.Hex("#e8def8"),
-			Error: draw2d.Hex("#f2b8b5"), OnError: draw2d.Hex("#601410"),
-			ErrorContainer: draw2d.Hex("#8c1d18"), OnErrorContainer: draw2d.Hex("#f9dedc"),
-			Surface: draw2d.Hex("#141218"), OnSurface: draw2d.Hex("#e6e0e9"), OnSurfaceVariant: draw2d.Hex("#cac4d0"),
-			SurfaceContainerLow: draw2d.Hex("#1d1b20"), SurfaceContainer: draw2d.Hex("#211f26"),
-			SurfaceContainerHigh: draw2d.Hex("#2b2930"), SurfaceContainerHighest: draw2d.Hex("#36343b"),
-			Outline: draw2d.Hex("#938f99"), OutlineVariant: draw2d.Hex("#49454f"), Scrim: draw2d.Hex("#141218cc"),
-			InverseSurface: draw2d.Hex("#e6e0e9"), InverseOnSurface: draw2d.Hex("#322f35"), InversePrimary: draw2d.Hex("#6750a4"),
+			Primary: draw2d.MustHex("#d0bcff"), OnPrimary: draw2d.MustHex("#381e72"),
+			PrimaryContainer: draw2d.MustHex("#4f378b"), OnPrimaryContainer: draw2d.MustHex("#eaddff"),
+			SecondaryContainer: draw2d.MustHex("#4a4458"), OnSecondaryContainer: draw2d.MustHex("#e8def8"),
+			Error: draw2d.MustHex("#f2b8b5"), OnError: draw2d.MustHex("#601410"),
+			ErrorContainer: draw2d.MustHex("#8c1d18"), OnErrorContainer: draw2d.MustHex("#f9dedc"),
+			Surface: draw2d.MustHex("#141218"), OnSurface: draw2d.MustHex("#e6e0e9"), OnSurfaceVariant: draw2d.MustHex("#cac4d0"),
+			SurfaceContainerLow: draw2d.MustHex("#1d1b20"), SurfaceContainer: draw2d.MustHex("#211f26"),
+			SurfaceContainerHigh: draw2d.MustHex("#2b2930"), SurfaceContainerHighest: draw2d.MustHex("#36343b"),
+			Outline: draw2d.MustHex("#938f99"), OutlineVariant: draw2d.MustHex("#49454f"), Scrim: draw2d.MustHex("#141218cc"),
+			InverseSurface: draw2d.MustHex("#e6e0e9"), InverseOnSurface: draw2d.MustHex("#322f35"), InversePrimary: draw2d.MustHex("#6750a4"),
 		}
 	}
 	return Scheme{
-		Primary: draw2d.Hex("#6750a4"), OnPrimary: draw2d.Hex("#ffffff"),
-		PrimaryContainer: draw2d.Hex("#eaddff"), OnPrimaryContainer: draw2d.Hex("#21005d"),
-		SecondaryContainer: draw2d.Hex("#e8def8"), OnSecondaryContainer: draw2d.Hex("#1d192b"),
-		Error: draw2d.Hex("#b3261e"), OnError: draw2d.Hex("#ffffff"),
-		ErrorContainer: draw2d.Hex("#f9dedc"), OnErrorContainer: draw2d.Hex("#410e0b"),
-		Surface: draw2d.Hex("#fef7ff"), OnSurface: draw2d.Hex("#1d1b20"), OnSurfaceVariant: draw2d.Hex("#49454f"),
-		SurfaceContainerLow: draw2d.Hex("#f7f2fa"), SurfaceContainer: draw2d.Hex("#f3edf7"),
-		SurfaceContainerHigh: draw2d.Hex("#ece6f0"), SurfaceContainerHighest: draw2d.Hex("#e6e0e9"),
-		Outline: draw2d.Hex("#79747e"), OutlineVariant: draw2d.Hex("#cac4d0"), Scrim: draw2d.Hex("#fef7ffcc"),
-		InverseSurface: draw2d.Hex("#322f35"), InverseOnSurface: draw2d.Hex("#f5eff7"), InversePrimary: draw2d.Hex("#d0bcff"),
+		Primary: draw2d.MustHex("#6750a4"), OnPrimary: draw2d.MustHex("#ffffff"),
+		PrimaryContainer: draw2d.MustHex("#eaddff"), OnPrimaryContainer: draw2d.MustHex("#21005d"),
+		SecondaryContainer: draw2d.MustHex("#e8def8"), OnSecondaryContainer: draw2d.MustHex("#1d192b"),
+		Error: draw2d.MustHex("#b3261e"), OnError: draw2d.MustHex("#ffffff"),
+		ErrorContainer: draw2d.MustHex("#f9dedc"), OnErrorContainer: draw2d.MustHex("#410e0b"),
+		Surface: draw2d.MustHex("#fef7ff"), OnSurface: draw2d.MustHex("#1d1b20"), OnSurfaceVariant: draw2d.MustHex("#49454f"),
+		SurfaceContainerLow: draw2d.MustHex("#f7f2fa"), SurfaceContainer: draw2d.MustHex("#f3edf7"),
+		SurfaceContainerHigh: draw2d.MustHex("#ece6f0"), SurfaceContainerHighest: draw2d.MustHex("#e6e0e9"),
+		Outline: draw2d.MustHex("#79747e"), OutlineVariant: draw2d.MustHex("#cac4d0"), Scrim: draw2d.MustHex("#fef7ffcc"),
+		InverseSurface: draw2d.MustHex("#322f35"), InverseOnSurface: draw2d.MustHex("#f5eff7"), InversePrimary: draw2d.MustHex("#d0bcff"),
 	}
 }
 
