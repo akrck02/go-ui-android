@@ -236,13 +236,13 @@ func clampFloat(value, minimum, maximum float32) float32 { return min(max(value,
 // that keeps the title readable on any photo; an empty title leaves the photo alone (a narrow item).
 func (look Look) CarouselPicture(picture *draw2d.Image, height float32, title string) {
 	layout := ui.Layout{Width: ui.Grow(), Height: ui.Fixed(height)}
-	look.Context.Paint(layout, func(area draw2d.Rect, drawing *draw2d.List) {
+	look.Context.Paint(layout, func(area draw2d.Rectangle, drawing *draw2d.List) {
 		drawing.Image(picture, area, 28, draw2d.Color{1, 1, 1, 1})
 		if title == "" {
 			return
 		}
 		const veilHeight = 56
-		veil := draw2d.Rect{X: area.X, Y: area.Bottom() - veilHeight, Width: area.Width, Height: veilHeight}
+		veil := draw2d.Rectangle{X: area.X, Y: area.Bottom() - veilHeight, Width: area.Width, Height: veilHeight}
 		// the photo's own shape, cut to its foot: the veil's corners are the photo's
 		drawing.PushClip(veil)
 		drawing.Rectangle(area, 28, draw2d.Color{0, 0, 0, 0.45}, draw2d.Color{}, 0)

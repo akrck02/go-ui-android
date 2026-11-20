@@ -67,16 +67,16 @@ func main() {
 		},
 		dark: options.Dark || window.SystemPrefersDark(),
 	}
-	material.UseRoboto() // Android's typeface, before the window reads the fonts
+	options.Fonts = material.Roboto() // Android's typeface, for every text
 	if err := window.Run(options, program.build); err != nil {
 		log.Fatal(err)
 	}
 }
 ```
 
-`material.UseRoboto()` draws every text in Roboto, Android's typeface; call it before the window
-opens. `window.Options` and `RegisterFlags` are Go UI's: `-width 412 -height 892` gives the window a
-phone's size on the desktop, and `-capture` a picture.
+`options.Fonts = material.Roboto()` draws every text in Roboto, Android's typeface. `window.Options`
+and `RegisterFlags` are Go UI's: `-width 412 -height 892` gives the window a phone's size on the
+desktop, and `-capture` a picture.
 
 ## A frame with Material
 
@@ -88,7 +88,7 @@ controls its theme, and makes a **`material.Look`**, which draws the pieces:
 func (program *app) build(context *ui.Context) {
 	scheme := material.System(program.dark) // the wallpaper's colours on Android 12 and later
 	if program.ownColour {
-		scheme = material.FromColour(draw2d.Hex("#00796b"), program.dark)
+		scheme = material.FromColour(draw2d.MustHex("#00796b"), program.dark)
 	}
 	context.Theme = scheme.Theme(program.dark)
 	look := material.New(context, scheme)

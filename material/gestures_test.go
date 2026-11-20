@@ -23,19 +23,19 @@ func (screen *screen) clocked() {
 
 // drag puts a finger down, moves it in ten frames, and lifts it when told.
 func (screen *screen) drag(fromX, fromY, byX, byY float64, lift bool) {
-	screen.state.SetTouch(1, fromX, fromY)
-	screen.state.MoveCursor(fromX, fromY)
-	screen.state.SetButton(input.MouseLeft, true)
+	screen.state.Feed().SetTouch(1, fromX, fromY)
+	screen.state.Feed().MoveCursor(fromX, fromY)
+	screen.state.Feed().SetButton(input.MouseLeft, true)
 	screen.frame()
 	for step := 1; step <= 10; step++ {
 		x, y := fromX+byX*float64(step)/10, fromY+byY*float64(step)/10
-		screen.state.SetTouch(1, x, y)
-		screen.state.MoveCursor(x, y)
+		screen.state.Feed().SetTouch(1, x, y)
+		screen.state.Feed().MoveCursor(x, y)
 		screen.frame()
 	}
 	if lift {
-		screen.state.SetButton(input.MouseLeft, false)
-		screen.state.LiftTouch(1)
+		screen.state.Feed().SetButton(input.MouseLeft, false)
+		screen.state.Feed().LiftTouch(1)
 		screen.frame()
 	}
 }
@@ -147,8 +147,8 @@ func TestAMultiBrowseCarouselShrinksItemsTowardsItsEdges(t *testing.T) {
 	for range 15 { // the finger stays still before it lifts, so it is no flick
 		screen.frame()
 	}
-	screen.state.SetButton(input.MouseLeft, false)
-	screen.state.LiftTouch(1)
+	screen.state.Feed().SetButton(input.MouseLeft, false)
+	screen.state.Feed().LiftTouch(1)
 	for range 30 {
 		screen.frame()
 	}

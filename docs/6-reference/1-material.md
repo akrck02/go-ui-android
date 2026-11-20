@@ -39,7 +39,7 @@ The files follow Material's catalogue:
 | Function | |
 |---|---|
 | `func PalettesFromColour(seed draw2d.Color) window.Palettes` | PalettesFromColour makes the five palettes Android makes from a wallpaper, from one colour: the main one of its hue, a quieter one for the containers, a third of the hue turned a sixth of the way round, and two near-greys of its hue for the surfaces. |
-| `func UseRoboto()` | UseRoboto draws every text in Roboto, Android's own typeface (SIL Open Font License, in fonts/). |
+| `func Roboto() overlay.Fonts` | Roboto gives Roboto, Android's own typeface (SIL Open Font License, in fonts/), for the window to measure and draw every text in: options.Fonts = material.Roboto(). |
 
 ### Constants and variables
 
@@ -434,7 +434,7 @@ type Stick struct {
 | Function or method | |
 |---|---|
 | `func (stick *Stick) Follow(touches []input.Touch)` | Follow gives the stick to the finger that came down on it, and points it at that finger; a finger lifted lets it go back to the middle. |
-| `func (stick *Stick) Place(area draw2d.Rect, size float32)` | Place says where a stick of a program's own drawing is, and its side, for Follow. |
+| `func (stick *Stick) Place(area draw2d.Rectangle, size float32)` | Place says where a stick of a program's own drawing is, and its side, for Follow. |
 | `func (stick *Stick) Touching(touch input.Touch) bool` | Touching tells whether a finger is the one holding the stick: a program that turns a view with the other fingers leaves this one out. |
 
 ### TimeNames

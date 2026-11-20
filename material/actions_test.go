@@ -25,7 +25,7 @@ func TestTheFloatingMenuOpensChoosesAndCloses(t *testing.T) {
 		t.Fatalf("chosen %d, open %v: want Picture, and the menu closed", chosen, menu.Open)
 	}
 	screen.tap("create", "toggle")
-	screen.state.PressBack()
+	screen.state.Feed().PressBack()
 	screen.frame()
 	if menu.Open {
 		t.Fatal("the back does not close the menu")

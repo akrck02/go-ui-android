@@ -147,7 +147,7 @@ type TimePicker struct {
 	minute  int
 	minutes bool // the dial shows minutes
 	open    bool
-	dial    draw2d.Rect // where the dial was painted in the last frame
+	dial    draw2d.Rectangle // where the dial was painted in the last frame
 }
 
 // TimePicker asks for a time of day in a dialog, on Material's dial: the hour first, on a ring of
@@ -211,7 +211,7 @@ func (look Look) dial(picker *TimePicker) {
 	layout := ui.Layout{Width: ui.Fixed(dialSize), Height: ui.Fixed(dialSize)}
 	context.Box(ui.Layout{Width: ui.Grow(), AlignX: ui.Center}, func() {
 		touched := context.Clickable("dial", layout, ui.Looks{}, func() {
-			context.Paint(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func(area draw2d.Rect, drawing *draw2d.List) {
+			context.Paint(ui.Layout{Width: ui.Grow(), Height: ui.Grow()}, func(area draw2d.Rectangle, drawing *draw2d.List) {
 				look.paintDial(area, drawing, picker)
 			})
 		})
@@ -227,7 +227,7 @@ func (look Look) dial(picker *TimePicker) {
 }
 
 // choose sets the hour or the minute from where a finger is on the dial.
-func (picker *TimePicker) choose(area draw2d.Rect, x, y float32) {
+func (picker *TimePicker) choose(area draw2d.Rectangle, x, y float32) {
 	middleX, middleY := float64(area.X+area.Width/2), float64(area.Y+area.Height/2)
 	angle := math.Atan2(float64(x)-middleX, middleY-float64(y)) // 0 at twelve o'clock, clockwise
 	if angle < 0 {
@@ -252,7 +252,7 @@ func (picker *TimePicker) choose(area draw2d.Rect, x, y float32) {
 }
 
 // paintDial draws the face, the numbers and the hand.
-func (look Look) paintDial(area draw2d.Rect, drawing *draw2d.List, picker *TimePicker) {
+func (look Look) paintDial(area draw2d.Rectangle, drawing *draw2d.List, picker *TimePicker) {
 	scheme := look.Scheme
 	picker.dial = area
 	drawing.Rectangle(area, area.Width/2, scheme.SurfaceContainerHighest, draw2d.Transparent, 0)

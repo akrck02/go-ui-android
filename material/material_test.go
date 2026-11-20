@@ -40,7 +40,7 @@ func (screen *screen) frame() {
 	screen.context.Begin(screen.state)
 	screen.build(New(screen.context, Baseline(false)))
 	screen.context.End()
-	screen.state.EndFrame()
+	screen.state.Feed().EndFrame()
 }
 
 // tap presses and lifts the pointer in the middle of a piece laid out in the last frame.
@@ -50,10 +50,10 @@ func (screen *screen) tap(path ...string) {
 	if !found {
 		screen.t.Fatalf("nothing called %v was laid out", path)
 	}
-	screen.state.MoveCursor(float64(area.X+area.Width/2), float64(area.Y+area.Height/2))
-	screen.state.SetButton(input.MouseLeft, true)
+	screen.state.Feed().MoveCursor(float64(area.X+area.Width/2), float64(area.Y+area.Height/2))
+	screen.state.Feed().SetButton(input.MouseLeft, true)
 	screen.frame()
-	screen.state.SetButton(input.MouseLeft, false)
+	screen.state.Feed().SetButton(input.MouseLeft, false)
 	screen.frame()
 }
 
